@@ -27,7 +27,6 @@ This repository is structured into several categories for ease of navigation. Ea
 
 - [Basic Functions](./basic-functions)
 - [API Integration](./api-integration)
-- [Data Processing](./data-processing)
 - [Complex Workflows](./complex-workflows)
 - [Custom Solutions](./custom-solutions)
 
