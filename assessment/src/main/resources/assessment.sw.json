@@ -1,0 +1,80 @@
+{
+    "id": "assessment",
+    "version": "1.0",
+    "specVersion": "0.8",
+    "name": "Assessment Workflow example",
+    "description": "An example of assessment workflow",
+    "start": "Hello",
+    "extensions": [
+        {
+            "extensionid": "workflow-output-schema",
+            "outputSchema": "schema/workflow-options.json"
+        }
+    ],
+    "functions": [
+        {
+            "name": "wfCollectionFun",
+            "operation": "rest:get:http://localhost:3005/workflowoptions",
+            "type": "custom"
+        },
+        {
+            "name": "debug",
+            "type": "custom",
+            "operation": "sysout"
+        }
+    ],
+    "states": [
+        {
+            "name": "Hello",
+            "type": "operation",
+            "actionMode": "sequential",
+            "actions": [
+                {
+                    "name": "printAction",
+                    "functionRef": {
+                        "refName": "debug",
+                        "arguments": {
+                            "message": "Hello"
+                        }
+                    }
+                }
+            ],
+            "transition": "Start"
+        },
+        {
+            "name": "Start",
+            "type": "operation",
+            "actions": [
+                {
+                    "name": "getWfCollection",
+                    "functionRef": "wfCollectionFun",
+                    "actionDataFilter": {
+                        "toStateData" : ".wfCollections"
+                     }
+                }
+            ],
+            "transition": "PrintResult"
+        },
+
+          {
+              "name": "PrintResult",
+              "type": "operation",
+              "actionMode": "sequential",
+              "stateDataFilter": {
+                "output": "{wfOptions: .wfCollections}"
+              },
+              "actions": [
+                  {
+                      "name": "printAction",
+                      "functionRef": {
+                          "refName": "debug",
+                          "arguments": {
+                              "message": ".wfOptions"
+                          }
+                      }
+                  }
+              ],
+              "end": true
+          }
+    ]
+}
