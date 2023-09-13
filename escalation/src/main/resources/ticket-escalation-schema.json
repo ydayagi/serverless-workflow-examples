@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "namespace": {
+      "type": "string"
+    },
+    "manager": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "namespace",
+    "manager"
+  ]
+}
