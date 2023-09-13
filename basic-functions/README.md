@@ -7,6 +7,17 @@ This project is a basic example which uses:
 - Sample OpenAPI functions from GitHub using custom REST to be able to get the token from the user.
 - A way to validate data using dataInputstream, so input validation can be done
 
+## Dependencies
+
+- GitHub Token with the following permissions:
+    - Read and Write access to code
+    - Read access to metadata
+- Knative workflow plugin
+
+### Kogito
+
+To avoid issues with openapi, the pom.xml file is updated to use the snapshot
+versions
 
 ## How to run:
 
@@ -41,7 +52,7 @@ Response:
     "message": "Hello World",
     "ref": "refs/heads/newBranch",
     "node_id": "MDM6UmVmOTg2NzA0MzpyZWZzL2hlYWRzL3Rlc3RUZXN0LWpvLW1lcmRh",
-    "url": "https://api.github.com/repos/eloycoto/dotfiles/git/refs/heads/testTest-jo-merda",
+    "url": "https://api.github.com/repos/eloycoto/dotfiles/git/refs/heads/org",
     "object": {
       "sha": "c4c7f4c46fff1ef11cd46ce6782f4bcbecdbf1b9",
       "type": "commit",

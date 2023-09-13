@@ -20,7 +20,6 @@
                 "dotfiles"
             ]
         },
-
         "org": {
             "description": "the org to be used",
             "type": "string",
@@ -29,7 +28,7 @@
             ]
         },
         "base_branch": {
-            "description": "the base_branch to be used",
+            "description": "the base branch to be used to send to move2kube",
             "type": "string",
             "default": "main"
         }
