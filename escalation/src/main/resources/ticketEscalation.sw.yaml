@@ -32,9 +32,9 @@ states:
             fields:
               summary: '"Request For New Namespace: " + .namespace'
               issuetype:
-                id: "10001"
+                id: "$SECRET.jira_issue_type"
               project:
-                key: "TEST"
+                key: "$SECRET.jira_project"
         actionDataFilter:
           toStateData: .jiraIssue
     transition: InitJiraBrowser
@@ -61,16 +61,13 @@ states:
         actionDataFilter:
           toStateData: .jiraIssue
         sleep:
-          before: PT6S
-    transition: GetJiraIssueResult
-  - name: GetJiraIssueResult
+          before: PT5S
+          # This is not working for now, waiting for a fix to https://issues.redhat.com/browse/KOGITO-9811
+          # before: $SECRET.polling_periodicity
+    transition: UpdateTimer
+  - name: UpdateTimer
     type: operation
-    actions:
-      - name: "printAction"
-        functionRef:
-          refName: "logInfo"
-          arguments:
-            message: "\"GetJiraIssueResult is \\(.)\""
+    actions: []
     transition: TicketDone
     stateDataFilter:
       output: ". += { timer: { triggered: .timer.triggered, startTime: .timer.startTime, elapsedSeconds: now() - .timer.startTime }}"
@@ -80,7 +77,7 @@ states:
       - condition: (.jiraIssue.fields.status.statusCategory.key == "done")
         transition:
           nextState: CreateK8sNamespace
-      - condition: (.jiraIssue.fields.status.statusCategory.key != "done" and .timer.triggered == false and .timer.elapsedSeconds > 60)
+      - condition: (.jiraIssue.fields.status.statusCategory.key != "done" and .timer.triggered == false and .timer.elapsedSeconds > ($SECRET.timeout_seconds | tonumber))
         transition:
           nextState: Escalate
     defaultCondition:
@@ -97,12 +94,12 @@ states:
         functionRef:
           refName: sendEmail
           arguments:
-            inbox_id: 2403453
+            inbox_id: $SECRET.mailtrap_inbox_id | tonumber
             to: 
               - email: .manager
                 name: "Escalation Manager"
             from:
-              email: escalation@gmail.com
+              email: $SECRET.sender_email
               name: "Escalation service"
             subject: " \"Escalation ticket \" + .jiraIssue.key "
             html: '"Please manage escalation ticket <a href=\"" + .jiraBrowser + "\">" + .jiraIssue.key + "</a>"'

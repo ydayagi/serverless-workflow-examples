@@ -9,82 +9,35 @@ Email service is using [MailTrap Send email API](https://api-docs.mailtrap.io/do
 * An account to [MailTrap](https://mailtrap.io/home) with a [testing Inbox](https://mailtrap.io/inboxes) and an [API token](https://mailtrap.io/api-tokens)
 
 ## Escalation flow
-
-    Create a new JIRA ticket ->
-    
-    Watch Jira ticket status (Wait for 'done' status) ->
-    
-        if approved before timeout ->
-            Create the namespace in configured Red Hat Openshift Cluster
-    
-        if timeout has reached ->
-            Send email to provided email address
+![SWF VIZ](./src/main/resources/ticketEscalation.svg)
 
 **Note**:
 The value of the `.jiraIssue.fields.status.statusCategory.key` field is the one to be used to identify when the `done` status is reached, all the other
 similar fields are subject to translation to the configured language and cannot be used for a consistent check.
 
-## Hardcoded settings
-Some settings are hardcoded in [ticketEscalation.sw.yaml](./src/main/resources/ticketEscalation.sw.yaml), see below details.
-
-Jira project name is hardcoded in:
-```yaml
-states:
-  - name: CreateJiraIssue
-...
-              project:
-                key: "TEST"
-...
-```
-
-Polling periodicity and escalation timeout are hardcoded in:
-```yaml
-states:
-...
-  - name: GetJiraIssue
-...
-        sleep:
-          before: PT6S
-...
-  - name: TicketDone
-    type: switch
-    dataConditions:
-      - condition: (.jiraIssue.fields.status.statusCategory.key == "done")
-        transition:
-          nextState: CreateK8sNamespace
-      - condition: (.jiraIssue.fields.status.statusCategory.key != "done" and .timer.triggered == false and .timer.elapsedSeconds > 60)
-        transition:
-          nextState: Escalate
-...
-```
-
-The sender email and inbox ID are hardcoded in:
-```yaml
-states:
-...
-  - name: Escalate
-...
-      - name: "sendEmail"
-...
-          arguments:
-            inbox_id: 2403453
-...
-            from:
-              email: escalation@gmail.com
-```
-
-## How to run
+## Application configuration
 Application properties can be initialized from environment variables before running the application:
 
+| Environment variable  | Description | Mandatory | Default value |
+|-----------------------|-------------|-----------|---------------|
+| `JIRA_URL`            | The Jira server URL | ✅ | |
+| `JIRA_USERNAME`       | The Jira server username | ✅ | |
+| `JIRA_API_TOKEN`      | The Jira API Token | ✅ | |
+| `JIRA_PROJECT`        | The key of the Jira project where the escalation issue is created | ❌ | `TEST` |
+| `JIRA_ISSUE_TYPE`     | The ID of the Jira issue type to be created | ✅ | |
+| `MAILTRAP_URL`        | The MailTrail API Token| ❌ | `https://sandbox.api.mailtrap.io` |
+| `MAILTRAP_API_TOKEN`  | The MailTrail API Token| ✅ | |
+| `MAILTRAP_INBOX_ID`   | The ID of the MailTrap inbox | ✅ | |
+| `MAILTRAP_SENDER_EMAIL` | The email address of the mail sender | ❌ | `escalation@company.com` |
+| `OCP_API_SERVER_URL`  | The OpensShift API Server URL | ✅ | |
+| `OCP_API_SERVER_TOKEN`| The OpensShift API Server Token | ✅ | |
+| `ESCALATION_TIMEOUT_SECONDS` | The number of seconds to wait before triggering the escalation request, after the issue has been created | ❌ | `60` |
+| `POLLING_PERIODICITY`(1) | The polling periodicity of the issue state checker, according to ISO 8601 duration format | ❌ | `PT6S` |
+
+(1) This is still hardcoded as `PT5S` while waiting for a fix to [KOGITO-9811](https://issues.redhat.com/browse/KOGITO-9811)
+## How to run
+
 ```bash
-export JIRA_URL=_YOUR_JIRA_URL_
-export JIRA_USERNAME=_YOUR_JIRA_USERNAME_
-export JIRA_PASSWORD=_YOUR_JIRA_TOKEN_
-
-export MAILTRAPIO_TOKEN=_YOUR_MAINTRAPIO_API_TOKEN_
-
-export OCP_API_SERVER_URL=_YOUR_OPENSHIFT_API_SERVER_URL_
-export OCP_API_SERVER_TOKEN=_YOUR_OPENSHIFT_API_TOKEN_
 mvn clean quarkus:dev
 ```
 
