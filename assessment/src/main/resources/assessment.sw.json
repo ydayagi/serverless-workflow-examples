@@ -4,7 +4,8 @@
     "specVersion": "0.8",
     "name": "Assessment Workflow example",
     "description": "An example of assessment workflow",
-    "start": "Hello",
+    "start": "Assessment",
+    "dataInputSchema" : "schema/input-schema.json",
     "extensions": [
         {
             "extensionid": "workflow-output-schema",
@@ -14,7 +15,7 @@
     "functions": [
         {
             "name": "wfCollectionFun",
-            "operation": "rest:get:http://localhost:3005/workflowoptions",
+            "operation": "rest:get:http://localhost:3005/workflowoptions?repo={repositoryUrl}",
             "type": "custom"
         },
         {
@@ -25,29 +26,17 @@
     ],
     "states": [
         {
-            "name": "Hello",
-            "type": "operation",
-            "actionMode": "sequential",
-            "actions": [
-                {
-                    "name": "printAction",
-                    "functionRef": {
-                        "refName": "debug",
-                        "arguments": {
-                            "message": "Hello"
-                        }
-                    }
-                }
-            ],
-            "transition": "Start"
-        },
-        {
-            "name": "Start",
+            "name": "Assessment",
             "type": "operation",
             "actions": [
                 {
                     "name": "getWfCollection",
-                    "functionRef": "wfCollectionFun",
+                    "functionRef": {
+                        "refName": "wfCollectionFun",
+                        "arguments": {
+                            "repositoryUrl": ".repositoryUrl"
+                        }
+                    },
                     "actionDataFilter": {
                         "toStateData" : ".wfCollections"
                      }
@@ -55,26 +44,24 @@
             ],
             "transition": "PrintResult"
         },
-
-          {
-              "name": "PrintResult",
-              "type": "operation",
-              "actionMode": "sequential",
-              "stateDataFilter": {
-                "output": "{wfOptions: .wfCollections}"
-              },
-              "actions": [
-                  {
-                      "name": "printAction",
-                      "functionRef": {
-                          "refName": "debug",
-                          "arguments": {
-                              "message": ".wfOptions"
-                          }
-                      }
-                  }
-              ],
-              "end": true
-          }
+        {
+            "name": "PrintResult",
+            "type": "operation",
+            "stateDataFilter": {
+            "output": "{wfOptions: .wfCollections}"
+            },
+            "actions": [
+                {
+                    "name": "printAction",
+                    "functionRef": {
+                        "refName": "debug",
+                        "arguments": {
+                            "message": ".wfOptions"
+                        }
+                    }
+                }
+            ],
+            "end": true
+        }
     ]
 }
