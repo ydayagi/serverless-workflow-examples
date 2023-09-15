@@ -26,12 +26,12 @@
         <scope>import</scope>
       </dependency>
       <dependency>
-        <groupId>${quarkus.platform.group-id}</groupId>
-        <artifactId>quarkus-kogito-bom</artifactId>
-        <version>${quarkus.platform.version}</version>
+        <groupId>org.kie.kogito</groupId>
+        <artifactId>kogito-bom</artifactId>
+        <version>1.44.1.Final</version>
         <type>pom</type>
         <scope>import</scope>
-      </dependency>
+     </dependency>
     </dependencies>
   </dependencyManagement>
   <dependencies>

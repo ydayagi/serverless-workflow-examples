@@ -1,0 +1,11 @@
+id: move2Kube
+version: '1.0'
+specVersion: 0.8.0
+name: Move2Kube
+start: Move2Kube
+states:
+    - name: Move2Kube
+      type: inject
+      data:
+          message: Move2Kube...
+      end: true

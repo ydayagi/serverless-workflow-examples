@@ -1,0 +1,11 @@
+id: ocpOnboarding
+version: '1.0'
+specVersion: 0.8.0
+name: Ocp Onboarding
+start: OcpOnboarding
+states:
+    - name: OcpOnboarding
+      type: inject
+      data:
+          message: Ocp Onboarding...
+      end: true

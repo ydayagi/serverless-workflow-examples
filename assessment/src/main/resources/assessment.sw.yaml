@@ -1,0 +1,38 @@
+id: assessment
+version: 1.0
+specVersion: 0.8
+name: Assessment workflow example
+description: An example of assessment workflow
+start: AssessRepository
+dataInputSchema: schema/input-schema.json
+extensions:
+  - extensionid: workflow-output-schema
+    outputSchema: schema/workflow-options.json
+functions:
+  - name: assessRepositoryFunc
+    operation: "rest:post:/infrastructures?repo={repositoryUrl}"
+    type: custom
+  - name: getInfrastructionOptionsFunc
+    operation: "sysout"
+    type: custom
+states:
+  - name: AssessRepository
+    type: operation
+    actions:
+      - functionRef:
+          refName: assessRepositoryFunc
+          arguments:
+            repositoryUrl: ".repositoryUrl"
+        actionDataFilter:
+          toStateData: ".wfCollections"
+    transition: GetInfrastructionOptions
+  - name: GetInfrastructionOptions
+    type: operation
+    stateDataFilter:
+      output: '{wfOptions: .wfCollections}'
+    actions:
+      - functionRef:
+          refName: getInfrastructionOptionsFunc
+          arguments:
+            message: ".wfOptions"
+    end: true
