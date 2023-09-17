@@ -1,13 +1,13 @@
 specVersion: "0.8"
-id: move2kube
-name: Move2Kube
+id: analysis
+name: Analysis
 annotations:
   - "workflow-type/infrastructure"
 version: 0.0.1
-start: Move2Kube
+start: Analysis
 states:
-    - name: Move2Kube
+    - name: Analysis
       type: inject
       data:
-          message: Move2Kube...
+          message: Analysis...
       end: true

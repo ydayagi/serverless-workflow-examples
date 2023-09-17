@@ -1,38 +1,37 @@
+specVersion: "0.8"
 id: assessment
-version: 1.0
-specVersion: 0.8
-name: Assessment workflow example
-description: An example of assessment workflow
+name: Assessment
+annotations:
+  - "workflow-type/assessment"
+version: 0.0.1
 start: AssessRepository
 dataInputSchema: schema/input-schema.json
 extensions:
   - extensionid: workflow-output-schema
-    outputSchema: schema/workflow-options.json
+    outputSchema: schema/workflow-options-schema.json
 functions:
-  - name: assessRepositoryFunc
-    operation: "rest:post:/infrastructures?repo={repositoryUrl}"
+  - name: execute
     type: custom
-  - name: getInfrastructionOptionsFunc
-    operation: "sysout"
+    operation: "service:java:com.redhat.parodos.workflow.assessment.BasicAssessment::execute"
+  - name: logOuput
     type: custom
+    operation: "sysout:INFO"
 states:
   - name: AssessRepository
     type: operation
+    stateDataFilter:
+      output: '{workflowOptions: .result}'
     actions:
-      - functionRef:
-          refName: assessRepositoryFunc
+      - name: executeAction
+        functionRef:
+          refName: execute
           arguments:
             repositoryUrl: ".repositoryUrl"
         actionDataFilter:
-          toStateData: ".wfCollections"
-    transition: GetInfrastructionOptions
-  - name: GetInfrastructionOptions
-    type: operation
-    stateDataFilter:
-      output: '{wfOptions: .wfCollections}'
-    actions:
-      - functionRef:
-          refName: getInfrastructionOptionsFunc
+          toStateData: ".result"
+      - name: printAction
+        functionRef:
+          refName: logOuput
           arguments:
-            message: ".wfOptions"
+            message: ".workflowOptions"
     end: true
