@@ -1,10 +1,10 @@
 # Basic assessment workflow
-A basic assessment workflow that evaluates a repository and returns infrastructure workflow options with their id and name.
+A basic assessment workflow that assess an input (e.g. repository URL) and returns a list of suitable infrastructure workflows aka workflow options identified by an id and name.
 
-For simplicity's sake, the workflow assesses whether the repository URL contains the keyword `java` or not to recommend available infrastructure workflows.
+For simplicity's sake, this assessment workflow example checks whether the repository URL contains the keyword `java` or not for the workflow options recommendation.
 
 **Note**:
-This example assumed that the workflow options returned upon assessment are available and known by the assessment task developer.
+This example assumes that the workflow options returned upon assessment are available.
 The list of workflows provided into `resources/infrastructures` are purely illustrative.
 
 ## Assessment flow
