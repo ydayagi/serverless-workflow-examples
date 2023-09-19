@@ -8,7 +8,7 @@ start: AssessRepository
 dataInputSchema: schema/input-schema.json
 extensions:
   - extensionid: workflow-output-schema
-    outputSchema: schema/workflow-options-schema.json
+    outputSchema: schema/workflow-options-output-schema.json
 functions:
   - name: execute
     type: custom
