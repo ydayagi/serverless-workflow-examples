@@ -10,15 +10,23 @@ Deploy SonataFlow services and workflows
 minikube start --cpus 4 --memory 10240 --addons registry --addons metrics-server --insecure-registry "10.0.0.0/24" --insecure-registry "localhost:5000"
 ```
 
-## Deploy PostgreSQL, Data Index, Jobs Service & Sample Work Flow
+## Deploy PostgreSQL, Data Index, Jobs Service
 
 ```shell
 kustomize build kustomize/base/ | kubectl apply -f -
 ```
-
-Deploy sample workflow:
+You may have the following error:
 ```shell
-kustomize build workflows/sonataflow-greeting/ | kubectl apply -f -
+error: unable to recognize "STDIN": no matches for kind "SonataFlowPlatform" in version "sonataflow.org/v1alpha08"
+```
+In that case, simply re-run 
+```shell
+kustomize build kustomize/base/ | kubectl apply -f -
+```
+
+## Deploy sample workflow
+```shell
+kustomize build kustomize/workflows/sonataflow-greeting/ | kubectl apply -f -
 ```
 
 ## Testing the Sample Work Flow
