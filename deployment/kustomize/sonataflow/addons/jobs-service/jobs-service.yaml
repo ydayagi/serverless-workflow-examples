@@ -21,9 +21,9 @@ spec:
         - containerPort: 8080
         env:
         - name: QUARKUS_DATASOURCE_REACTIVE_URL
-          value: "postgresql://postgres-db-service.postgres:5432/sonataflow?currentSchema=jobs-service"
+          value: "postgresql://postgres-db-service.postgres.svc.cluster.local:5432/sonataflow?search_path=jobs-service"
         - name: QUARKUS_DATASOURCE_JDBC_URL
-          value: "jdbc:postgresql://postgres-db-service.postgres:5432/sonataflow?currentSchema=jobs-service"
+          value: "jdbc:postgresql://postgres-db-service.postgres.svc.cluster.local:5432/sonataflow?currentSchema=jobs-service"
         - name: QUARKUS_DATASOURCE_USERNAME
           valueFrom:
             secretKeyRef:

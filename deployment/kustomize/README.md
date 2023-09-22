@@ -13,7 +13,7 @@ minikube start --cpus 4 --memory 10240 --addons registry --addons metrics-server
 ## Deploy PostgreSQL, Data Index, Jobs Service & Sample Work Flow
 
 ```shell
-kustomize build base/ | kubectl apply -f -
+kustomize build kustomize/base/ | kubectl apply -f -
 ```
 
 Deploy sample workflow:
