@@ -46,6 +46,9 @@ spec:
           value: update
         - name: KOGITO_DATA_INDEX_PROPS
           value: "-Dquarkus.hibernate-orm.database.generation=update -Dquarkus.log.category.\"org.kie.kogito.index\".min-level=DEBUG -Dquarkus.log.category.\"org.kie.kogito.index\".level=DEBUG"
+        volumeMounts:
+        - name: application-config
+          mountPath: "/home/kogito/config"
         livenessProbe:
           failureThreshold: 3
           httpGet:
@@ -66,6 +69,10 @@ spec:
           periodSeconds: 30
           successThreshold: 1
           timeoutSeconds: 10
+      volumes:
+      - name: application-config
+        configMap:
+          name: data-index-properties
       initContainers:
       - name: init-postgres
         image: busybox:1.36

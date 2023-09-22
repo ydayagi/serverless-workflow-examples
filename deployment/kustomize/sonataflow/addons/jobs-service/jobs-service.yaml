@@ -48,6 +48,9 @@ spec:
           value: "false"
         - name: QUARKUS_LOG_LEVEL
           value: INFO
+        volumeMounts:
+        - name: application-config
+          mountPath: "/home/kogito/config"
         livenessProbe:
           failureThreshold: 3
           httpGet:
