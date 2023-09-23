@@ -17,13 +17,16 @@ spec:
       containers:
       - name: jobs-service
         image: quay.io/kiegroup/kogito-jobs-service-postgresql:1.44
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "500m"
+          limits:
+            memory: "512Mi"
+            cpu: "1000m"
         ports:
         - containerPort: 8080
         env:
-        - name: QUARKUS_DATASOURCE_REACTIVE_URL
-          value: "postgresql://postgres-db-service.postgres.svc.cluster.local:5432/sonataflow?search_path=jobs-service"
-        - name: QUARKUS_DATASOURCE_JDBC_URL
-          value: "jdbc:postgresql://postgres-db-service.postgres.svc.cluster.local:5432/sonataflow?currentSchema=jobs-service"
         - name: QUARKUS_DATASOURCE_USERNAME
           valueFrom:
             secretKeyRef:
@@ -34,20 +37,6 @@ spec:
             secretKeyRef:
               name: postgres-secrets
               key: POSTGRES_PASSWORD
-        - name: JOBS_SERVICE_PERSISTENCE
-          value: postgresql
-        - name: QUARKUS_DATASOURCE_DB_KIND
-          value: postgresql
-        - name: KOGITO_JOBS_SERVICE_KNATIVE_EVENTS
-          value: "false"
-        - name: KOGITO_JOBS_SERVICE_JOB_STATUS_CHANGE_EVENTS
-          value: "true"
-        - name: MP_MESSAGING_OUTGOING_KOGITO_JOB_SERVICE_JOB_STATUS_EVENTS_HTTP_URL
-          value: http://data-index-service/jobs
-        - name: SCRIPT_DEBUG
-          value: "false"
-        - name: QUARKUS_LOG_LEVEL
-          value: INFO
         volumeMounts:
         - name: application-config
           mountPath: "/home/kogito/config"

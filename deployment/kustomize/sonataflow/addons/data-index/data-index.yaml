@@ -15,11 +15,20 @@ spec:
       containers:
       - name: data-index
         image: quay.io/kiegroup/kogito-data-index-postgresql:1.44.1
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "500m"
+          limits:
+            memory: "512Mi"
+            cpu: "1000m"
         ports:
         - containerPort: 8080
         env:
-        - name: QUARKUS_DATASOURCE_JDBC_URL
-          value: "jdbc:postgresql://postgres-db-service.postgres:5432/sonataflow?currentSchema=data-index-service"
+        - name: QUARKUS_PROFILE
+          value: http-events-support
+        - name: KOGITO_DATA_INDEX_QUARKUS_PROFILE
+          value: http-events-support
         - name: QUARKUS_DATASOURCE_USERNAME
           valueFrom:
             secretKeyRef:
@@ -30,22 +39,6 @@ spec:
             secretKeyRef:
               name: postgres-secrets
               key: POSTGRES_PASSWORD
-        - name: QUARKUS_HTTP_CORS
-          value: "true"
-        - name: QUARKUS_HTTP_CORS_ORIGINS
-          value: "/.*/"
-        - name: QUARKUS_PROFILE
-          value: http-events-support
-        - name: KOGITO_DATA_INDEX_QUARKUS_PROFILE
-          value: http-events-support
-        - name: QUARKUS_FLYWAY_MIGRATE_AT_START
-          value: "true"
-        - name: QUARKUS_FLYWAY_TABLE
-          value: data-index-flyway
-        - name: QUARKUS_HIBERNATE_ORM_DATABASE_GENERATION
-          value: update
-        - name: KOGITO_DATA_INDEX_PROPS
-          value: "-Dquarkus.hibernate-orm.database.generation=update -Dquarkus.log.category.\"org.kie.kogito.index\".min-level=DEBUG -Dquarkus.log.category.\"org.kie.kogito.index\".level=DEBUG"
         volumeMounts:
         - name: application-config
           mountPath: "/home/kogito/config"
