@@ -1,0 +1,87 @@
+apiVersion: sonataflow.org/v1alpha08
+kind: SonataFlow
+metadata:
+  name: event-timeout
+  annotations:
+    sonataflow.org/description: Event timeout example on k8s!
+    sonataflow.org/version: 0.0.1
+    sonataflow.org/profile: prod
+spec:
+  flow:
+    start: PrintStartMessage
+    events:
+      - name: event1
+        source: ''
+        type: event1_event_type
+      - name: event2
+        source: ''
+        type: event2_event_type
+    functions:
+      - name: systemOut
+        type: custom
+        operation: sysout
+    timeouts:
+      eventTimeout: PT30S
+    states:
+      - name: PrintStartMessage
+        type: operation
+        actions:
+          - name: printSystemOut
+            functionRef:
+              refName: systemOut
+              arguments:
+                message: "${\"event-state-timeouts: \" + $WORKFLOW.instanceId + \" has started.\"}"
+        transition: WaitForEvent1
+      - name: WaitForEvent1
+        type: event
+        onEvents:
+          - eventRefs: [ event1 ]
+            eventDataFilter:
+              data: "${ \"The event1 was received.\" }"
+              toStateData: "${ .exitMessage1 }"
+            actions:
+              - name: printAfterEvent1
+                functionRef:
+                  refName: systemOut
+                  arguments:
+                    message: "${\"event-state-timeouts: \" + $WORKFLOW.instanceId + \" executing actions for event1.\"}"
+
+        transition: WaitForEvent2
+      - name: WaitForEvent2
+        type: event
+        onEvents:
+          - eventRefs: [ event2 ]
+            eventDataFilter:
+              data: "${ \"The event2 was received.\" }"
+              toStateData: "${ .exitMessage2 }"
+            actions:
+              - name: printAfterEvent2
+                functionRef:
+                  refName: systemOut
+                  arguments:
+                    message: "${\"event-state-timeouts: \" + $WORKFLOW.instanceId + \" executing actions for event2.\"}"
+        transition: PrintExitMessage
+      - name: PrintExitMessage
+        type: operation
+        actions:
+          - name: printSystemOut
+            functionRef:
+              refName: systemOut
+              arguments:
+                message: "${\"event-state-timeouts: \" + $WORKFLOW.instanceId + \" has finalized. \" + if .exitMessage1 != null then .exitMessage1 else \"The event state did not receive event1, and the timeout has overdue\" end + \" -- \" + if .exitMessage2 != null then .exitMessage2 else \"The event state did not receive event2, and the timeout has overdue\" end }"
+        end: true
+
+# kind: Route
+# apiVersion: route.openshift.io/v1
+# metadata:
+#   name: greeting
+#   labels:
+#     app: greeting
+# spec:
+#   host: greeting-arhkp-kustomize.apps.rhdh-dev01.kni.syseng.devcluster.openshift.com
+#   to:
+#     kind: Service
+#     name: greeting
+#   port:
+#     targetPort: 8080
+---
