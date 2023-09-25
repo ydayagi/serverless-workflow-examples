@@ -10,6 +10,17 @@ data:
     quarkus.datasource.username=sonataflow
     quarkus.datasource.password=sonataflow
     kogito.jobs-service.url=${kubernetes:services.v1/jobs-service-service}
+    # Job Service kogito-addons-quarkus-jobs-knative-eventing configuration
+    mp.messaging.outgoing.kogito-job-service-job-request-events.connector=quarkus-http
+    mp.messaging.outgoing.kogito-job-service-job-request-events.url=http://jobs-service-service/v2/jobs/events
+    # Data Index configuration
+    mp.messaging.outgoing.kogito-processinstances-events.url=http://data-index-service/processes
+    mp.messaging.outgoing.kogito-usertaskinstances-events.url=http://data-index-service/tasks
+    mp.messaging.outgoing.kogito-variables-events.url=http://data-index-service/variables
+    
+    # Skip user tasks and variables events sending.
+    kogito.events.usertasks.enabled=false
+    kogito.events.variables.enabled=false
 kind: ConfigMap
 metadata:
   labels:
