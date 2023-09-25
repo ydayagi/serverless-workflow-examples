@@ -9,6 +9,7 @@ data:
     quarkus.datasource.jdbc.url=jdbc:postgresql://postgres-db-service.postgres:5432/sonataflow
     quarkus.datasource.username=sonataflow
     quarkus.datasource.password=sonataflow
+    kogito.jobs-service.url=${kubernetes:services.v1/jobs-service-service}
 kind: ConfigMap
 metadata:
   labels:
