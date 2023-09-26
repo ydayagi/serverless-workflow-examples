@@ -44,6 +44,8 @@ spec:
         volumeMounts:
         - name: postgres-storage
           mountPath: dbfiles
+        - name: init-scripts
+          mountPath: "/docker-entrypoint-initdb.d"
         readinessProbe:
           exec:
             command: ["pg_isready"]
@@ -70,6 +72,9 @@ spec:
       - name: postgres-storage
         persistentVolumeClaim:
           claimName: postgres-pvc
+      - name: init-scripts
+        configMap:
+          name: sonataflow-runtime-ddl
 ---
 kind: Service
 apiVersion: v1

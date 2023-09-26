@@ -24,3 +24,12 @@ images:
   newTag: "1.44.1"
 - name: postgres
   newTag: "15"
+
+generatorOptions:
+  disableNameSuffixHash: true
+
+configMapGenerator:
+  - name: sonataflow-runtime-ddl
+    namespace: postgres
+    files:
+      - V1.35.0__create_runtime_PostgreSQL.sql

@@ -25,6 +25,9 @@ kustomize build kustomize/base/ | kubectl apply -f -
 ```
 
 ### Configure DB
+The PostgreSQL database is automatically running the initialization script [V1.35.0__create_runtime_PostgreSQL.sql](base/V1.35.0__create_runtime_PostgreSQL.sql) in order to setup the schemas needed to enable workflow persistence.
+
+You can manually execute this by following the below steps (Optional): 
 1. Redirect the PostgreSQL service to your local host
 ```bash
 kubectl port-forward --namespace postgres svc/postgres-db-service 5432:5432 &
