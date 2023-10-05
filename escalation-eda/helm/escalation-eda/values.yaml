@@ -1,0 +1,5 @@
+namespace: escalation
+jiralistener:
+  image: quay.io/dmartino/jira-listener-jvm
+eventdisplay:
+  enabled: true

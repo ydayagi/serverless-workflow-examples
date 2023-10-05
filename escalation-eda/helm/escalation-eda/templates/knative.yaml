@@ -1,0 +1,39 @@
+---
+apiVersion: eventing.knative.dev/v1
+kind: Broker
+metadata:
+  name: default
+  namespace: {{ .Values.namespace }}
+---
+{{- if .Values.eventdisplay.enabled }}
+apiVersion: eventing.knative.dev/v1
+kind: Trigger
+metadata:
+  name: event-display-trigger
+  namespace: {{ .Values.namespace }}
+spec:
+  broker: default
+  subscriber:
+    ref:
+      apiVersion: serving.knative.dev/v1
+      kind: Service
+      name: event-display
+{{- end }}
+---
+apiVersion: sources.knative.dev/v1
+kind: SinkBinding
+metadata:
+  name: listener-binding
+  namespace: {{ .Values.namespace }}
+spec:
+  subject:
+    apiVersion: serving.knative.dev/v1
+    kind: Service
+    name: jira-listener
+  sink:
+    ref:
+      apiVersion: eventing.knative.dev/v1
+      kind: Broker
+      name: default
+      namespace: {{ .Values.namespace }}
+

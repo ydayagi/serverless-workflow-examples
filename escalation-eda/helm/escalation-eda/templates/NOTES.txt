@@ -1,0 +1,27 @@
+{{ .Release.Name }} release of chart {{ .Chart.Name }} installed in namespace {{ .Values.namespace }}
+
+Run the following to verify the release status and export the configuration:
+  helm status {{ .Release.Name }}
+  helm get all {{ .Release.Name }}
+
+{{/* Empty line */}}
+Verify the status of the Knative eventing resources:
+  oc get -n {{ .Values.namespace }} trigger,broker,sinkbinding
+
+Run the following to wait until the services are ready:
+  oc wait -n {{ .Values.namespace }} ksvc/jira-listener --for=condition=Ready --timeout=5m
+{{- if .Values.eventdisplay.enabled }}
+  oc wait -n {{ .Values.namespace }} ksvc/event-display --for=condition=Ready --timeout=5m
+{{- end }}
+
+The URL to be used in the Jira webhook is:
+  JIRA_LISTENER_URL=$(oc get route -n knative-serving-ingress jira-listener -oyaml | yq '.status.ingress[0].host')
+  echo "https://${JIRA_LISTENER_URL//\"/}/webhook/jira"
+
+Log the applications using:
+  oc logs -f -l app=jira-listener -c user-container -n escalation
+{{- if .Values.eventdisplay.enabled }}
+  oc logs -f -l app=event-display -c user-container -n {{ .Values.namespace }}
+{{- end }}
+
+

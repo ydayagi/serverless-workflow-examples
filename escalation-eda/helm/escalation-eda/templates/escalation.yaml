@@ -1,0 +1,68 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ .Values.namespace }}
+---
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: jira-listener
+  namespace: {{ .Values.namespace }}
+  annotations:
+    serving.knative.openshift.io/disableRoute: "true"
+spec:
+  template:
+    metadata:
+      labels:
+        app: jira-listener
+      annotations:
+        autoscaling.knative.dev/min-scale: "1"
+    spec:
+      containers:
+        - image: {{ .Values.jiralistener.image }}
+          imagePullPolicy: Always
+          name: user-container
+          resources:
+            limits:
+              memory: 200Mi
+---
+{{- if .Values.eventdisplay.enabled }}
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: event-display
+  namespace: {{ .Values.namespace }}
+spec:
+  template:
+    metadata:
+      labels:
+        app: event-display
+      annotations:
+        autoscaling.knative.dev/min-scale: "1"
+    spec:
+      containers:
+        - image: gcr.io/knative-releases/knative.dev/eventing/cmd/event_display
+          name: user-container
+          resources:
+            limits:
+              memory: 200Mi
+{{- end }}
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  annotations:
+    haproxy.router.openshift.io/timeout: 600s 
+    kubernetes.io/tls-acme: "true"
+  name: jira-listener 
+  namespace: knative-serving-ingress 
+spec:
+  host: jira-listener-{{ .Values.namespace }}.apps.sssc-cl01.appeng.rhecoeng.com
+  port:
+    targetPort: http2
+  to:
+    kind: Service
+    name: kourier
+    weight: 100
+  wildcardPolicy: None
+
