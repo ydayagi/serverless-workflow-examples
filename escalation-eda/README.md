@@ -91,7 +91,7 @@ Helm properties:
 | Property | Description | Default |
 |----------|-------------|---------|
 | `namespace` | Target namespace | `escalation` |
-| `jiralistener.image` | Container image of the `Jira listener` application | `quay.io/dmartino/jira-listener-jvm` |
+| `jiralistener.image` | Container image of the `Jira listener` application | `quay.io/orchestrator/jira-listener-jvm` |
 | `eventdisplay.enabled` | Flag to install the optional `event-display` application for debugging purposes | `true` |
 
 The following commands install, upgrade and delete the [escalation-eda](./helm/escalation-eda/Chart.yaml) Helm chart in the `default` namespace

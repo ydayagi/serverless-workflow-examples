@@ -29,7 +29,7 @@ spec:
   subject:
     apiVersion: serving.knative.dev/v1
     kind: Service
-    name: jira-listener
+    name: {{ .Values.jiralistener.name }}
   sink:
     ref:
       apiVersion: eventing.knative.dev/v1

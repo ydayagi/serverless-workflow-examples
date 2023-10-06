@@ -6,7 +6,7 @@ metadata:
 apiVersion: serving.knative.dev/v1
 kind: Service
 metadata:
-  name: jira-listener
+  name: {{ .Values.jiralistener.name }}
   namespace: {{ .Values.namespace }}
   annotations:
     serving.knative.openshift.io/disableRoute: "true"
@@ -14,7 +14,7 @@ spec:
   template:
     metadata:
       labels:
-        app: jira-listener
+        app: {{ .Values.jiralistener.name }}
       annotations:
         autoscaling.knative.dev/min-scale: "1"
     spec:
@@ -54,10 +54,10 @@ metadata:
   annotations:
     haproxy.router.openshift.io/timeout: 600s 
     kubernetes.io/tls-acme: "true"
-  name: jira-listener 
+  name: {{ .Values.jiralistener.name }} 
   namespace: knative-serving-ingress 
 spec:
-  host: jira-listener-{{ .Values.namespace }}.apps.sssc-cl01.appeng.rhecoeng.com
+  host: {{ .Values.jiralistener.name }}-{{ .Values.namespace }}.apps.sssc-cl01.appeng.rhecoeng.com
   port:
     targetPort: http2
   to:

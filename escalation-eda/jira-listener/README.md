@@ -38,7 +38,7 @@ and also limit the risk of parsing failures due to unexpected changes in the pay
 Parsing was derived from the original example in [this Backstage repo](https://github.com/tiagodolphine/backstage/blob/eedfe494dd313a3ad6a484c0596ba12d6199c1a8/plugins/swf-backend/src/service/JiraService.ts#L66C19-L66C40)
 
 ## Building and publishing the image
-The application runs from a containerized image already avaliable at `quay.io/dmartino/jira-listener-jvm`.
+The application runs from a containerized image already avaliable at `quay.io/orchestrator/jira-listener-jvm`.
 You can build and publish your own image using:
 ```bash
 mvn clean package
@@ -77,7 +77,8 @@ Then, we use the [Let's Encrypt](https://letsencrypt.org/) service to leverage i
 The following procedure is not integrated with the provided Helm charts and comes from this [article](https://developer.ibm.com/tutorials/secure-red-hat-openshift-routes-with-lets-encrypt/):
 ```bash
 oc new-project acme-operator
-oc create -fhttps://raw.githubusercontent.com/tnozicka/openshift-acme/master/deploy/cluster-wide/{clusterrole,serviceaccount,issuer-letsencrypt-live,deployment}.yaml
+oc create -n acme-operator \
+  -fhttps://raw.githubusercontent.com/tnozicka/openshift-acme/master/deploy/cluster-wide/{clusterrole,serviceaccount,issuer-letsencrypt-live,deployment}.yaml
 oc create clusterrolebinding openshift-acme --clusterrole=openshift-acme --serviceaccount="$( oc project -q ):openshift-acme" --dry-run -o yaml | oc create -f -
 ```
 
@@ -92,6 +93,14 @@ metadata:
   name: jira-listener 
   namespace: knative-serving-ingress 
 ...
+```
+
+Run the following to uninstall the Let's Encrypt operator:
+```bash
+oc delete clusterrolebinding openshift-acme
+oc delete -n acme-operator \
+  -fhttps://raw.githubusercontent.com/tnozicka/openshift-acme/master/deploy/cluster-wide/{clusterrole,serviceaccount,issuer-letsencrypt-live,deployment}.yaml
+oc delete project acme-operator
 ```
 
 ## Testing with curl
@@ -109,6 +118,17 @@ Then, use one of the sample json documents in [src/test/resources](./src/test/re
 ```bash
 curl -v -X POST -d @./src/test/resources/valid.json -H "Content-Type: application/json" -k  "${JIRA_WEBHOOK_URL}"
 curl -v -X POST -d @./src/test/resources/invalid.json -H "Content-Type: application/json" -k  "${JIRA_WEBHOOK_URL}"
+```
+
+### Troubleshooting the Duplicate Certificate Limit error
+`Let's Encrypt` allows 5 certificate requests per week for each unique set of hostnames requested for the certificate.
+
+The issue is detected when the `jira-listener` service is not receiving any webhook event, and the above `JIRA_WEBHOOK_URL` uses an `http`
+protocol instead of the expected `https`.
+
+To overcome this issue, you can define a different name for the `jira-listener` service by setting the property `jiralistener.name` as in:
+```bash
+helm upgrade -n default escalation-eda helm/escalation-eda --set jiralistener.name=my-jira-listener --debug 
 ```
 
 ## Configuring the Jira server
