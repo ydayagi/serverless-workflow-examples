@@ -2,7 +2,7 @@
 apiVersion: eventing.knative.dev/v1
 kind: Broker
 metadata:
-  name: default
+  name: ticket-events
   namespace: {{ .Values.namespace }}
 ---
 {{- if .Values.eventdisplay.enabled }}
@@ -12,7 +12,7 @@ metadata:
   name: event-display-trigger
   namespace: {{ .Values.namespace }}
 spec:
-  broker: default
+  broker: ticket-events
   subscriber:
     ref:
       apiVersion: serving.knative.dev/v1
@@ -23,7 +23,7 @@ spec:
 apiVersion: sources.knative.dev/v1
 kind: SinkBinding
 metadata:
-  name: listener-binding
+  name: ticket-source
   namespace: {{ .Values.namespace }}
 spec:
   subject:
