@@ -1,15 +1,19 @@
+{{- if .Values.namespace.create }}
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: {{ .Values.namespace }}
+  name: {{ .Values.namespace.name }}
+{{- end }}
 ---
 apiVersion: serving.knative.dev/v1
 kind: Service
 metadata:
   name: {{ .Values.jiralistener.name }}
-  namespace: {{ .Values.namespace }}
+  namespace: {{ .Values.namespace.name }}
+{{- if .Values.letsEncryptCertificate }}
   annotations:
     serving.knative.openshift.io/disableRoute: "true"
+{{- end }}
 spec:
   template:
     metadata:
@@ -31,7 +35,7 @@ apiVersion: serving.knative.dev/v1
 kind: Service
 metadata:
   name: event-display
-  namespace: {{ .Values.namespace }}
+  namespace: {{ .Values.namespace.name }}
 spec:
   template:
     metadata:
@@ -48,6 +52,15 @@ spec:
               memory: 200Mi
 {{- end }}
 ---
+{{- if .Values.letsEncryptCertificate }}
+{{- $cluster := lookup "config.openshift.io/v1" "Ingress" "" "cluster" }}
+{{- $domain := "UNKNOWN" }}
+{{- if hasKey $cluster "spec" }}
+  {{- if hasKey $cluster.spec "domain" }}
+    {{- $domain = $cluster.spec.domain}}
+  {{- end }}
+{{- end }}
+
 apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
@@ -57,7 +70,7 @@ metadata:
   name: {{ .Values.jiralistener.name }} 
   namespace: knative-serving-ingress 
 spec:
-  host: {{ .Values.jiralistener.name }}-{{ .Values.namespace }}.apps.sssc-cl01.appeng.rhecoeng.com
+  host: {{ .Values.jiralistener.name }}-{{ .Values.namespace.name }}.{{ $domain }}
   port:
     targetPort: http2
   to:
@@ -65,4 +78,4 @@ spec:
     name: kourier
     weight: 100
   wildcardPolicy: None
-
+{{- end }}

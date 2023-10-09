@@ -3,14 +3,14 @@ apiVersion: eventing.knative.dev/v1
 kind: Broker
 metadata:
   name: ticket-events
-  namespace: {{ .Values.namespace }}
+  namespace: {{ .Values.namespace.name }}
 ---
 {{- if .Values.eventdisplay.enabled }}
 apiVersion: eventing.knative.dev/v1
 kind: Trigger
 metadata:
   name: event-display-trigger
-  namespace: {{ .Values.namespace }}
+  namespace: {{ .Values.namespace.name }}
 spec:
   broker: ticket-events
   subscriber:
@@ -24,7 +24,7 @@ apiVersion: sources.knative.dev/v1
 kind: SinkBinding
 metadata:
   name: ticket-source
-  namespace: {{ .Values.namespace }}
+  namespace: {{ .Values.namespace.name }}
 spec:
   subject:
     apiVersion: serving.knative.dev/v1
@@ -35,5 +35,5 @@ spec:
       apiVersion: eventing.knative.dev/v1
       kind: Broker
       name: ticket-events
-      namespace: {{ .Values.namespace }}
+      namespace: {{ .Values.namespace.name }}
 

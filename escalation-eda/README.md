@@ -92,10 +92,12 @@ Helm properties:
 
 | Property | Description | Default |
 |----------|-------------|---------|
-| `namespace` | Target namespace | `escalation` |
+| `namespace.create` | Flag to create the target namespace | `true` |
+| `namespace.name` | Target namespace name | `escalation` |
 | `jiralistener.image` | Container image of the `Jira listener` application | `quay.io/orchestrator/jira-listener-jvm` |
 | `jiralistener.name` | The name of the `Jira listener` service (see [Troubleshooting the Duplicate Certificate Limit error](./jira-listener/README.md#troubleshooting-the-duplicate-certificate-limit-error)) | `jira-listener` |
 | `eventdisplay.enabled` | Flag to install the optional `event-display` application for debugging purposes | `true` |
+| `letsEncryptCertificate` | Flag to use the `Lets Encrypt` certificate to expose the `Jira listener` service as the webhook receiver | `false` |
 
 The following commands install, upgrade and delete the [escalation-eda](./helm/escalation-eda/Chart.yaml) Helm chart in the `default` namespace
  with name `escalation-eda`:
@@ -111,5 +113,21 @@ After the initial installation, run the following commands to wait until the ser
 service.serving.knative.dev/jira-listener condition met
 ```
 
+#### Deploy using the Let's Encrypt certificate
+The following commands install, upgrade and uninstall a deployment that uses the publicly-signed TLS certificate from [Let's Encrypt](https://letsencrypt.org/):
+```bash
+helm install -n default escalation-eda helm/escalation-eda --debug --set jiralistener.name=my-jira-listener --set letsEncryptCertificate=true
+helm upgrade -n default escalation-eda helm/escalation-eda --debug --set jiralistener.name=my-jira-listener --set letsEncryptCertificate=true
+helm uninstall -n default escalation-eda --debug
+```
+
+#### Deploying on OpenShift sandbox
+The following commands install, upgrade and uninstall a deployment on the [OpenShift sandbox](https://developers.redhat.com/developer-sandbox):
+```bash
+SANDBOX_NS=$(oc project -q)
+helm install -n $SANDBOX_NS escalation-eda helm/escalation-eda --debug --set namespace.create=false --set namespace.name=$SANDBOX_NS
+helm upgrade -n $SANDBOX_NS escalation-eda helm/escalation-eda --debug --set namespace.create=false --set namespace.name=$SANDBOX_NS
+helm uninstall -n $SANDBOX_NS escalation-eda --debug
+```
 
 

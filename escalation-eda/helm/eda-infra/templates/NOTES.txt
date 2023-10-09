@@ -1,4 +1,4 @@
-{{ .Release.Name }} of {{ .Chart.Name }} installed in namespace {{ .Values.namespace }}
+{{ .Release.Name }} of {{ .Chart.Name }} installed
 
 Installed components:
 =======================

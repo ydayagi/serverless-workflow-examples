@@ -1,4 +1,7 @@
-namespace: escalation
+namespace: 
+  create: true
+  name: escalation
+letsEncryptCertificate: false
 jiralistener:
   # Override this name to overcome the Let's Encrypt rate limit as defined here: https://letsencrypt.org/docs/duplicate-certificate-limit/
   name: jira-listener
