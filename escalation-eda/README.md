@@ -36,8 +36,8 @@ It is made of the following components:
 **WORK IN PROGRESS**
 
 This is a two steps deployment:
-1. Deploy the serverless infrastrucure (optional, if already availble)
-2. Deploy the escalation services
+1. [Deploy the serverless infrastrucure](#eda-infra-chart) (optional, if already availble)
+2. [Deploy the escalation services](#escalation-eda-chart)
 
 ### eda-infra chart
 The [eda-infra](./helm/eda-infra/Chart.yaml) Helm creates the `Red Hat Serverless Operator`, and default instances of `KnativeEventing` and `KnativeServing`.
@@ -48,7 +48,7 @@ This chart requires a user with `cluster-admin` role.
 It also created the needed [CRDs](./helm/eda-infra/crds/operator.yaml) according to the latest release of the
 [OpenShift Serverless 1.30 operator](https://access.redhat.com/documentation/en-us/red_hat_openshift_serverless/1.30/html-single/about_serverless/index#new-features-1-30-0_serverless-release-notes).
 
-CRDs have been downloaded as:
+CRDs were downloaded from:
 ```bash
 curl -LJO https://github.com/knative/operator/releases/download/knative-v1.9.6/operator.yaml
 ```
@@ -69,6 +69,7 @@ knativeserving.operator.knative.dev/knative-serving condition met
 ```
 
 **Note**: the CRDs are not removed when the chart is uninstalled, see the [Helm docs](https://helm.sh/docs/chart_best_practices/custom_resource_definitions/#some-caveats-and-explanations)
+
 **Know issues**: after the uninstall command the KnativeEventing and KnativeServing instances can remain in terminating state, which also prevents the 
 associated namespaces from being deleted. Manually run this command to verify the status:
 ```bash
@@ -83,7 +84,8 @@ oc patch -n knative-serving knativeserving/knative-serving -p '{"metadata":{"fin
 ### escalation-eda chart
 **WORK IN PROGRESS**
 
-The [escalation-eda](./helm/escalation-eda/Chart.yaml) Helm creates all the services related to the deployment of the `Escalation workflow` and the `Jira listener`.
+The [escalation-eda](./helm/escalation-eda/Chart.yaml) Helm creates all the services related to the deployment of the [Escalation workflow](#escalation-workflow) 
+and the [Jira listener](#jira-listener).
 This chart requires a user with `admin` role.
 
 Helm properties:
@@ -92,6 +94,7 @@ Helm properties:
 |----------|-------------|---------|
 | `namespace` | Target namespace | `escalation` |
 | `jiralistener.image` | Container image of the `Jira listener` application | `quay.io/orchestrator/jira-listener-jvm` |
+| `jiralistener.name` | The name of the `Jira listener` service (see [Troubleshooting the Duplicate Certificate Limit error](./jira-listener/README.md#troubleshooting-the-duplicate-certificate-limit-error)) | `jira-listener` |
 | `eventdisplay.enabled` | Flag to install the optional `event-display` application for debugging purposes | `true` |
 
 The following commands install, upgrade and delete the [escalation-eda](./helm/escalation-eda/Chart.yaml) Helm chart in the `default` namespace

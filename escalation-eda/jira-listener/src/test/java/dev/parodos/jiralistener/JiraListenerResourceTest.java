@@ -5,12 +5,12 @@ import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options;
-import static dev.parodos.jiralistener.model.JiraConstants.ISSUE;
-import static dev.parodos.jiralistener.model.JiraConstants.FIELDS;
-import static dev.parodos.jiralistener.model.JiraConstants.KEY;
-import static dev.parodos.jiralistener.model.JiraConstants.LABELS;
-import static dev.parodos.jiralistener.model.JiraConstants.STATUS;
-import static dev.parodos.jiralistener.model.JiraConstants.STATUS_CATEGORY;
+import static dev.parodos.jiralistener.JiraConstants.FIELDS;
+import static dev.parodos.jiralistener.JiraConstants.ISSUE;
+import static dev.parodos.jiralistener.JiraConstants.KEY;
+import static dev.parodos.jiralistener.JiraConstants.LABELS;
+import static dev.parodos.jiralistener.JiraConstants.STATUS;
+import static dev.parodos.jiralistener.JiraConstants.STATUS_CATEGORY;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -96,7 +96,9 @@ public class JiraListenerResourceTest {
                         throws StreamReadException, DatabindException, IOException {
                 Map<String, Object> webhookEvent = aClosedIssue();
 
-                ClosedJiraTicket closedTicket = ClosedJiraTicket.builder().ticketId("PR-1").workFlowInstanceId("500")
+                String workflowInstanceId = "500";
+                ClosedJiraTicket closedTicket = ClosedJiraTicket.builder().ticketId("PR-1")
+                                .workFlowInstanceId(workflowInstanceId)
                                 .workflowName("escalation").status("done").build();
 
                 ExtractableResponse<Response> response = given()
@@ -109,7 +111,8 @@ public class JiraListenerResourceTest {
                 assertEquals(response.as(ClosedJiraTicket.class), closedTicket, "Returns ClosedJiraTicket");
                 sink.verify(1, postRequestedFor(urlEqualTo("/"))
                                 .withHeader("ce-source", WireMock.equalTo(cloudeventSource))
-                                .withHeader("ce-type", WireMock.equalTo(cloudeventType)));
+                                .withHeader("ce-type", WireMock.equalTo(cloudeventType))
+                                .withHeader("ce-kogitoprocrefid", WireMock.equalTo(workflowInstanceId)));
                 List<ServeEvent> allServeEvents = sink.getAllServeEvents();
                 allServeEvents = Lists.reverse(allServeEvents);
                 assertThat(allServeEvents, hasSize(1));
@@ -122,6 +125,8 @@ public class JiraListenerResourceTest {
                                 is(cloudeventSource));
                 assertThat(event.getRequest().header("ce-type").values().get(0),
                                 is(cloudeventType));
+                assertThat(event.getRequest().header("ce-kogitoprocrefid").values().get(0),
+                                is(workflowInstanceId));
                 assertThat("Response body is equal to the request body", eventBody, is(closedTicket));
         }
 

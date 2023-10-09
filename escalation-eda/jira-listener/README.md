@@ -20,7 +20,8 @@ No events are generated for discarded webhooks.
 ## Design notes
 
 ### Externalized configuration
-The following environment variables can modify the configuratin properties:
+The following environment variables can modify the configuration properties:
+
 | Variable | Description | Default value |
 |----------|-------------|---------------|
 | CLOUD_EVENT_TYPE | The value of `ce-type` header in the generated `CloudEvent` | `dev.parodos.escalation` |
@@ -144,7 +145,7 @@ If you use Jira Cloud, you can create the webhook at https://_YOUR_JIRA_/plugins
 
 ![Jira webhook](../doc/webhook.png)
 
-The webhook vvent format is exaplained in [Issue: Get issue](https://docs.atlassian.com/software/jira/docs/api/REST/9.11.0/#api/2/issue-getIssue),
+The webhook event format is exaplained in [Issue: Get issue](https://docs.atlassian.com/software/jira/docs/api/REST/9.11.0/#api/2/issue-getIssue),
 see an [Example](https://jira.atlassian.com/rest/api/2/issue/JRA-2000)
 
 In case of issues receiving the events, you can troubleshoot using [RequestBin](https://requestbin.com/), see [How to collect data to troubleshoot WebHook failure in Jira](https://confluence.atlassian.com/jirakb/how-to-collect-data-to-troubleshoot-webhook-failure-in-jira-397083035.html)

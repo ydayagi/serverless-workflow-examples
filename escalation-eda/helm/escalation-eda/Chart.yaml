@@ -2,7 +2,7 @@ apiVersion: v2
 name: escalation-eda
 description: |
   A Helm chart to install the escalation application(s):
-  * kira-listener Knative service
+  * jira-listener Knative service
   * (optional) event-display Knative service
   * required Knative eventing resoures (Trigger, SinkBinding and Broker)
 type: application
