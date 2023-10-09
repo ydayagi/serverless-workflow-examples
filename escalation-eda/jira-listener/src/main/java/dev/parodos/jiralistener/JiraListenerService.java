@@ -12,7 +12,7 @@ import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import dev.parodos.jiralistener.model.ClosedJiraTicket;
+import dev.parodos.jiralistener.model.JiraTicketEventData;
 import dev.parodos.jiralistener.model.JiraIssue;
 import dev.parodos.jiralistener.model.JiraIssue.StatusCategory;
 import io.cloudevents.CloudEvent;
@@ -47,14 +47,14 @@ public class JiraListenerService {
 
     static class OnEventResponse {
         boolean eventAccepted;
-        ClosedJiraTicket closedJiraTicket;
+        JiraTicketEventData jiraTicketEventData;
     }
 
     OnEventResponse onEvent(JiraIssue jiraIssue) {
         OnEventResponse response = new OnEventResponse();
         response.eventAccepted = false;
 
-        Optional<ClosedJiraTicket> ticket = validateIsAClosedJiraIssue(jiraIssue);
+        Optional<JiraTicketEventData> ticket = validateIsAClosedJiraIssue(jiraIssue);
         if (ticket.isPresent()) {
             logger.log(Level.INFO, "Created ticket " + ticket.get());
             CloudEvent newCloudEvent = CloudEventBuilder.v1()
@@ -70,14 +70,14 @@ public class JiraListenerService {
             logger.log(Level.INFO, "Emitting " + newCloudEvent);
             eventNotifier.emit(newCloudEvent);
             response.eventAccepted = true;
-            response.closedJiraTicket = ticket.get();
+            response.jiraTicketEventData = ticket.get();
         }
 
         return response;
     }
 
-    private Optional<ClosedJiraTicket> validateIsAClosedJiraIssue(JiraIssue jiraIssue) {
-        Optional<ClosedJiraTicket> notaClosedJiraIssue = Optional.empty();
+    private Optional<JiraTicketEventData> validateIsAClosedJiraIssue(JiraIssue jiraIssue) {
+        Optional<JiraTicketEventData> notaClosedJiraIssue = Optional.empty();
         String issueKey = jiraIssue.getKey();
         if (jiraIssue.getKey() != null) {
             if (jiraIssue.getFields() == null) {
@@ -143,7 +143,7 @@ public class JiraListenerService {
                 return notaClosedJiraIssue;
             }
 
-            return Optional.of(ClosedJiraTicket.builder().ticketId(issueKey)
+            return Optional.of(JiraTicketEventData.builder().ticketId(issueKey)
                     .workFlowInstanceId(workflowInstanceId)
                     .workflowName(workflowName).status(statusCategoryKey).build());
         } else {

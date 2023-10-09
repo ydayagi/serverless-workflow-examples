@@ -28,6 +28,7 @@ public class JiraListenerResource {
     @Inject
     JiraListenerService jiraListenerService;
 
+    // Test endpoint used in dev mode when not specifying a K_SINK variable
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/")
@@ -52,7 +53,7 @@ public class JiraListenerResource {
 
             OnEventResponse response = jiraListenerService.onEvent(jiraIssue);
             if (response.eventAccepted) {
-                return Response.ok(response.closedJiraTicket).build();
+                return Response.ok(response.jiraTicketEventData).build();
             }
             return Response.noContent().build();
         } catch (IOException e) {

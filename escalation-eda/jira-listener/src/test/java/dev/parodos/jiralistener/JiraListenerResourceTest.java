@@ -37,7 +37,7 @@ import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.stubbing.ServeEvent;
 import com.google.common.collect.Lists;
 
-import dev.parodos.jiralistener.model.ClosedJiraTicket;
+import dev.parodos.jiralistener.model.JiraTicketEventData;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -97,7 +97,7 @@ public class JiraListenerResourceTest {
                 Map<String, Object> webhookEvent = aClosedIssue();
 
                 String workflowInstanceId = "500";
-                ClosedJiraTicket closedTicket = ClosedJiraTicket.builder().ticketId("PR-1")
+                JiraTicketEventData closedTicket = JiraTicketEventData.builder().ticketId("PR-1")
                                 .workFlowInstanceId(workflowInstanceId)
                                 .workflowName("escalation").status("done").build();
 
@@ -108,7 +108,7 @@ public class JiraListenerResourceTest {
                                 .statusCode(200)
                                 .extract();
 
-                assertEquals(response.as(ClosedJiraTicket.class), closedTicket, "Returns ClosedJiraTicket");
+                assertEquals(response.as(JiraTicketEventData.class), closedTicket, "Returns JiraTicketEventData");
                 sink.verify(1, postRequestedFor(urlEqualTo("/"))
                                 .withHeader("ce-source", WireMock.equalTo(cloudeventSource))
                                 .withHeader("ce-type", WireMock.equalTo(cloudeventType))
@@ -119,7 +119,7 @@ public class JiraListenerResourceTest {
 
                 ServeEvent event = allServeEvents.get(0);
                 System.out.println("Received event with headers " + event.getRequest().getAllHeaderKeys());
-                ClosedJiraTicket eventBody = mapper.readValue(event.getRequest().getBody(), ClosedJiraTicket.class);
+                JiraTicketEventData eventBody = mapper.readValue(event.getRequest().getBody(), JiraTicketEventData.class);
                 System.out.println("Received event with eventBody " + eventBody);
                 assertThat(event.getRequest().header("ce-source").values().get(0),
                                 is(cloudeventSource));

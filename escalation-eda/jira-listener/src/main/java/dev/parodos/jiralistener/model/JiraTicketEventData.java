@@ -7,7 +7,7 @@ import lombok.extern.jackson.Jacksonized;
 @Builder
 @Data
 @Jacksonized
-public class ClosedJiraTicket {
+public class JiraTicketEventData {
     private String ticketId;
     private String workFlowInstanceId;
     private String workflowName;
