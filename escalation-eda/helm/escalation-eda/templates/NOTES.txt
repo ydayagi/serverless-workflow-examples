@@ -8,10 +8,14 @@ Run the following to verify the release status and export the configuration:
 Verify the status of the Knative eventing resources:
   oc get -n {{ .Values.namespace.name }} trigger,broker,sinkbinding
 
+Verify the status of the Knative services:
+  oc get -n {{ .Values.namespace.name }} ksvc
+
 Run the following to wait until the services are ready:
-  oc wait -n {{ .Values.namespace.name }} ksvc/{{ .Values.jiralistener.name }} --for=condition=Ready --timeout=5m
+  oc wait -n {{ .Values.namespace.name }} ksvc -l app=jira-listener --for=condition=Ready --timeout=5m
+  oc wait -n {{ .Values.namespace.name }} ksvc -l app=escalation-swf --for=condition=Ready --timeout=5m
 {{- if .Values.eventdisplay.enabled }}
-  oc wait -n {{ .Values.namespace.name }} ksvc/event-display --for=condition=Ready --timeout=5m
+  oc wait -n {{ .Values.namespace.name }} ksvc -l app=event-display --for=condition=Ready --timeout=5m
 {{- end }}
 
 The URL to be used in the Jira webhook is:
@@ -24,9 +28,10 @@ The URL to be used in the Jira webhook is:
 {{- end }}
 
 Log the applications using:
-  oc logs -f -l app={{ .Values.jiralistener.name }} -c user-container -n {{ .Values.namespace.name }}
+  oc logs -f -l app=jira-listener -c jira-listener -n {{ .Values.namespace.name }}
+  oc logs -f -l app=escalation-swf -c escalation-swf -n {{ .Values.namespace.name }}
 {{- if .Values.eventdisplay.enabled }}
-  oc logs -f -l app=event-display -c user-container -n {{ .Values.namespace.name }}
+  oc logs -f -l app=event-display -c event-display -n {{ .Values.namespace.name }}
 {{- end }}
 
 

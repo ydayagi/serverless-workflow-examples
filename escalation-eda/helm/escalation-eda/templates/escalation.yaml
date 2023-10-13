@@ -10,6 +10,8 @@ kind: Service
 metadata:
   name: {{ .Values.jiralistener.name }}
   namespace: {{ .Values.namespace.name }}
+  labels:
+    app: jira-listener
 {{- if .Values.letsEncryptCertificate }}
   annotations:
     serving.knative.openshift.io/disableRoute: "true"
@@ -18,17 +20,91 @@ spec:
   template:
     metadata:
       labels:
-        app: {{ .Values.jiralistener.name }}
+        app: jira-listener
       annotations:
         autoscaling.knative.dev/min-scale: "1"
     spec:
       containers:
         - image: {{ .Values.jiralistener.image }}
           imagePullPolicy: Always
-          name: user-container
+          name: jira-listener
           resources:
             limits:
               memory: 200Mi
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: escalation-swf-config
+  namespace: {{ .Values.namespace.name }}
+data:
+  JIRA_URL: {{ .Values.escalationSwf.jira.url}}
+  JIRA_PROJECT: {{ .Values.escalationSwf.jira.project}}
+  JIRA_ISSUE_TYPE: '{{ .Values.escalationSwf.jira.issueType}}'
+  ESCALATION_TIMEOUT_SECONDS: '{{ .Values.escalationSwf.escalationTimeoutSeconds}}'
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: escalation-swf-secret
+  namespace: {{ .Values.namespace.name }}
+type: Opaque
+stringData:
+  JIRA_USERNAME: {{ .Values.escalationSwf.jira.username}}
+  JIRA_API_TOKEN: {{ .Values.escalationSwf.jira.apiToken}}
+  MAILTRAP_API_TOKEN: {{ .Values.escalationSwf.mailTrap.apiToken}}
+  MAILTRAP_INBOX_ID: '{{ .Values.escalationSwf.mailTrap.inboxId}}'
+  OCP_API_SERVER_URL: {{ .Values.escalationSwf.ocp.apiServerUrl}}
+  OCP_API_SERVER_TOKEN: {{ .Values.escalationSwf.ocp.apiServerToken}}
+---
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: {{ .Values.escalationSwf.name }}
+  namespace: {{ .Values.namespace.name }}
+  labels:
+    app: escalation-swf
+spec:
+  template:
+    metadata:
+      labels:
+        app: escalation-swf
+      annotations:
+        autoscaling.knative.dev/min-scale: "1"
+    spec:
+      containers:
+        - image: {{ .Values.escalationSwf.image }}
+          imagePullPolicy: Always
+          envFrom:
+          - configMapRef:
+              name: escalation-swf-config
+          - secretRef:
+              name: escalation-swf-secret
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /q/health/live
+              port: null
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 10
+          name: escalation-swf
+          ports:
+            - containerPort: 8080
+              name: http1
+              protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /q/health/ready
+              port: null
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 10
 ---
 {{- if .Values.eventdisplay.enabled }}
 apiVersion: serving.knative.dev/v1
@@ -36,6 +112,8 @@ kind: Service
 metadata:
   name: event-display
   namespace: {{ .Values.namespace.name }}
+  labels:
+    app: event-display
 spec:
   template:
     metadata:
@@ -46,7 +124,7 @@ spec:
     spec:
       containers:
         - image: gcr.io/knative-releases/knative.dev/eventing/cmd/event_display
-          name: user-container
+          name: event-display
           resources:
             limits:
               memory: 200Mi

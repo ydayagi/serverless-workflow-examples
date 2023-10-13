@@ -132,6 +132,10 @@ To overcome this issue, you can define a different name for the `jira-listener` 
 helm upgrade -n default escalation-eda helm/escalation-eda --set jiralistener.name=my-jira-listener --debug 
 ```
 
+### Troubleshooting the SAN short enough to fit in CN issue
+Note that the created hostname cannot exceed the 64 characters as described in: [Let's Encrypt (NewOrder request did not include a SAN short enough to fit in CN)](https://support.cpanel.net/hc/en-us/articles/4405807056023-Let-s-Encrypt-NewOrder-request-did-not-include-a-SAN-short-enough-to-fit-in-CN-)
+>This error occurs when attempting to request an SSL certificate from Let's Encrypt for a domain name longer than 64 characters
+
 ## Configuring the Jira server
 ### API token
 In case you need to interact with Jira server using the [REST APIs])https://developer.atlassian.com/server/jira/platform/rest-apis/, you need an API Token:

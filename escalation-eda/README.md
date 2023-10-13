@@ -1,6 +1,4 @@
 # Escalation workflow with Event Driven Architecture
-**WORK IN PROGRESS**
-
 ## Use case
 As a user I want to create a ticket to request the creation of a new namespace in an OpenShift cluster and inform the given
 escalation manager in case the ticket is not completed in a given time.
@@ -19,7 +17,8 @@ A ticketing service configured to create tickets and notify webhooks any time th
 
 # Escalation workflow
 A Serverless Workflow receiving the user request and then creating the ticket: once it is approved, it take care of provisioning the given namespace.
-** WORK IN PROGRESS ***
+
+See the [README](./escalation-swf/README.md)
 
 ### Jira listener
 A Java application configured to receive webhooks from the ticketing service, extract the relevant data and notify the Escalation workflow about the approval.
@@ -33,8 +32,6 @@ It is made of the following components:
   (using a `Trigger` instance)
 
 ## Deploying the example
-**WORK IN PROGRESS**
-
 This is a two steps deployment:
 1. [Deploy the serverless infrastrucure](#eda-infra-chart) (optional, if already availble)
 2. [Deploy the escalation services](#escalation-eda-chart)
@@ -56,6 +53,7 @@ curl -LJO https://github.com/knative/operator/releases/download/knative-v1.9.6/o
 The following commands install, upgrade and delete the [eda-infra](./helm/eda-infra/Chart.yaml) Helm chart in the `default` namespace with name `eda-infra`:
 ```bash
 helm install -n default eda-infra helm/eda-infra --debug
+helm status -n default eda-infra
 helm upgrade -n default eda-infra helm/eda-infra --debug
 helm uninstall -n default eda-infra --debug
 ```
@@ -82,52 +80,69 @@ oc patch -n knative-serving knativeserving/knative-serving -p '{"metadata":{"fin
 ```
 
 ### escalation-eda chart
-**WORK IN PROGRESS**
-
 The [escalation-eda](./helm/escalation-eda/Chart.yaml) Helm creates all the services related to the deployment of the [Escalation workflow](#escalation-workflow) 
 and the [Jira listener](#jira-listener).
 This chart requires a user with `admin` role.
 
 Helm properties:
 
-| Property | Description | Default |
-|----------|-------------|---------|
-| `namespace.create` | Flag to create the target namespace | `true` |
-| `namespace.name` | Target namespace name | `escalation` |
-| `jiralistener.image` | Container image of the `Jira listener` application | `quay.io/orchestrator/jira-listener-jvm` |
-| `jiralistener.name` | The name of the `Jira listener` service (see [Troubleshooting the Duplicate Certificate Limit error](./jira-listener/README.md#troubleshooting-the-duplicate-certificate-limit-error)) | `jira-listener` |
-| `eventdisplay.enabled` | Flag to install the optional `event-display` application for debugging purposes | `true` |
-| `letsEncryptCertificate` | Flag to use the `Lets Encrypt` certificate to expose the `Jira listener` service as the webhook receiver | `false` |
+| Property | Description | Mandatory | Default |
+|----------|-------------|-----------|---------|
+| `namespace.create` | Flag to create the target namespace | ❌ | `true` |
+| `namespace.name` | Target namespace name | ❌ | `escalation` |
+| `jiralistener.image` | Container image of the `Jira listener` application | ❌ | `quay.io/orchestrator/jira-listener-jvm` |
+| `jiralistener.name` | The name of the `Jira listener` service (see [Troubleshooting the Duplicate Certificate Limit error](./jira-listener/README.md#troubleshooting-the-duplicate-certificate-limit-error)) | ❌ | `jira-listener` |
+| `escalationSwf.name` | The name of te `Escalation SWF` service | ❌ | `escalation-swf` |
+| `escalationSwf.image` | Container image of the `Escalation SWF` application | ❌ | `quay.io/orchestrator/escalation-swf:1.0` |
+| `escalationSwf.jira.url` | The Jira server URL | ✅ | |
+| `escalationSwf.jira.username` | The Jira server username | ✅ | |
+| `escalationSwf.jira.apiToken` | The Jira API Token | ✅ | |
+| `escalationSwf.jira.project` | The key of the Jira project where the escalation issue is created | ✅ | |
+| `escalationSwf.jira.issueType` | The ID of the Jira issue type to be created | ✅ | |
+| `escalationSwf.mailTrap.apiToken` | The MailTrail API Token | ✅ | |
+| `escalationSwf.mailTrap.inboxId` | The ID of the MailTrap inbox | ✅ | |
+| `escalationSwf.ocp.apiServerUrl` | The ID of the MailTrap inbox | ✅ | |
+| `escalationSwf.ocp.apiServerToken` | The ID of the MailTrap inbox | ✅ | |
+| `escalationSwf.escalationTimeoutSeconds` | The ID of the MailTrap inbox | ❌ | `30` |
+| `eventdisplay.enabled` | Flag to install the optional `event-display` application for debugging purposes | ❌ | `true` |
+| `letsEncryptCertificate` | Flag to use the `Lets Encrypt` certificate to expose the `Jira listener` service as the webhook receiver | ❌ | `false` |
 
 The following commands install, upgrade and delete the [escalation-eda](./helm/escalation-eda/Chart.yaml) Helm chart in the `default` namespace
- with name `escalation-eda`:
+ with name `escalation-eda`, assuming you provided the mandatory values in a file `escalation-eda-values.yaml`:
 ```bash
-helm install -n default escalation-eda helm/escalation-eda --debug
-helm upgrade -n default escalation-eda helm/escalation-eda --debug
+helm install -n default escalation-eda helm/escalation-eda --debug -f ./escalation-eda-values.yaml
+helm status -n default escalation-eda
+helm upgrade -n default escalation-eda helm/escalation-eda --debug -f ./escalation-eda-values.yaml
 helm uninstall -n default escalation-eda --debug
 ```
 
-After the initial installation, run the following commands to wait until the serverless infrastructure is ready:
+After the initial installation, run the following commands to wait until the services are ready:
 ```bash
-> oc wait -n escalation ksvc/jira-listener --for=condition=Ready --timeout=5m
+> oc wait -n escalation ksvc -l app=jira-listener --for=condition=Ready --timeout=5m
 service.serving.knative.dev/jira-listener condition met
+> oc wait -n escalation ksvc -l app=escalation-swf --for=condition=Ready --timeout=5m
+service.serving.knative.dev/escalation-swf condition met
 ```
 
 #### Deploy using the Let's Encrypt certificate
-The following commands install, upgrade and uninstall a deployment that uses the publicly-signed TLS certificate from [Let's Encrypt](https://letsencrypt.org/):
-```bash
-helm install -n default escalation-eda helm/escalation-eda --debug --set jiralistener.name=my-jira-listener --set letsEncryptCertificate=true
-helm upgrade -n default escalation-eda helm/escalation-eda --debug --set jiralistener.name=my-jira-listener --set letsEncryptCertificate=true
-helm uninstall -n default escalation-eda --debug
+To uses the publicly-signed TLS certificate from [Let's Encrypt](https://letsencrypt.org/), set the following values in the custom values file:
+```yaml
+letsEncryptCertificate: false
+jiralistener:
+  name: _YOUR_CUSTOM_NAME_
 ```
 
 #### Deploying on OpenShift sandbox
-The following commands install, upgrade and uninstall a deployment on the [OpenShift sandbox](https://developers.redhat.com/developer-sandbox):
+When deploying on the [OpenShift sandbox](https://developers.redhat.com/developer-sandbox), remember to manage the Helm chart in the user namespace, not in the `default` one:
 ```bash
 SANDBOX_NS=$(oc project -q)
-helm install -n $SANDBOX_NS escalation-eda helm/escalation-eda --debug --set namespace.create=false --set namespace.name=$SANDBOX_NS
-helm upgrade -n $SANDBOX_NS escalation-eda helm/escalation-eda --debug --set namespace.create=false --set namespace.name=$SANDBOX_NS
-helm uninstall -n $SANDBOX_NS escalation-eda --debug
+```
+
+Then, set the following values in the custom values file:
+```bash
+namespace: 
+  create: false
+  name: <value of $SANDBOX_NS>
 ```
 
 

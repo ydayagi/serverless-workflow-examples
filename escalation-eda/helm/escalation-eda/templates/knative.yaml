@@ -5,6 +5,22 @@ metadata:
   name: ticket-events
   namespace: {{ .Values.namespace.name }}
 ---
+apiVersion: eventing.knative.dev/v1
+kind: Trigger
+metadata:
+  name: ticket-closed
+  namespace: {{ .Values.namespace.name }}
+spec:
+  broker: ticket-events
+  filter:
+    attributes:
+      type: dev.parodos.escalation
+  subscriber:
+    ref:
+      apiVersion: serving.knative.dev/v1
+      kind: Service
+      name: {{ .Values.escalationSwf.name }}
+---
 {{- if .Values.eventdisplay.enabled }}
 apiVersion: eventing.knative.dev/v1
 kind: Trigger
