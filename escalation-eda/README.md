@@ -101,9 +101,9 @@ Helm properties:
 | `escalationSwf.jira.issueType` | The ID of the Jira issue type to be created | ✅ | |
 | `escalationSwf.mailTrap.apiToken` | The MailTrail API Token | ✅ | |
 | `escalationSwf.mailTrap.inboxId` | The ID of the MailTrap inbox | ✅ | |
-| `escalationSwf.ocp.apiServerUrl` | The ID of the MailTrap inbox | ✅ | |
-| `escalationSwf.ocp.apiServerToken` | The ID of the MailTrap inbox | ✅ | |
-| `escalationSwf.escalationTimeoutSeconds` | The ID of the MailTrap inbox | ❌ | `30` |
+| `escalationSwf.ocp.apiServerUrl` | The OpenShift API server URL | ✅ | |
+| `escalationSwf.ocp.apiServerToken` | The OpenShift API server token | ✅ | |
+| `escalationSwf.escalationTimeoutSeconds` | The time to wait (in seconds) before escalating  | ❌ | `30` |
 | `eventdisplay.enabled` | Flag to install the optional `event-display` application for debugging purposes | ❌ | `true` |
 | `letsEncryptCertificate` | Flag to use the `Lets Encrypt` certificate to expose the `Jira listener` service as the webhook receiver | ❌ | `false` |
 
