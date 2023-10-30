@@ -1,0 +1,3 @@
+resources:
+- configmap_event-timeout-props.yaml
+- sonataflow_event_timeout.yaml
