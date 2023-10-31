@@ -43,12 +43,12 @@ states:
             fields:
               summary: '"Request For New Namespace: " + .namespace'
               labels:
-                - '$SECRET.jira_label_workflowInstanceId + "=" + $WORKFLOW.instanceId'
-                - "$SECRET.jira_label_workflowName"
+                - $SECRET.jira_label_workflowInstanceId + "=" + $WORKFLOW.instanceId
+                - $SECRET.jira_label_workflowName
               issuetype:
-                id: "$SECRET.jira_issue_type"
+                id: $SECRET.jira_issue_type
               project:
-                key: "$SECRET.jira_project"
+                key: $SECRET.jira_project
         actionDataFilter:
           toStateData: .jiraIssue
     onErrors:
@@ -84,7 +84,7 @@ states:
     type: callback
     action:
       functionRef:
-        refName: "logInfo"
+        refName: logInfo
         arguments:
           message: "\"Waiting for approvalEvent: \\(.)\""
     eventRef: approvalEvent
@@ -97,31 +97,31 @@ states:
   - name: AuthError
     type: operation
     actions:
-      - name: "printAction"
+      - name: printAction
         functionRef:
-          refName: "logInfo"
+          refName: logInfo
           arguments:
             message: "\"Authentication error: \\(.)\""
     end: true
   - name: Escalate
     type: operation
     actions:
-      - name: "printAction"
+      - name: printAction
         functionRef:
-          refName: "logInfo"
+          refName: logInfo
           arguments:
             message: "\"Invoking escalation: \\(.)\""
-      - name: "sendEmail"
+      - name: sendEmail
         functionRef:
           refName: sendEmail
           arguments:
             inbox_id: $SECRET.mailtrap_inbox_id | tonumber
             to: 
               - email: .manager
-                name: "Escalation Manager"
+                name: Escalation Manager
             from:
               email: $SECRET.sender_email
-              name: "Escalation service"
+              name: Escalation service
             subject: " \"Escalation ticket \" + .jiraIssue.key "
             html: '"Please manage escalation ticket <a href=\"" + .jiraBrowser + "\">" + .jiraIssue.key + "</a>"'
     transition: GetJiraIssue
@@ -134,7 +134,7 @@ states:
             apiVersion: v1
             kind: Namespace
             metadata:
-              name: ".namespace"
+              name: .namespace
         actionDataFilter:
           toStateData: .createdNamespace
     stateDataFilter:
