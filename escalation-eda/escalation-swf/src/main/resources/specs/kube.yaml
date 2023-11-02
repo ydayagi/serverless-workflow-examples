@@ -286,7 +286,7 @@
             type: string
           metadata:
             description: 'Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
-            # # default: { }
+            # default: { }
             allOf:
               - $ref: '#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta'
         x-kubernetes-group-version-kind:
