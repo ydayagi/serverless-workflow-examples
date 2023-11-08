@@ -7,8 +7,11 @@ jiralistener:
   name: jira-listener
   image: quay.io/orchestrator/jira-listener-jvm
 escalationSwf:
+  profile: dev
   name: escalation-swf
-  image: quay.io/orchestrator/escalation-swf:1.0
+  ticketingServiceSubflow: jiraSwf.sw.yaml
+  ticketingServiceProps: application-jira.properties
+  # image: quay.io/orchestrator/escalation-swf:1.0
   jira:
     url: null
     username: null
