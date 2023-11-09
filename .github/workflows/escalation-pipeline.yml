@@ -26,14 +26,14 @@
             java-version: 11
             checkout-ref: generic-swf
       
-        - name: Build project with Maven
-          run: |
-            mvn ${{ env.MVN_OPTS }} -B package --file escalation-eda/pom.xml -DskipTests
+        # - name: Build project with Maven
+        #   run: |
+        #     mvn ${{ env.MVN_OPTS }} -B package --file escalation-eda/pom.xml -DskipTests
 
         - name: Set env
           run: |
-            echo ::set-env name=ESCALATION_CHART::${{ env.ESCALATION_CHART_PATH }}/Chart.yaml
-            echo ::set-env name=ESCALATION_CHART_VERSION::$(mvn ${{ env.MVN_OPTS }} help:evaluate -Dexpression=project.version -q -DforceStdout -f ${{ env.ESCALATION_SWF_PATH }}/pom.xml | sed 's/-SNAPSHOT//g')
+            echo "ESCALATION_CHART=${{ env.ESCALATION_CHART_PATH }}/Chart.yaml" >> "$GITHUB_ENV"
+            echo "ESCALATION_CHART_VERSION=$(mvn ${{ env.MVN_OPTS }} help:evaluate -Dexpression=project.version -q -DforceStdout -f ${{ env.ESCALATION_SWF_PATH }}/pom.xml | sed 's/-SNAPSHOT//g')" >> "$GITHUB_ENV"
 
         - name: Get chart name
           id: chart_name
