@@ -1,0 +1,87 @@
+---
+  name: Escalation CI pipeline
+  
+  on:
+    workflow_dispatch:
+    push:
+      paths:
+        - escalation-eda/*
+    release:
+      types: prereleased
+  env:
+    HELM_REPO_URL: "https://dmartinol.github.io/serverless-workflow-examples"
+    ESCALATION_CHART_PATH: "escalation-eda/helm/escalation-eda"
+    ESCALATION_SWF_PATH: "escalation-eda/escalation-swf"
+    # TODO: one of latest/release
+    CHART_REPO: "latest"  
+    MVN_OPTS: "-Dmaven.repo.remote=https://repository.jboss.org/nexus/content/groups/public"
+  jobs:
+    build-chart-and-deploy:
+      runs-on: ubuntu-latest
+      name: Package and deploy a new chart version
+      steps:
+        - name: Setup Maven Action
+          uses: s4u/setup-maven-action@v1.2.1
+          with:
+            java-version: 11
+      
+        - name: Build project with Maven
+          run: |
+            echo "mvn ${{ env.MVN_OPTS }} -B package --file escalation-eda/escalation-swf/pom.xml"
+            mvn ${{ env.MVN_OPTS }} -B package --file escalation-eda/escalation-swf/pom.xml
+
+        - name: Set env
+          run: |
+            echo ::set-env name=ESCALATION_CHART::${{ env.ESCALATION_CHART_PATH }}/Chart.yaml
+            echo ::set-env name=ESCALATION_CHART_VERSION::$(mvn ${{ env.MVN_OPTS }} help:evaluate -Dexpression=project.version -q -DforceStdout -f ${{ env.ESCALATION_SWF_PATH }}/pom.xml | sed 's/-SNAPSHOT//g')
+
+        - name: Get chart name
+          id: chart_name
+          run: echo "::set-output name=name::$(cat ${{ env.ESCALATION_CHART }} | grep 'name:' | cut -c 7-)"
+  
+        - name: Update chart version
+          run: |
+            sed -i 's/version: .*/version: ${{ env.ESCALATION_CHART_VERSION }}/g' ${{ env.ESCALATION_CHART }}
+            sed -i 's/appVersion: .*/appVersion: ${{ env.ESCALATION_CHART_VERSION }}/g' ${{ env.ESCALATION_CHART }}
+  
+        - name: Configure Git
+          run: |
+            git config user.name "${{ github.actor }}"
+            git config user.email "${{ github.actor }}@users.noreply.github.com"
+  
+        - name: Setup Helm
+          uses: azure/setup-helm@v3
+
+        - name: Lint chart
+          run: helm lint ${{ env.ESCALATION_CHART_PATH }}
+  
+        - name: Package chart
+          run: helm package ${{ env.ESCALATION_CHART_PATH }}
+  
+        - name: Push new chart file
+          run: |
+            git add $ESCALATION_CHART
+            git commit -m "build: bumped ${{ steps.chart_name.outputs.name }} to ${{ env.ESCALATION_CHART_VERSION }} [skip ci]"
+            git push
+        # TODO: add tag on release or add released artifact to tag?
+        # - name: Push new tag
+        #   if: ${{ github.event.inputs.add_tag }}
+        #   run: |
+        #     git tag "v${{ github.event.inputs.new_semver }}"
+        #     git push origin --tags
+  
+        - name: GH-Pages checkout
+          run: git checkout gh_pages
+  
+        - name: Update repository index
+          run: |
+            mkdir -p charts/${{ env.CHART_REPO }}
+            mv *.tgz charts//${{ env.CHART_REPO }}
+            helm repo index --url ${{ env.HELM_REPO_URL }} charts
+  
+        - name: Deploy new chart
+          run: |
+            git add charts/${{ steps.chart_name.outputs.name }}-${{ env.ESCALATION_CHART_VERSION }}.tgz
+            git add charts/index.yaml
+            git commit -m "chore: deployed ${{ steps.chart_name.outputs.name }} ${{ env.ESCALATION_CHART_VERSION }}"
+            git push
