@@ -14,7 +14,7 @@
     ESCALATION_SWF_PATH: "escalation-eda/escalation-swf"
     # TODO: one of latest/release
     CHART_REPO: "latest"  
-    MVN_OPTS: "-Dmaven.repo.remote=https://repository.jboss.org/nexus/content/groups/public"
+    MVN_OPTS: "-Dmaven.repo.remote=https://repository.jboss.org/nexus/content/groups/public -s escalation-eda/settings.xml"
   jobs:
     build-chart-and-deploy:
       runs-on: ubuntu-latest
@@ -28,8 +28,6 @@
       
         - name: Build project with Maven
           run: |
-            echo ${{ env.MVN_SETTINGS }} > ~/.m2/settings.xml
-            cat ~/.m2/settings.xml
             echo "mvn ${{ env.MVN_OPTS }} -B package --file escalation-eda/escalation-swf/pom.xml"
             mvn ${{ env.MVN_OPTS }} -B package --file escalation-eda/escalation-swf/pom.xml
 
