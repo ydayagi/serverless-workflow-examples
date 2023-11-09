@@ -21,9 +21,10 @@
       name: Package and deploy a new chart version
       steps:
         - name: Setup Maven Action
-          uses: s4u/setup-maven-action@v1.2.1
+          uses: s4u/setup-maven-action@v1.10.0
           with:
             java-version: 11
+            checkout-ref: generic-swf
       
         - name: Build project with Maven
           run: |
