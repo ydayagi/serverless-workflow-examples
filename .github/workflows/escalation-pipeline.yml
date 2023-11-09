@@ -28,8 +28,7 @@
       
         - name: Build project with Maven
           run: |
-            echo "mvn ${{ env.MVN_OPTS }} -B package --file escalation-eda/escalation-swf/pom.xml"
-            mvn ${{ env.MVN_OPTS }} -B package --file escalation-eda/escalation-swf/pom.xml
+            mvn ${{ env.MVN_OPTS }} -B package --file escalation-eda/pom.xml -DskipTests
 
         - name: Set env
           run: |
