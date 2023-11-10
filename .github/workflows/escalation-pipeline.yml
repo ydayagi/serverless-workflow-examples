@@ -38,7 +38,7 @@
           run: |
             echo "ESCALATION_CHART=${{ env.ESCALATION_CHART_PATH }}/Chart.yaml" >> "$GITHUB_ENV"
             echo "ESCALATION_CHART_VERSION=$(mvn ${{ env.MVN_OPTS }} help:evaluate -Dexpression=project.version -q -DforceStdout -f ${{ env.ESCALATION_SWF_PATH }}/pom.xml | sed 's/-SNAPSHOT//g')" >> "$GITHUB_ENV"
-            echo "CURRENT_CHART_REPO"=charts/${{ env.CHART_REPO }}" >> "$GITHUB_ENV"
+            echo "CURRENT_CHART_REPO=charts/${{ env.CHART_REPO }}" >> "$GITHUB_ENV"
 
         - name: Get chart name
           id: chart_name
