@@ -106,9 +106,9 @@
             echo "ESCALATION_SWF_VERSION=$(mvn ${{ env.MVN_OPTS }} help:evaluate -Dexpression=project.version -q -DforceStdout -f ${{ env.ESCALATION_SWF_PATH }}/pom.xml)" >> "$GITHUB_ENV"
             echo "JIRA_LISTENER_VERSION=$(mvn ${{ env.MVN_OPTS }} help:evaluate -Dexpression=project.version -q -DforceStdout -f ${{ env.JIRA_LISTENER_PATH }}/pom.xml)" >> "$GITHUB_ENV"
 
-        # - name: Build Java projects
-        #   run: |
-        #     mvn ${{ env.MVN_OPTS }} -B package --file escalation-eda/pom.xml -DskipTests
+        - name: Build Java projects
+          run: |
+            mvn ${{ env.MVN_OPTS }} -B clean package --file escalation-eda/pom.xml -DskipTests
         # TODO: enable tests once fixed
 
         - name: "Build ${{ env.ESCALATION_SWF_IMAGE_NAME }} image"
