@@ -20,11 +20,15 @@
       runs-on: ubuntu-latest
       name: Package and deploy a new chart version
       steps:
-        - name: Setup Maven Action
-          uses: s4u/setup-maven-action@v1.10.0
+        - uses: actions/checkout@v3
           with:
-            java-version: 11
-            checkout-ref: generic-swf
+            ref: generic-swf
+        - name: Set up JDK 17
+          uses: actions/setup-java@v3
+          with:
+            java-version: '17'
+            distribution: 'temurin'
+            cache: maven
       
         # - name: Build project with Maven
         #   run: |
