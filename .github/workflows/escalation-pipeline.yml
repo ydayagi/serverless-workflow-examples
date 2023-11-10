@@ -65,8 +65,10 @@
         - name: Push new chart file
           run: |
             git add $ESCALATION_CHART
-            git commit -m "build: bumped ${{ steps.chart_name.outputs.name }} to ${{ env.ESCALATION_CHART_VERSION }} [skip ci]"
-            git push
+            if ! git diff-index --quiet HEAD; then
+              git commit -m "build: bumped ${{ steps.chart_name.outputs.name }} to ${{ env.ESCALATION_CHART_VERSION }} [skip ci]"
+              git push
+            fi
         # TODO: add tag on release or add released artifact to tag?
         # - name: Push new tag
         #   if: ${{ github.event.inputs.add_tag }}
