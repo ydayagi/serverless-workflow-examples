@@ -23,6 +23,7 @@
         - uses: actions/checkout@v3
           with:
             ref: generic-swf
+
         - name: Set up JDK 17
           uses: actions/setup-java@v3
           with:
@@ -39,20 +40,17 @@
             echo "ESCALATION_CHART=${{ env.ESCALATION_CHART_PATH }}/Chart.yaml" >> "$GITHUB_ENV"
             echo "ESCALATION_CHART_VERSION=$(mvn ${{ env.MVN_OPTS }} help:evaluate -Dexpression=project.version -q -DforceStdout -f ${{ env.ESCALATION_SWF_PATH }}/pom.xml | sed 's/-SNAPSHOT//g')" >> "$GITHUB_ENV"
             echo "CURRENT_CHART_REPO=charts/${{ env.CHART_REPO }}" >> "$GITHUB_ENV"
-
-        - name: Get chart name
-          id: chart_name
-          run: echo "::set-output name=name::$(cat ${{ env.ESCALATION_CHART }} | grep 'name:' | cut -c 7-)"
-  
+            echo "CHART_NAME=$(cat ${{ env.ESCALATION_CHART }} | grep 'name:' | cut -c 7-)" >> "$GITHUB_ENV"
+          
         - name: Update chart version
           run: |
             sed -i 's/version: .*/version: ${{ env.ESCALATION_CHART_VERSION }}/g' ${{ env.ESCALATION_CHART }}
             sed -i 's/appVersion: .*/appVersion: ${{ env.ESCALATION_CHART_VERSION }}/g' ${{ env.ESCALATION_CHART }}
   
-        - name: Configure Git
-          run: |
-            git config user.name "${{ github.actor }}"
-            git config user.email "${{ github.actor }}@users.noreply.github.com"
+        # - name: Configure Git
+        #   run: |
+        #     git config user.name "${{ github.actor }}"
+        #     git config user.email "${{ github.actor }}@users.noreply.github.com"
   
         - name: Setup Helm
           uses: azure/setup-helm@v3
@@ -67,7 +65,7 @@
           run: |
             git add $ESCALATION_CHART
             if ! git diff-index --quiet HEAD; then
-              git commit -m "build: bumped ${{ steps.chart_name.outputs.name }} to ${{ env.ESCALATION_CHART_VERSION }} [skip ci]"
+              git commit -m "build: bumped ${{ env.CHART_NAME }} to ${{ env.ESCALATION_CHART_VERSION }} [skip ci]"
               git push
             fi
         # TODO: add tag on release or add released artifact to tag?
@@ -94,5 +92,5 @@
         - name: Deploy new chart
           run: |
             git add ${{ env.CURRENT_CHART_REPO }}
-            git commit -m "chore: deployed chart ${{ steps.chart_name.outputs.name }} version ${{ env.ESCALATION_CHART_VERSION }} on repo ${{ env.CURRENT_CHART_REPO }}"
+            git commit -m "chore: deployed chart ${{ env.CHART_NAME }} version ${{ env.ESCALATION_CHART_VERSION }} on repo ${{ env.CURRENT_CHART_REPO }}"
             git push
