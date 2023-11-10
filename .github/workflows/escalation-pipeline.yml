@@ -7,7 +7,7 @@
       paths:
         - escalation-eda/*
     release:
-      types: prereleased
+      types: [prereleased]
   env:
     HELM_REPO_URL: "https://dmartinol.github.io/serverless-workflow-examples"
     ESCALATION_CHART_PATH: "escalation-eda/helm/escalation-eda"
@@ -16,13 +16,11 @@
     CHART_REPO: "latest"  
     MVN_OPTS: "-Dmaven.repo.remote=https://repository.jboss.org/nexus/content/groups/public -s escalation-eda/settings.xml"
   jobs:
-    build-chart-and-deploy:
+    setup:
       runs-on: ubuntu-latest
-      name: Package and deploy a new chart version
+      name: Setup the CI environment
       steps:
         - uses: actions/checkout@v3
-          # with:
-          #   ref: generic-swf
 
         - name: Configure Git
           run: |
@@ -36,17 +34,18 @@
             distribution: 'temurin'
             cache: maven
       
-        # - name: Build project with Maven
-        #   run: |
-        #     mvn ${{ env.MVN_OPTS }} -B package --file escalation-eda/pom.xml -DskipTests
-
         - name: Set env
           run: |
             echo "ESCALATION_CHART=${{ env.ESCALATION_CHART_PATH }}/Chart.yaml" >> "$GITHUB_ENV"
             echo "ESCALATION_CHART_VERSION=$(mvn ${{ env.MVN_OPTS }} help:evaluate -Dexpression=project.version -q -DforceStdout -f ${{ env.ESCALATION_SWF_PATH }}/pom.xml | sed 's/-SNAPSHOT//g')" >> "$GITHUB_ENV"
             echo "CURRENT_CHART_REPO=charts/${{ env.CHART_REPO }}" >> "$GITHUB_ENV"
             echo "CHART_NAME=$(cat ${{ env.ESCALATION_CHART }} | grep 'name:' | cut -c 7-)" >> "$GITHUB_ENV"
-          
+
+    build-chart:
+      runs-on: ubuntu-latest
+      needs: setup
+      name: Package a new chart version
+      steps:          
         - name: Update chart version
           run: |
             sed -i 's/version: .*/version: ${{ env.ESCALATION_CHART_VERSION }}/g' ${{ env.ESCALATION_CHART }}
@@ -75,22 +74,40 @@
         #     git tag "v${{ github.event.inputs.new_semver }}"
         #     git push origin --tags
   
-        - name: GH-Pages checkout
-          run: |
-            git fetch
-            git checkout gh_pages
-  
-        - name: Prepare repository
-          run: |
-            mkdir -p ${{ env.CURRENT_CHART_REPO }}
-            mv *.tgz ${{ env.CURRENT_CHART_REPO }}
+    deploy-chart:
+      runs-on: ubuntu-latest
+      needs: build-chart
+      name: Deploy the chart package on GH pages
+      steps:
+      - name: Checkout GH pages
+        run: |
+          git fetch
+          git checkout gh_pages
 
-        - name: Update repository index
+      - name: Prepare repository
+        run: |
+          mkdir -p ${{ env.CURRENT_CHART_REPO }}
+          mv *.tgz ${{ env.CURRENT_CHART_REPO }}
+
+      - name: Update repository index
+        run: |
+          helm repo index --url ${{ env.HELM_REPO_URL }}/${{ env.CURRENT_CHART_REPO }} ${{ env.CURRENT_CHART_REPO }}
+
+      - name: Deploy new chart
+        run: |
+          git add ${{ env.CURRENT_CHART_REPO }}
+          git commit -m "chore: deployed chart ${{ env.CHART_NAME }} version ${{ env.ESCALATION_CHART_VERSION }} on repo ${{ env.CURRENT_CHART_REPO }}"
+          git push
+    build_java:
+      runs-on: ubuntu-latest
+      needs: setup
+      name: Deploy the chart package on GH pages      
+      steps:
+        - name: Build Java projects
           run: |
-            helm repo index --url ${{ env.HELM_REPO_URL }}/${{ env.CURRENT_CHART_REPO }} ${{ env.CURRENT_CHART_REPO }}
-  
-        - name: Deploy new chart
+            mvn ${{ env.MVN_OPTS }} -B package --file escalation-eda/pom.xml -DskipTests
+
+        - name: Build jira-listener image
           run: |
-            git add ${{ env.CURRENT_CHART_REPO }}
-            git commit -m "chore: deployed chart ${{ env.CHART_NAME }} version ${{ env.ESCALATION_CHART_VERSION }} on repo ${{ env.CURRENT_CHART_REPO }}"
-            git push
+            cd escalation-eda/jira-listener
+            docker build -f src/main/docker/Dockerfile.jvm -t quay.io/orchestrator/jira-listener-jvm:latest .
