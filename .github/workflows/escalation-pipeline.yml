@@ -75,7 +75,9 @@
         #     git push origin --tags
   
         - name: GH-Pages checkout
-          run: git checkout gh_pages
+          run: |
+            git fetch
+            git checkout gh_pages
   
         - name: Update repository index
           run: |
