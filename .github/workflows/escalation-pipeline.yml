@@ -100,27 +100,28 @@
         IMAGE_GROUP: "orchestrator"
       steps:
         - uses: actions/checkout@v3
-        - name: Build Java projects
-          run: |
-            mvn ${{ env.MVN_OPTS }} -B package --file escalation-eda/pom.xml -DskipTests
-        # TODO: enable tests once fixed
 
         - name: Set env
           run: |
             echo "ESCALATION_SWF_VERSION=$(mvn ${{ env.MVN_OPTS }} help:evaluate -Dexpression=project.version -q -DforceStdout -f ${{ env.ESCALATION_SWF_PATH }}/pom.xml)" >> "$GITHUB_ENV"
             echo "JIRA_LISTENER_VERSION=$(mvn ${{ env.MVN_OPTS }} help:evaluate -Dexpression=project.version -q -DforceStdout -f ${{ env.JIRA_LISTENER_PATH }}/pom.xml)" >> "$GITHUB_ENV"
 
-        - name: Build ${{ env.ESCALATION_SWF_IMAGE_NAME }} image
+        # - name: Build Java projects
+        #   run: |
+        #     mvn ${{ env.MVN_OPTS }} -B package --file escalation-eda/pom.xml -DskipTests
+        # TODO: enable tests once fixed
+
+        - name: "Build ${{ env.ESCALATION_SWF_IMAGE_NAME }} image"
           run: |
-            cd ${{ env.ESCALATION_SWF_PATH }}
             mvn ${{ env.MVN_OPTS }} clean install -Pknative -DskipTests \
               -Dquarkus.container-image.registry=${{ env.IMAGE_REGISTRY }} \
               -Dquarkus.container-image.group=${{ env.IMAGE_GROUP }} \
               -Dquarkus.container-image.name=${{ env.ESCALATION_SWF_IMAGE_NAME }} \
-              -Dquarkus.container-image.tag=${{ env.ESCALATION_SWF_VERSION }}
+              -Dquarkus.container-image.tag=${{ env.ESCALATION_SWF_VERSION }} \
+              --file ${{ env.ESCALATION_SWF_PATH }}/pom.xml
       
-        - name: Build ${{ env.JIRA_LISTENER_IMAGE_NAME }} image
+        - name: "Build ${{ env.JIRA_LISTENER_IMAGE_NAME }} image"
           run: |
-            cd ${{ env.JIRA_LISTENER_PATH }}
-            docker build -f src/main/docker/Dockerfile.jvm -t ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_GROUP }}/${{ env.JIRA_LISTENER_IMAGE_NAME }}:${{ env.JIRA_LISTENER_VERSION }} .
+            docker build -f ${{ env.JIRA_LISTENER_PATH }}/src/main/docker/Dockerfile.jvm \
+              -t ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_GROUP }}/${{ env.JIRA_LISTENER_IMAGE_NAME }}:${{ env.JIRA_LISTENER_VERSION }} ${{ env.JIRA_LISTENER_PATH }}
             
