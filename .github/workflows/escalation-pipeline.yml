@@ -9,16 +9,17 @@
     release:
       types: [prereleased]
   env:
-    HELM_REPO_URL: "https://dmartinol.github.io/serverless-workflow-examples"
-    ESCALATION_CHART_PATH: "escalation-eda/helm/escalation-eda"
     ESCALATION_SWF_PATH: "escalation-eda/escalation-swf"
-    # TODO: one of latest/release
-    CHART_REPO: "latest"  
     MVN_OPTS: "-Dmaven.repo.remote=https://repository.jboss.org/nexus/content/groups/public -s escalation-eda/settings.xml"
-  jobs:
+  jobs:    
     build_and_deploy_chart:
       runs-on: ubuntu-latest
       name: Build and deploy the new chart on the GH pages repository
+      env:
+        HELM_REPO_URL: "https://dmartinol.github.io/serverless-workflow-examples"
+        ESCALATION_CHART_PATH: "escalation-eda/helm/escalation-eda"
+        # TODO: one of latest/release
+        CHART_REPO: "latest"  
       steps:
         - uses: actions/checkout@v3
 
@@ -91,13 +92,30 @@
     build_and_deploy_java_apps:
       runs-on: ubuntu-latest
       name: Build and deploy container images for the Java applications
+      env:
+        JIRA_LISTENER_PATH: "escalation-eda/jira-listener"
+        ESCALATION_SWF_IMAGE_NAME: "escalation-swf"
+        JIRA_LISTENER_IMAGE_NAME: "jira-listener"
+        IMAGE_REGISTRY: "quay.io/orchestrator"
       steps:
         - uses: actions/checkout@v3
         - name: Build Java projects
           run: |
             mvn ${{ env.MVN_OPTS }} -B package --file escalation-eda/pom.xml -DskipTests
 
-        - name: Build jira-listener image
+        - name: Set env
           run: |
+            echo "ESCALATION_SWF_VERSION=$(mvn ${{ env.MVN_OPTS }} help:evaluate -Dexpression=project.version -q -DforceStdout -f ${{ env.ESCALATION_SWF_PATH }}/pom.xml)" >> "$GITHUB_ENV"
+            echo "JIRA_LISTENER_VERSION=$(mvn ${{ env.MVN_OPTS }} help:evaluate -Dexpression=project.version -q -DforceStdout -f ${{ env.JIRA_LISTENER_PATH }}/pom.xml)" >> "$GITHUB_ENV"
+
+        - name: Build ${{ env.JIRA_LISTENER_IMAGE_NAME }} image
+          run: |
+            cd ${{ env.JIRA_LISTENER_PATH }}
+            docker build -f src/main/docker/Dockerfile.jvm -t ${{ env.IMAGE_REGISTRY }}/${{ env.JIRA_LISTENER_IMAGE_NAME }}:latest .
+            
+        - name: Build ${{ env.ESCALATION_SWF_IMAGE_NAME }} image
+          run: |
+            cd ${{ env.ESCALATION_SWF_PATH }}
             cd escalation-eda/jira-listener
-            docker build -f src/main/docker/Dockerfile.jvm -t quay.io/orchestrator/jira-listener-jvm:latest .
+            mvn clean install -Pknative
+            docker build -f src/main/docker/Dockerfile.jvm -t ${{ env.IMAGE_REGISTRY }}/${{ env.ESCALATION_SWF_IMAGE_NAME }}:latest .
