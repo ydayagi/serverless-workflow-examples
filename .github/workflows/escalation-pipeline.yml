@@ -12,99 +12,6 @@
     ESCALATION_SWF_PATH: "escalation-eda/escalation-swf"
     MVN_OPTS: "-Dmaven.repo.remote=https://repository.jboss.org/nexus/content/groups/public -s escalation-eda/settings.xml"
   jobs:    
-    build_and_deploy_chart:
-      runs-on: ubuntu-latest
-      name: Build and deploy the new chart on the GH pages repository
-      env:
-        HELM_REPO_URL: "https://dmartinol.github.io/serverless-workflow-examples"
-        ESCALATION_CHART_PATH: "escalation-eda/helm/escalation-eda"
-        # TODO: one of latest/release
-        CHART_REPO: "latest"  
-      steps:
-        - uses: actions/checkout@v3
-
-        - name: Configure Git
-          run: |
-            git config user.name "${{ github.actor }}"
-            git config user.email "${{ github.actor }}@users.noreply.github.com"
-
-        - name: Set up JDK 17
-          uses: actions/setup-java@v3
-          with:
-            java-version: '17'
-            distribution: 'temurin'
-            cache: maven
-      
-        - name: Set env
-          run: |
-            echo "ESCALATION_CHART=${{ env.ESCALATION_CHART_PATH }}/Chart.yaml" >> "$GITHUB_ENV"
-            echo "ESCALATION_CHART_VERSION=$(mvn ${{ env.MVN_OPTS }} help:evaluate -Dexpression=project.version -q -DforceStdout -f ${{ env.ESCALATION_SWF_PATH }}/pom.xml | sed 's/-SNAPSHOT//g')" >> "$GITHUB_ENV"
-            echo "CURRENT_CHART_REPO=charts/${{ env.CHART_REPO }}" >> "$GITHUB_ENV"
-            echo "CHART_NAME=$(cat ${{ env.ESCALATION_CHART }} | grep 'name:' | cut -c 7-)" >> "$GITHUB_ENV"
-
-        - name: Update chart version
-          run: |
-            sed -i 's/version: .*/version: ${{ env.ESCALATION_CHART_VERSION }}/g' ${{ env.ESCALATION_CHART }}
-            sed -i 's/appVersion: .*/appVersion: ${{ env.ESCALATION_CHART_VERSION }}/g' ${{ env.ESCALATION_CHART }}
-  
-        - name: Setup Helm
-          uses: azure/setup-helm@v3
-
-        - name: Load resources
-          run: |
-            cd ${{ env.ESCALATION_CHART_PATH }}
-            ./prepare.sh
-
-        - name: Lint chart
-          run: helm lint ${{ env.ESCALATION_CHART_PATH }}
-        
-        - name: Validate chart
-          run: |
-            helm template test ${{ env.ESCALATION_CHART_PATH }} > test.yaml
-            # Count by resource type
-            test $(grep -c "kind: ConfigMap" test.yaml) -eq 4
-            test $(grep -c "kind: Secret" test.yaml) -eq 1
-            test $(grep -c "kind: SonataFlow" test.yaml) -eq 1
-            test $(grep -c "kind: SonataFlow" test.yaml) -eq 1
-            # Verify resources
-            cat test.yaml| yq  '. | select(.kind == "ConfigMap" and .metadata.name == "escalation-specs")' | grep -q "jira.yaml" 
-            cat test.yaml| yq  '. | select(.kind == "ConfigMap" and .metadata.name == "escalation-specs")' | grep -q "kube.yaml" 
-            cat test.yaml| yq  '. | select(.kind == "ConfigMap" and .metadata.name == "escalation-specs")' | grep -q "mailtrap.yaml" 
-            cat test.yaml| yq  '. | select(.kind == "ConfigMap" and .metadata.name == "escalation-specs")' | grep -q "subflow-input-schema.json" 
-            cat test.yaml| yq  '. | select(.kind == "ConfigMap" and .metadata.name == "escalation-specs")' | grep -q "ticket-escalation-schema.json" 
-            cat test.yaml| yq  '. | select(.kind == "ConfigMap" and .metadata.name == "escalation-subflow")' | grep -q "ticketing-service.sw.yaml" 
-            cat test.yaml| yq  '. | select(.kind == "SonataFlow").spec.flow.id' | grep -q "ticketEscalation" 
-
-        - name: Package chart
-          run: helm package ${{ env.ESCALATION_CHART_PATH }}
-  
-        - name: Push new chart file
-          run: |
-            git add $ESCALATION_CHART
-            if ! git diff-index --quiet HEAD; then
-              git commit -m "build: bumped ${{ env.CHART_NAME }} to ${{ env.ESCALATION_CHART_VERSION }} [skip ci]"
-              git push
-            fi
-  
-        - name: Checkout GH pages
-          run: |
-            git fetch
-            git checkout gh_pages
-
-        - name: Prepare repository
-          run: |
-            mkdir -p ${{ env.CURRENT_CHART_REPO }}
-            mv *.tgz ${{ env.CURRENT_CHART_REPO }}
-
-        - name: Update repository index
-          run: |
-            helm repo index --url ${{ env.HELM_REPO_URL }}/${{ env.CURRENT_CHART_REPO }} ${{ env.CURRENT_CHART_REPO }}
-
-        - name: Deploy new chart
-          run: |
-            git add ${{ env.CURRENT_CHART_REPO }}
-            git commit -m "chore: deployed chart ${{ env.CHART_NAME }} version ${{ env.ESCALATION_CHART_VERSION }} on repo ${{ env.CURRENT_CHART_REPO }}"
-            git push
     build_and_deploy_java_apps:
       runs-on: ubuntu-latest
       name: Build and deploy container images for the Java applications
@@ -152,3 +59,103 @@
         - name: "Push ${{ env.JIRA_LISTENER_IMAGE_NAME }} to ${{ env.IMAGE_REGISTRY}}/${{ env.IMAGE_GROUP }}"
           run: |
             docker push ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_GROUP }}/${{ env.JIRA_LISTENER_IMAGE_NAME }}:${{ env.JIRA_LISTENER_VERSION }}
+
+    build_and_deploy_chart:
+      runs-on: ubuntu-latest
+      name: Build and deploy the new chart on the GH pages repository
+      needs: build_and_deploy_java_apps
+      env:
+        HELM_REPO_URL: "https://dmartinol.github.io/serverless-workflow-examples"
+        ESCALATION_CHART_PATH: "escalation-eda/helm/escalation-eda"
+        # TODO: one of latest/release
+        CHART_REPO: "latest"  
+      steps:
+        - uses: actions/checkout@v3
+
+        - name: Configure Git
+          run: |
+            git config user.name "${{ github.actor }}"
+            git config user.email "${{ github.actor }}@users.noreply.github.com"
+
+        - name: Set up JDK 17
+          uses: actions/setup-java@v3
+          with:
+            java-version: '17'
+            distribution: 'temurin'
+            cache: maven
+      
+        - name: Set env
+          run: |
+            echo "ESCALATION_CHART=${{ env.ESCALATION_CHART_PATH }}/Chart.yaml" >> "$GITHUB_ENV"
+            echo "ESCALATION_VALUES=${{ env.ESCALATION_CHART_PATH }}/values.yaml" >> "$GITHUB_ENV"
+            echo "ESCALATION_CHART_VERSION=$(mvn ${{ env.MVN_OPTS }} help:evaluate -Dexpression=project.version -q -DforceStdout -f ${{ env.ESCALATION_SWF_PATH }}/pom.xml | sed 's/-SNAPSHOT//g')" >> "$GITHUB_ENV"
+            echo "CURRENT_CHART_REPO=charts/${{ env.CHART_REPO }}" >> "$GITHUB_ENV"
+            echo "CHART_NAME=$(cat ${{ env.ESCALATION_CHART }} | grep 'name:' | cut -c 7-)" >> "$GITHUB_ENV"
+
+        - name: Update chart version
+          run: |
+            sed -i 's/version: .*/version: "${{ env.ESCALATION_CHART_VERSION }}"/g' ${{ env.ESCALATION_CHART }}
+            sed -i 's/appVersion: .*/appVersion: "${{ env.ESCALATION_CHART_VERSION }}"/g' ${{ env.ESCALATION_CHART }}
+      
+        - name: Update default values
+          run: |
+            yq -e -i -y '.jiralistener.image = "${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_GROUP }}/${{ env.JIRA_LISTENER_IMAGE_NAME }}"' ${{ env.ESCALATION_VALUES }}
+  
+        - name: Setup Helm
+          uses: azure/setup-helm@v3
+
+        - name: Load resources
+          run: |
+            cd ${{ env.ESCALATION_CHART_PATH }}
+            ./prepare.sh
+
+        - name: Lint chart
+          run: helm lint ${{ env.ESCALATION_CHART_PATH }}
+        
+        - name: Validate chart
+          run: |
+            helm template test ${{ env.ESCALATION_CHART_PATH }} > test.yaml
+            # Count by resource type
+            test $(grep -c "kind: ConfigMap" test.yaml) -eq 4
+            test $(grep -c "kind: Secret" test.yaml) -eq 1
+            test $(grep -c "kind: SonataFlow" test.yaml) -eq 1
+            test $(grep -c "kind: SonataFlow" test.yaml) -eq 1
+            # Verify resources
+            cat test.yaml| yq  '. | select(.kind == "ConfigMap" and .metadata.name == "escalation-specs")' | grep -q "jira.yaml" 
+            cat test.yaml| yq  '. | select(.kind == "ConfigMap" and .metadata.name == "escalation-specs")' | grep -q "kube.yaml" 
+            cat test.yaml| yq  '. | select(.kind == "ConfigMap" and .metadata.name == "escalation-specs")' | grep -q "mailtrap.yaml" 
+            cat test.yaml| yq  '. | select(.kind == "ConfigMap" and .metadata.name == "escalation-specs")' | grep -q "subflow-input-schema.json" 
+            cat test.yaml| yq  '. | select(.kind == "ConfigMap" and .metadata.name == "escalation-specs")' | grep -q "ticket-escalation-schema.json" 
+            cat test.yaml| yq  '. | select(.kind == "ConfigMap" and .metadata.name == "escalation-subflow")' | grep -q "ticketing-service.sw.yaml" 
+            cat test.yaml| yq  '. | select(.kind == "SonataFlow").spec.flow.id' | grep -q "ticketEscalation" 
+
+        - name: Package chart
+          run: helm package ${{ env.ESCALATION_CHART_PATH }}
+  
+        - name: Push changes to ${{ github.ref_name }}
+          run: |
+            git add $ESCALATION_CHART
+            if ! git diff-index --quiet HEAD; then
+              git commit -m "build: bumped ${{ env.CHART_NAME }} to ${{ env.ESCALATION_CHART_VERSION }} [skip ci]"
+              git push
+            fi
+  
+        - name: Checkout GH pages
+          run: |
+            git fetch
+            git checkout gh_pages
+
+        - name: Prepare repository
+          run: |
+            mkdir -p ${{ env.CURRENT_CHART_REPO }}
+            mv *.tgz ${{ env.CURRENT_CHART_REPO }}
+
+        - name: Update repository index
+          run: |
+            helm repo index --url ${{ env.HELM_REPO_URL }}/${{ env.CURRENT_CHART_REPO }} ${{ env.CURRENT_CHART_REPO }}
+
+        - name: Deploy new chart
+          run: |
+            git add ${{ env.CURRENT_CHART_REPO }}
+            git commit -m "chore: deployed chart ${{ env.CHART_NAME }} version ${{ env.ESCALATION_CHART_VERSION }} on repo ${{ env.CURRENT_CHART_REPO }}"
+            git push
