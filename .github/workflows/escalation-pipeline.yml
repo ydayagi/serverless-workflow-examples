@@ -134,14 +134,14 @@
             cat test.yaml| yq  '. | select(.kind == "ConfigMap" and .metadata.name == "escalation-subflow")' | grep -q "ticketing-service.sw.yaml" 
             cat test.yaml| yq  '. | select(.kind == "SonataFlow").spec.flow.id' | grep -q "ticketEscalation" 
 
-        - name: Package chart ${{ env.CHART_NAME }}
-          run: helm package ${{ env.ESCALATION_CHART_PATH }}
+        - name: Package chart $CHART_NAME
+          run: helm package ${ESCALATION_CHART_PATH}
   
         - name: Push changes to ${{ github.ref_name }}
           run: |
-            git add $ESCALATION_CHART
+            git add ${ESCALATION_CHART_PATH}
             if ! git diff-index --quiet HEAD; then
-              git commit -m "build: bumped ${{ env.CHART_NAME }} to ${{ env.ESCALATION_CHART_VERSION }}"
+              git commit -m "build: bumped ${CHART_NAME} to ${ESCALATION_CHART_VERSION}"
               git push
             fi
   
