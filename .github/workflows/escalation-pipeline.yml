@@ -21,6 +21,9 @@
         JIRA_LISTENER_IMAGE_NAME: "jira-listener"
         IMAGE_REGISTRY: "quay.io"
         IMAGE_GROUP: "orchestrator"
+      outputs:
+        JiraListenerImageFull: ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_GROUP }}/${{ env.JIRA_LISTENER_IMAGE_NAME }}:${{ env.JIRA_LISTENER_VERSION }}
+        EscalationSwfImageFull: ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_GROUP }}/${{ env.ESCALATION_SWF_IMAGE_NAME }}:${{ env.ESCALATION_SWF_VERSION }}
       steps:
         - uses: actions/checkout@v3
 
@@ -68,7 +71,9 @@
         HELM_REPO_URL: "https://dmartinol.github.io/serverless-workflow-examples"
         ESCALATION_CHART_PATH: "escalation-eda/helm/escalation-eda"
         # TODO: one of latest/release
-        CHART_REPO: "latest"  
+        CHART_REPO: "latest"
+        JIRA_LISTENER_IMAGE_FULL: ${{ needs.build_and_deploy_java_apps.outputs.JiraListenerImageFull }}
+        ESCALATION_SWF_IMAGE_FULL: ${{ needs.build_and_deploy_java_apps.outputs.EscalationSwfImageFull }}
       steps:
         - uses: actions/checkout@v3
 
@@ -99,7 +104,7 @@
       
         - name: Update default values
           run: |
-            yq -e -i -y '.jiralistener.image = "${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_GROUP }}/${{ env.JIRA_LISTENER_IMAGE_NAME }}"' ${{ env.ESCALATION_VALUES }}
+            yq -e -i -y '.jiralistener.image = "${{ env.JIRA_LISTENER_IMAGE_FULL }}"' ${{ env.ESCALATION_VALUES }}
   
         - name: Setup Helm
           uses: azure/setup-helm@v3
