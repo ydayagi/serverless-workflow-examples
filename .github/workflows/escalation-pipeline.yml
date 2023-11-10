@@ -132,7 +132,7 @@
             
         - name: "Login to ${{ env.IMAGE_REGISTRY }}"
           run: |
-            docker login --username="${{ secrets.REGISTRY_USERNAME }}" --password="${{ secrets.REGISTRY_PASSWORD }}" ${{ env.IMAGE_REGISTRY }}
+            docker login -u="${{ secrets.REGISTRY_USERNAME }}" -p="${{ secrets.REGISTRY_PASSWORD }}" ${{ env.IMAGE_REGISTRY }}
 
         - name: "Push ${{ env.ESCALATION_SWF_IMAGE_NAME }} to ${{ env.IMAGE_REGISTRY}}/${{ env.IMAGE_GROUP }}"
           run: |
