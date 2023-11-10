@@ -24,6 +24,11 @@
           # with:
           #   ref: generic-swf
 
+        - name: Configure Git
+          run: |
+            git config user.name "${{ github.actor }}"
+            git config user.email "${{ github.actor }}@users.noreply.github.com"
+
         - name: Set up JDK 17
           uses: actions/setup-java@v3
           with:
@@ -46,11 +51,6 @@
           run: |
             sed -i 's/version: .*/version: ${{ env.ESCALATION_CHART_VERSION }}/g' ${{ env.ESCALATION_CHART }}
             sed -i 's/appVersion: .*/appVersion: ${{ env.ESCALATION_CHART_VERSION }}/g' ${{ env.ESCALATION_CHART }}
-  
-        # - name: Configure Git
-        #   run: |
-        #     git config user.name "${{ github.actor }}"
-        #     git config user.email "${{ github.actor }}@users.noreply.github.com"
   
         - name: Setup Helm
           uses: azure/setup-helm@v3
