@@ -1,3 +1,5 @@
+![Escalation CI](https://github.com/dmartinol/serverless-workflow-examples/actions/workflows/escalation-pipeline.yml/badge.svg)
+
 # Escalation workflow with Event Driven Architecture
 ## Use case
 As a user I want to create a ticket to request the creation of a new namespace in an OpenShift cluster and inform the given
