@@ -56,7 +56,7 @@
             ./prepare.sh
 
         - name: Lint chart
-         run: helm lint ${{ env.ESCALATION_CHART_PATH }}
+          run: helm lint ${{ env.ESCALATION_CHART_PATH }}
         
         - name: Validate chart
           run: |
