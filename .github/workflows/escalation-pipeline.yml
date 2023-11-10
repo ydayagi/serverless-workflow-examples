@@ -16,9 +16,9 @@
     CHART_REPO: "latest"  
     MVN_OPTS: "-Dmaven.repo.remote=https://repository.jboss.org/nexus/content/groups/public -s escalation-eda/settings.xml"
   jobs:
-    setup:
+    build_and_deploy_chart:
       runs-on: ubuntu-latest
-      name: Setup the CI environment
+      name: Build and deploy the new chart on the GH pages repository
       steps:
         - uses: actions/checkout@v3
 
@@ -41,11 +41,6 @@
             echo "CURRENT_CHART_REPO=charts/${{ env.CHART_REPO }}" >> "$GITHUB_ENV"
             echo "CHART_NAME=$(cat ${{ env.ESCALATION_CHART }} | grep 'name:' | cut -c 7-)" >> "$GITHUB_ENV"
 
-    build-chart:
-      runs-on: ubuntu-latest
-      needs: setup
-      name: Package a new chart version
-      steps:          
         - name: Update chart version
           run: |
             sed -i 's/version: .*/version: ${{ env.ESCALATION_CHART_VERSION }}/g' ${{ env.ESCALATION_CHART }}
@@ -74,35 +69,30 @@
         #     git tag "v${{ github.event.inputs.new_semver }}"
         #     git push origin --tags
   
-    deploy-chart:
+        - name: Checkout GH pages
+          run: |
+            git fetch
+            git checkout gh_pages
+
+        - name: Prepare repository
+          run: |
+            mkdir -p ${{ env.CURRENT_CHART_REPO }}
+            mv *.tgz ${{ env.CURRENT_CHART_REPO }}
+
+        - name: Update repository index
+          run: |
+            helm repo index --url ${{ env.HELM_REPO_URL }}/${{ env.CURRENT_CHART_REPO }} ${{ env.CURRENT_CHART_REPO }}
+
+        - name: Deploy new chart
+          run: |
+            git add ${{ env.CURRENT_CHART_REPO }}
+            git commit -m "chore: deployed chart ${{ env.CHART_NAME }} version ${{ env.ESCALATION_CHART_VERSION }} on repo ${{ env.CURRENT_CHART_REPO }}"
+            git push
+    build_and_deploy_java_apps:
       runs-on: ubuntu-latest
-      needs: build-chart
-      name: Deploy the chart package on GH pages
+      name: Build and deploy container images for the Java applications
       steps:
-      - name: Checkout GH pages
-        run: |
-          git fetch
-          git checkout gh_pages
-
-      - name: Prepare repository
-        run: |
-          mkdir -p ${{ env.CURRENT_CHART_REPO }}
-          mv *.tgz ${{ env.CURRENT_CHART_REPO }}
-
-      - name: Update repository index
-        run: |
-          helm repo index --url ${{ env.HELM_REPO_URL }}/${{ env.CURRENT_CHART_REPO }} ${{ env.CURRENT_CHART_REPO }}
-
-      - name: Deploy new chart
-        run: |
-          git add ${{ env.CURRENT_CHART_REPO }}
-          git commit -m "chore: deployed chart ${{ env.CHART_NAME }} version ${{ env.ESCALATION_CHART_VERSION }} on repo ${{ env.CURRENT_CHART_REPO }}"
-          git push
-    build_java:
-      runs-on: ubuntu-latest
-      needs: setup
-      name: Deploy the chart package on GH pages      
-      steps:
+        - uses: actions/checkout@v3
         - name: Build Java projects
           run: |
             mvn ${{ env.MVN_OPTS }} -B package --file escalation-eda/pom.xml -DskipTests
