@@ -1,11 +1,11 @@
-namespace: 
+namespace:
   create: true
   name: escalation
 letsEncryptCertificate: false
 jiralistener:
   # Override this name to overcome the Let's Encrypt rate limit as defined here: https://letsencrypt.org/docs/duplicate-certificate-limit/
   name: jira-listener
-  image: quay.io/orchestrator/jira-listener-jvm
+  image: quay.io/orchestrator/jira-listener:1.0.0-SNAPSHOT
 escalationSwf:
   profile: dev
   name: escalation-swf
@@ -25,6 +25,5 @@ escalationSwf:
     apiServerUrl: null
     apiServerToken: null
   escalationTimeoutSeconds: 30
-
 eventdisplay:
   enabled: true

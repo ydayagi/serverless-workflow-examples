@@ -1,0 +1,112 @@
+specVersion: "0.8"
+id: ticketEscalation
+name: Ticket escalation
+annotations:
+  - "workflow-type/infrastructure"
+version: 0.0.1
+timeouts:
+  workflowExecTimeout:
+    duration: PT24H
+start: CreateTicket
+dataInputSchema:
+  failOnValidationErrors: true
+  schema: specs/ticket-escalation-schema.json
+errors:
+  - name: timeoutError
+    code: TimedOut
+functions:
+  - name: sendEmail
+    operation: 'specs/mailtrap.yaml#sendEmail'
+  - name: createK8sNamespace
+    operation: specs/kube.yaml#createCoreV1Namespace
+  - name: logInfo
+    type: custom
+    operation: "sysout:INFO"
+events:
+ - name: approvalEvent
+   # TODO add property
+   source: ticket.listener 
+   # TODO add property
+   type: dev.parodos.escalation
+states:
+  - name: CreateTicket
+    type: operation
+    actions:
+      # - subFlowRef: $SECRET.escalation_subflow_id
+      - subFlowRef: ticketingService
+        actionDataFilter:
+          toStateData: .createResponse
+    stateDataFilter:
+      input: ". += { request: {type: \"create\", namespace: .namespace, parentId: $WORKFLOW.instanceId} }"
+    transition: WaitForApprovalEvent
+  - name: GetTicket
+    type: operation
+    actions:
+      # - subFlowRef: $SECRET.escalation_subflow_id
+      - subFlowRef: ticketingService
+        actionDataFilter:
+          toStateData: .getResponse
+    stateDataFilter:
+      input: ". += { request: { type: \"get\", ticketId: .createResponse.ticketId, ticket: .createResponse.ticket} }"
+    transition: CheckTicketState
+  - name: CheckTicketState
+    type: switch
+    dataConditions:
+      - condition: (.getResponse.status == "Approved")
+        transition:
+          nextState: CreateK8sNamespace
+    defaultCondition:
+      transition: WaitForApprovalEvent
+  - name: WaitForApprovalEvent
+    type: callback
+    action:
+      functionRef:
+        refName: logInfo
+        arguments:
+          message: "\"Waiting for approvalEvent: \\(.)\""
+    eventRef: approvalEvent
+    timeouts:
+      eventTimeout: PT10S
+      # This is not working for now, waiting for a fix to https://issues.redhat.com/browse/KOGITO-9811
+      # eventTimeout: $SECRET.timeout_seconds
+    onErrors:
+      - errorRef: timeoutError
+        transition: Escalate
+    transition: CreateK8sNamespace
+  - name: Escalate
+    type: operation
+    actions:
+      - name: printAction
+        functionRef:
+          refName: logInfo
+          arguments:
+            message: "\"Invoking escalation: \\(.)\""
+      - name: sendEmail
+        functionRef:
+          refName: sendEmail
+          arguments:
+            inbox_id: $SECRET.mailtrap_inbox_id | tonumber
+            to: 
+              - email: .manager
+                name: Escalation Manager
+            from:
+              email: $SECRET.sender_email
+              name: Escalation service
+            subject: " \"Escalation ticket \" + .createResponse.ticketId "
+            html: '"Please manage escalation ticket <a href=\"" + .createResponse.browseUrl + "\">" + .createResponse.ticketId + "</a>"'
+    transition: GetTicket
+  - name: CreateK8sNamespace
+    type: operation
+    actions:
+      - functionRef:
+          refName: createK8sNamespace
+          arguments:
+            apiVersion: v1
+            kind: Namespace
+            metadata:
+              name: .namespace
+        actionDataFilter:
+          toStateData: .createdNamespace
+    stateDataFilter:
+      output: "{createdNamespace: .createdNamespace}"
+    end: true
