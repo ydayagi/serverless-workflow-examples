@@ -56,8 +56,25 @@
             ./prepare.sh
 
         - name: Lint chart
-          run: helm lint ${{ env.ESCALATION_CHART_PATH }}
-  
+         run: helm lint ${{ env.ESCALATION_CHART_PATH }}
+        
+        - name: Validate chart
+          run: |
+            helm template test ${{ env.ESCALATION_CHART_PATH }} > test.yaml
+            # Count by resource type
+            test $(grep -c "kind: ConfigMap" all.yaml) -eq 4
+            test $(grep -c "kind: Secret" all.yaml) -eq 1
+            test $(grep -c "kind: SonataFlow" all.yaml) -eq 1
+            test $(grep -c "kind: SonataFlow" all.yaml) -eq 1
+            # Verify resources
+            cat test.yaml| yq  '. | select(.kind == "ConfigMap" and .metadata.name == "escalation-specs")' | grep -q "jira.yaml" 
+            cat test.yaml| yq  '. | select(.kind == "ConfigMap" and .metadata.name == "escalation-specs")' | grep -q "kube.yaml" 
+            cat test.yaml| yq  '. | select(.kind == "ConfigMap" and .metadata.name == "escalation-specs")' | grep -q "mailtrap.yaml" 
+            cat test.yaml| yq  '. | select(.kind == "ConfigMap" and .metadata.name == "escalation-specs")' | grep -q "subflow-input-schema.json" 
+            cat test.yaml| yq  '. | select(.kind == "ConfigMap" and .metadata.name == "escalation-specs")' | grep -q "ticket-escalation-schema.json" 
+            cat test.yaml| yq  '. | select(.kind == "ConfigMap" and .metadata.name == "escalation-subflow")' | grep -q "ticketing-service.sw.yaml" 
+            cat test.yaml| yq  '. | select(.kind == "SonataFlow").spec.flow.id' | grep -q "ticketEscalation" 
+
         - name: Package chart
           run: helm package ${{ env.ESCALATION_CHART_PATH }}
   
@@ -68,12 +85,6 @@
               git commit -m "build: bumped ${{ env.CHART_NAME }} to ${{ env.ESCALATION_CHART_VERSION }} [skip ci]"
               git push
             fi
-        # TODO: add tag on release or add released artifact to tag?
-        # - name: Push new tag
-        #   if: ${{ github.event.inputs.add_tag }}
-        #   run: |
-        #     git tag "v${{ github.event.inputs.new_semver }}"
-        #     git push origin --tags
   
         - name: Checkout GH pages
           run: |
