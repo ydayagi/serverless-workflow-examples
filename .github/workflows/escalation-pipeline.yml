@@ -50,6 +50,11 @@
         - name: Setup Helm
           uses: azure/setup-helm@v3
 
+        - name: Load resources
+          run: |
+            cd ${{ env.ESCALATION_CHART_PATH }}
+            ./prepare.sh
+
         - name: Lint chart
           run: helm lint ${{ env.ESCALATION_CHART_PATH }}
   

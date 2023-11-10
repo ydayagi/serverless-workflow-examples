@@ -21,3 +21,6 @@
 .idea/
 *.tmproj
 .vscode/
+
+# CI script
+prepare.sh
