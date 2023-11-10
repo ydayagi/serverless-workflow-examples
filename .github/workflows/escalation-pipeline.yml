@@ -62,10 +62,10 @@
           run: |
             helm template test ${{ env.ESCALATION_CHART_PATH }} > test.yaml
             # Count by resource type
-            test $(grep -c "kind: ConfigMap" all.yaml) -eq 4
-            test $(grep -c "kind: Secret" all.yaml) -eq 1
-            test $(grep -c "kind: SonataFlow" all.yaml) -eq 1
-            test $(grep -c "kind: SonataFlow" all.yaml) -eq 1
+            test $(grep -c "kind: ConfigMap" test.yaml) -eq 4
+            test $(grep -c "kind: Secret" test.yaml) -eq 1
+            test $(grep -c "kind: SonataFlow" test.yaml) -eq 1
+            test $(grep -c "kind: SonataFlow" test.yaml) -eq 1
             # Verify resources
             cat test.yaml| yq  '. | select(.kind == "ConfigMap" and .metadata.name == "escalation-specs")' | grep -q "jira.yaml" 
             cat test.yaml| yq  '. | select(.kind == "ConfigMap" and .metadata.name == "escalation-specs")' | grep -q "kube.yaml" 
