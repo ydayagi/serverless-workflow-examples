@@ -125,3 +125,14 @@
             docker build -f ${{ env.JIRA_LISTENER_PATH }}/src/main/docker/Dockerfile.jvm \
               -t ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_GROUP }}/${{ env.JIRA_LISTENER_IMAGE_NAME }}:${{ env.JIRA_LISTENER_VERSION }} ${{ env.JIRA_LISTENER_PATH }}
             
+        - name: "Login to ${{ env.IMAGE_REGISTRY }}"
+          run: |
+            docker login --username="${{ secrets.REGISTRY_USERNAME }}" --password="${{ secrets.REGISTRY_PASSWORD }}" ${{ env.IMAGE_REGISTRY }}
+
+        - name: "Push ${{ env.ESCALATION_SWF_IMAGE_NAME }} to ${{ env.IMAGE_REGISTRY}}/${{ env.IMAGE_GROUP }}"
+          run: |
+            docker push ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_GROUP }}/${{ env.ESCALATION_SWF_IMAGE_NAME }}:${{ env.ESCALATION_SWF_VERSION }}
+        
+        - name: "Push ${{ env.JIRA_LISTENER_IMAGE_NAME }} to ${{ env.IMAGE_REGISTRY}}/${{ env.IMAGE_GROUP }}"
+          run: |
+            docker push ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_GROUP }}/${{ env.JIRA_LISTENER_IMAGE_NAME }}:${{ env.JIRA_LISTENER_VERSION }}
