@@ -99,12 +99,14 @@
 
         - name: Update chart version
           run: |
-            sed -i 's/version: .*/version: "${ESCALATION_CHART_VERSION}"/g' ${ESCALATION_CHART}
-            sed -i 's/appVersion: .*/appVersion: "${ESCALATION_CHART_VERSION}"/g' ${ESCALATION_CHART}
+            yq -e -i '.version = "${ESCALATION_CHART_VERSION}"' ${ESCALATION_CHART}
+            yq -e -i '.appVersion = "${ESCALATION_CHART_VERSION}"' ${ESCALATION_CHART}
+            cat ${ESCALATION_CHART}
       
         - name: Update default values
           run: |
             yq -e -i '.jiralistener.image = "${JIRA_LISTENER_IMAGE_FULL}"' ${ESCALATION_VALUES}
+            cat ${ESCALATION_VALUES}
   
         - name: Setup Helm
           uses: azure/setup-helm@v3
