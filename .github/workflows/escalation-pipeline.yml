@@ -22,8 +22,8 @@
         IMAGE_REGISTRY: "quay.io"
         IMAGE_GROUP: "orchestrator"
       outputs:
-        JiraListenerImageFull: ${IMAGE_REGISTRY}/${IMAGE_GROUP}/${JIRA_LISTENER_IMAGE_NAME}:${JIRA_LISTENER_VERSION}
-        EscalationSwfImageFull: ${IMAGE_REGISTRY}/${IMAGE_GROUP}/${ESCALATION_SWF_IMAGE_NAME}:${ESCALATION_SWF_VERSION}
+        JiraListenerImageFull: ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_GROUP }}/${{ env.JIRA_LISTENER_IMAGE_NAME }}:${{ env.JIRA_LISTENER_VERSION }}
+        EscalationSwfImageFull: ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_GROUP }}/${{ env.ESCALATION_SWF_IMAGE_NAME }}:${{ env.ESCALATION_SWF_VERSION }}
       steps:
         - uses: actions/checkout@v3
 
