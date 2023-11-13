@@ -174,7 +174,7 @@
         - build_and_deploy_chart
       env:
         # TODO manage auth
-        CONFIG_REPO: "git@github.com:dmartinol/escalation-workflow-config.git"
+        CONFIG_REPO: "dmartinol/escalation-workflow-config"
         CONFIG_FILE: "user-values.yaml"
         # TODO: switch b/w dev and prod
         CONFIG_BRANCH: "dev"
