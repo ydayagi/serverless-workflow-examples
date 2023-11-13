@@ -99,13 +99,13 @@
 
         - name: Update chart version
           run: |
-            yq -e -i '.version = "${ESCALATION_CHART_VERSION}"' ${ESCALATION_CHART}
-            yq -e -i '.appVersion = "${ESCALATION_CHART_VERSION}"' ${ESCALATION_CHART}
+            yq -e -i '.version = "${{ env.ESCALATION_CHART_VERSION }}"' ${ESCALATION_CHART}
+            yq -e -i '.appVersion = "${{ env.ESCALATION_CHART_VERSION }}"' ${ESCALATION_CHART}
             cat ${ESCALATION_CHART}
       
         - name: Update default values
           run: |
-            yq -e -i '.jiralistener.image = "${JIRA_LISTENER_IMAGE_FULL}"' ${ESCALATION_VALUES}
+            yq -e -i '.jiralistener.image = "${{ env.JIRA_LISTENER_IMAGE_FULL }}"' ${ESCALATION_VALUES}
             cat ${ESCALATION_VALUES}
   
         - name: Setup Helm
