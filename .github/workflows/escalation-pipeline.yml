@@ -164,3 +164,40 @@
             git add ${{ env.CURRENT_CHART_REPO }}
             git commit -m "chore: deployed chart ${{ env.CHART_NAME }} version ${{ env.ESCALATION_CHART_VERSION }} on repo ${{ env.CURRENT_CHART_REPO }}"
             git push
+    update_config_repo:
+      runs-on: ubuntu-latest
+      name: Update the config repository
+      needs: 
+        - build_and_deploy_java_apps
+        - build_and_deploy_chart
+      env:
+        # TODO manage auth
+        CONFIG_REPO: "git@github.com:dmartinol/escalation-workflow-config.git"
+        CONFIG_FILE: "user-values.yaml"
+        # TODO: switch b/w dev and prod
+        CONFIG_BRANCH: "dev"
+        JIRA_LISTENER_IMAGE_FULL: ${{ needs.build_and_deploy_java_apps.outputs.JiraListenerImageFull }}
+        ESCALATION_SWF_IMAGE_FULL: ${{ needs.build_and_deploy_java_apps.outputs.EscalationSwfImageFull }}
+      steps:
+        - uses: actions/checkout@v3
+          with:
+            repository: ${CONFIG_REPO}
+            ref: ${CONFIG_BRANCH}
+
+        - name: Configure Git
+          run: |
+            git config user.name "${{ github.actor }}"
+            git config user.email "${{ github.actor }}@users.noreply.github.com"
+        
+        - name: Update image(s)
+          run: |
+            yq -e -i '.jiralistener.image = "${JIRA_LISTENER_IMAGE_FULL}"' ${CONFIG_FILE}
+
+        - name: Push changes to ${CONFIG_BRANCH}
+          run: |
+            git add ${CONFIG_FILE}
+            if ! git diff-index --quiet HEAD; then
+              git commit -m "build: bumped new images as ${JIRA_LISTENER_IMAGE_FULL}"
+              git push
+            fi
+  
