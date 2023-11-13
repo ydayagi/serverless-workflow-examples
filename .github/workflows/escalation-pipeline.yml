@@ -22,46 +22,46 @@
         IMAGE_REGISTRY: "quay.io"
         IMAGE_GROUP: "orchestrator"
       outputs:
-        JiraListenerImageFull: ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_GROUP }}/${{ env.JIRA_LISTENER_IMAGE_NAME }}:${{ env.JIRA_LISTENER_VERSION }}
-        EscalationSwfImageFull: ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_GROUP }}/${{ env.ESCALATION_SWF_IMAGE_NAME }}:${{ env.ESCALATION_SWF_VERSION }}
+        JiraListenerImageFull: ${IMAGE_REGISTRY}/${IMAGE_GROUP}/${JIRA_LISTENER_IMAGE_NAME}:${JIRA_LISTENER_VERSION}
+        EscalationSwfImageFull: ${IMAGE_REGISTRY}/${IMAGE_GROUP}/${ESCALATION_SWF_IMAGE_NAME}:${ESCALATION_SWF_VERSION}
       steps:
         - uses: actions/checkout@v3
 
         - name: Set env
           run: |
-            echo "ESCALATION_SWF_VERSION=$(mvn ${{ env.MVN_OPTS }} help:evaluate -Dexpression=project.version -q -DforceStdout -f ${{ env.ESCALATION_SWF_PATH }}/pom.xml)" >> "$GITHUB_ENV"
-            echo "JIRA_LISTENER_VERSION=$(mvn ${{ env.MVN_OPTS }} help:evaluate -Dexpression=project.version -q -DforceStdout -f ${{ env.JIRA_LISTENER_PATH }}/pom.xml)" >> "$GITHUB_ENV"
+            echo "ESCALATION_SWF_VERSION=$(mvn ${MVN_OPTS} help:evaluate -Dexpression=project.version -q -DforceStdout -f ${ESCALATION_SWF_PATH}/pom.xml)" >> "$GITHUB_ENV"
+            echo "JIRA_LISTENER_VERSION=$(mvn ${MVN_OPTS} help:evaluate -Dexpression=project.version -q -DforceStdout -f ${JIRA_LISTENER_PATH}/pom.xml)" >> "$GITHUB_ENV"
 
         - name: Build Java projects
           run: |
-            mvn ${{ env.MVN_OPTS }} -B clean package --file escalation-eda/pom.xml -DskipTests
+            mvn ${MVN_OPTS} -B clean package --file escalation-eda/pom.xml -DskipTests
         # TODO: enable tests once fixed
 
-        - name: "Build image ${{ env.ESCALATION_SWF_IMAGE_NAME }} version ${{ env.ESCALATION_SWF_VERSION }}"
+        - name: "Build image ${ESCALATION_SWF_IMAGE_NAME} version ${ESCALATION_SWF_VERSION}"
           run: |
-            mvn ${{ env.MVN_OPTS }} clean install -Pknative -DskipTests \
-              -Dquarkus.container-image.registry=${{ env.IMAGE_REGISTRY }} \
-              -Dquarkus.container-image.group=${{ env.IMAGE_GROUP }} \
-              -Dquarkus.container-image.name=${{ env.ESCALATION_SWF_IMAGE_NAME }} \
-              -Dquarkus.container-image.tag=${{ env.ESCALATION_SWF_VERSION }} \
-              --file ${{ env.ESCALATION_SWF_PATH }}/pom.xml
+            mvn ${MVN_OPTS} clean install -Pknative -DskipTests \
+              -Dquarkus.container-image.registry=${IMAGE_REGISTRY} \
+              -Dquarkus.container-image.group=${IMAGE_GROUP} \
+              -Dquarkus.container-image.name=${ESCALATION_SWF_IMAGE_NAME} \
+              -Dquarkus.container-image.tag=${ESCALATION_SWF_VERSION} \
+              --file ${ESCALATION_SWF_PATH}/pom.xml
       
-        - name: "Build image ${{ env.JIRA_LISTENER_IMAGE_NAME }} version ${{ env.JIRA_LISTENER_VERSION }}"
+        - name: "Build image ${JIRA_LISTENER_IMAGE_NAME} version ${JIRA_LISTENER_VERSION}"
           run: |
-            docker build -f ${{ env.JIRA_LISTENER_PATH }}/src/main/docker/Dockerfile.jvm \
-              -t ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_GROUP }}/${{ env.JIRA_LISTENER_IMAGE_NAME }}:${{ env.JIRA_LISTENER_VERSION }} ${{ env.JIRA_LISTENER_PATH }}
+            docker build -f ${JIRA_LISTENER_PATH}/src/main/docker/Dockerfile.jvm \
+              -t ${IMAGE_REGISTRY}/${IMAGE_GROUP}/${JIRA_LISTENER_IMAGE_NAME}:${JIRA_LISTENER_VERSION} ${JIRA_LISTENER_PATH}
             
-        - name: "Login to ${{ env.IMAGE_REGISTRY }}"
+        - name: "Login to ${IMAGE_REGISTRY}"
           run: |
-            docker login -u="${{ secrets.REGISTRY_USERNAME }}" -p="${{ secrets.REGISTRY_PASSWORD }}" ${{ env.IMAGE_REGISTRY }}
+            docker login -u="${{ secrets.REGISTRY_USERNAME }}" -p="${{ secrets.REGISTRY_PASSWORD }}" ${IMAGE_REGISTRY}
 
-        - name: "Push ${{ env.ESCALATION_SWF_IMAGE_NAME }} to ${{ env.IMAGE_REGISTRY}}/${{ env.IMAGE_GROUP }}:${{ env.ESCALATION_SWF_VERSION }}"
+        - name: "Push ${ESCALATION_SWF_IMAGE_NAME} to ${IMAGE_REGISTRY}}/${IMAGE_GROUP}:${ESCALATION_SWF_VERSION}"
           run: |
-            docker push ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_GROUP }}/${{ env.ESCALATION_SWF_IMAGE_NAME }}:${{ env.ESCALATION_SWF_VERSION }}
+            docker push ${IMAGE_REGISTRY}/${IMAGE_GROUP}/${ESCALATION_SWF_IMAGE_NAME}:${ESCALATION_SWF_VERSION}
         
-        - name: "Push ${{ env.JIRA_LISTENER_IMAGE_NAME }} to ${{ env.IMAGE_REGISTRY}}/${{ env.IMAGE_GROUP }}:${{ env.JIRA_LISTENER_VERSION }}"
+        - name: "Push ${JIRA_LISTENER_IMAGE_NAME} to ${IMAGE_REGISTRY}}/${IMAGE_GROUP}:${JIRA_LISTENER_VERSION}"
           run: |
-            docker push ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_GROUP }}/${{ env.JIRA_LISTENER_IMAGE_NAME }}:${{ env.JIRA_LISTENER_VERSION }}
+            docker push ${IMAGE_REGISTRY}/${IMAGE_GROUP}/${JIRA_LISTENER_IMAGE_NAME}:${JIRA_LISTENER_VERSION}
 
     build_and_deploy_chart:
       runs-on: ubuntu-latest
@@ -91,35 +91,35 @@
       
         - name: Set env
           run: |
-            echo "ESCALATION_CHART=${{ env.ESCALATION_CHART_PATH }}/Chart.yaml" >> "$GITHUB_ENV"
-            echo "ESCALATION_VALUES=${{ env.ESCALATION_CHART_PATH }}/values.yaml" >> "$GITHUB_ENV"
-            echo "ESCALATION_CHART_VERSION=$(mvn ${{ env.MVN_OPTS }} help:evaluate -Dexpression=project.version -q -DforceStdout -f ${{ env.ESCALATION_SWF_PATH }}/pom.xml | sed 's/-SNAPSHOT//g')" >> "$GITHUB_ENV"
-            echo "CURRENT_CHART_REPO=charts/${{ env.CHART_REPO }}" >> "$GITHUB_ENV"
-            echo "CHART_NAME=$(cat ${{ env.ESCALATION_CHART }} | grep 'name:' | cut -c 7-)" >> "$GITHUB_ENV"
+            echo "ESCALATION_CHART=${ESCALATION_CHART_PATH}/Chart.yaml" >> "$GITHUB_ENV"
+            echo "ESCALATION_VALUES=${ESCALATION_CHART_PATH}/values.yaml" >> "$GITHUB_ENV"
+            echo "ESCALATION_CHART_VERSION=$(mvn ${MVN_OPTS} help:evaluate -Dexpression=project.version -q -DforceStdout -f ${ESCALATION_SWF_PATH}/pom.xml | sed 's/-SNAPSHOT//g')" >> "$GITHUB_ENV"
+            echo "CURRENT_CHART_REPO=charts/${CHART_REPO}" >> "$GITHUB_ENV"
+            echo "CHART_NAME=$(cat ${ESCALATION_CHART} | grep 'name:' | cut -c 7-)" >> "$GITHUB_ENV"
 
         - name: Update chart version
           run: |
-            sed -i 's/version: .*/version: "${{ env.ESCALATION_CHART_VERSION }}"/g' ${{ env.ESCALATION_CHART }}
-            sed -i 's/appVersion: .*/appVersion: "${{ env.ESCALATION_CHART_VERSION }}"/g' ${{ env.ESCALATION_CHART }}
+            sed -i 's/version: .*/version: "${ESCALATION_CHART_VERSION}"/g' ${ESCALATION_CHART}
+            sed -i 's/appVersion: .*/appVersion: "${ESCALATION_CHART_VERSION}"/g' ${ESCALATION_CHART}
       
         - name: Update default values
           run: |
-            yq -e -i '.jiralistener.image = "${{ env.JIRA_LISTENER_IMAGE_FULL }}"' ${{ env.ESCALATION_VALUES }}
+            yq -e -i '.jiralistener.image = "${JIRA_LISTENER_IMAGE_FULL}"' ${ESCALATION_VALUES}
   
         - name: Setup Helm
           uses: azure/setup-helm@v3
 
         - name: Load resources
           run: |
-            cd ${{ env.ESCALATION_CHART_PATH }}
+            cd ${ESCALATION_CHART_PATH}
             ./prepare.sh
 
         - name: Lint chart
-          run: helm lint ${{ env.ESCALATION_CHART_PATH }}
+          run: helm lint ${ESCALATION_CHART_PATH}
         
         - name: Validate chart
           run: |
-            helm template test ${{ env.ESCALATION_CHART_PATH }} > test.yaml
+            helm template test ${ESCALATION_CHART_PATH} > test.yaml
             # Count by resource type
             test $(grep -c "kind: ConfigMap" test.yaml) -eq 4
             test $(grep -c "kind: Secret" test.yaml) -eq 1
@@ -150,19 +150,19 @@
             git fetch
             git checkout gh_pages
 
-        - name: Prepare repository ${{ env.CURRENT_CHART_REPO }}
+        - name: Prepare repository ${CURRENT_CHART_REPO}
           run: |
-            mkdir -p ${{ env.CURRENT_CHART_REPO }}
-            mv *.tgz ${{ env.CURRENT_CHART_REPO }}
+            mkdir -p ${CURRENT_CHART_REPO}
+            mv *.tgz ${CURRENT_CHART_REPO}
 
         - name: Update repository index
           run: |
-            helm repo index --url ${{ env.HELM_REPO_URL }}/${{ env.CURRENT_CHART_REPO }} ${{ env.CURRENT_CHART_REPO }}
+            helm repo index --url ${HELM_REPO_URL}/${CURRENT_CHART_REPO} ${CURRENT_CHART_REPO}
 
-        - name: Deploy new chart ${{ env.CHART_NAME }} version ${{ env.ESCALATION_CHART_VERSION }} on repo ${{ env.CURRENT_CHART_REPO }}
+        - name: Deploy new chart ${CHART_NAME} version ${ESCALATION_CHART_VERSION} on repo ${CURRENT_CHART_REPO}
           run: |
-            git add ${{ env.CURRENT_CHART_REPO }}
-            git commit -m "chore: deployed chart ${{ env.CHART_NAME }} version ${{ env.ESCALATION_CHART_VERSION }} on repo ${{ env.CURRENT_CHART_REPO }}"
+            git add ${CURRENT_CHART_REPO}
+            git commit -m "chore: deployed chart ${CHART_NAME} version ${ESCALATION_CHART_VERSION} on repo ${CURRENT_CHART_REPO}"
             git push
     update_config_repo:
       runs-on: ubuntu-latest
