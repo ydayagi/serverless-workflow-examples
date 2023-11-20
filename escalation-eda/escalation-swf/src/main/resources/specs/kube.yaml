@@ -225,17 +225,17 @@
             type: string
           metadata:
             description: 'Standard object''s metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata'
-            default: { }
+            default:
             allOf:
               - $ref: '#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta'
           spec:
             description: 'Spec defines the behavior of the Namespace. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status'
-            default: { }
+            default:
             allOf:
               - $ref: '#/components/schemas/io.k8s.api.core.v1.NamespaceSpec'
           status:
             description: 'Status describes the current status of a Namespace. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status'
-            default: { }
+            default:
             allOf:
               - $ref: '#/components/schemas/io.k8s.api.core.v1.NamespaceStatus'
         x-kubernetes-group-version-kind:
@@ -250,7 +250,7 @@
           - status
         properties:
           lastTransitionTime:
-            default: { }
+            default:
             allOf:
               - $ref: '#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Time'
           message:
@@ -278,7 +278,7 @@
             description: 'Items is the list of Namespace objects in the list. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/'
             type: array
             items:
-              default: { }
+              default:
               allOf:
                 - $ref: '#/components/schemas/io.k8s.api.core.v1.Namespace'
           kind:
@@ -286,7 +286,7 @@
             type: string
           metadata:
             description: 'Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
-            default: { }
+            default:
             allOf:
               - $ref: '#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta'
         x-kubernetes-group-version-kind:
@@ -361,7 +361,7 @@
               CreationTimestamp is a timestamp representing the server time when this object was created. It is not guaranteed to be set in happens-before order across separate operations. Clients may not set this value. It is represented in RFC3339 form and is in UTC.
   
               Populated by the system. Read-only. Null for lists. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
-            default: { }
+            default:
             allOf:
               - $ref: '#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Time'
           deletionGracePeriodSeconds:
@@ -404,7 +404,7 @@
             description: ManagedFields maps workflow-id and version to the set of fields that are managed by that workflow. This is mostly for internal housekeeping, and users typically shouldn't need to set or understand this field. A workflow can be the user's name, a controller's name, or the name of a specific apply path like "ci-cd". The set of fields is always in the version that the workflow used when modifying the object.
             type: array
             items:
-              default: { }
+              default:
               allOf:
                 - $ref: '#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.ManagedFieldsEntry'
           name:
@@ -420,7 +420,7 @@
             description: List of objects depended by this object. If ALL objects in the list have been deleted, this object will be garbage collected. If this object is managed by a controller, then an entry in this list will point to this controller, with the controller field set to true. There cannot be more than one managing controller.
             type: array
             items:
-              default: { }
+              default:
               allOf:
                 - $ref: '#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.OwnerReference'
             x-kubernetes-patch-merge-key: uid
@@ -492,7 +492,7 @@
             description: Represents the latest available observations of a namespace's current state.
             type: array
             items:
-              default: { }
+              default:
               allOf:
                 - $ref: '#/components/schemas/io.k8s.api.core.v1.NamespaceCondition'
             x-kubernetes-patch-merge-key: type

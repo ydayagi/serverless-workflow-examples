@@ -95,10 +95,14 @@ public class EscalationSwfTest {
     CreateResponse createResponse = startRequest();
     String workflowInstanceId = createResponse.getId();
     org.kie.kogito.index.model.ProcessInstance processInstance = readCurrentState(workflowInstanceId);
-    assertTrue(isNodeRunning("CreateJiraIssue", processInstance), "CreateJiraIssue is Running");
+    assertTrue(isNodeCompleted("CreateJiraIssue", processInstance), "CreateJiraIssue is Completed");
+    assertTrue(isNodeRunning("WaitForApprovalEvent", processInstance), "WaitForApprovalEvent is Running");
     sendCompletionCloudEvent(createResponse.getId());
     processInstance = readCurrentState(workflowInstanceId);
     assertTrue(isNodeCompleted("CreateJiraIssue", processInstance), "CreateJiraIssue is Completed");
+    assertTrue(nodeExists("Join-WaitForApprovalEvent", processInstance), "Join-WaitForApprovalEvent exists");
+    assertTrue(isNodeCompleted("Join-WaitForApprovalEvent", processInstance), "Join-WaitForApprovalEvent is Completed");
+    assertTrue(nodeExists("CreateK8sNamespace", processInstance), "CreateK8sNamespace exists");
     assertTrue(isNodeCompleted("CreateK8sNamespace", processInstance), "CreateK8sNamespace is Completed");
     assertEquals(ProcessInstanceState.COMPLETED,
         ProcessInstanceState.fromStatus(processInstance.getState()), "SWF state is COMPLETED");
@@ -109,7 +113,7 @@ public class EscalationSwfTest {
     logger.infof("Sending request %s", aRequest);
     ExtractableResponse<Response> response = given()
         .when().contentType("application/json")
-        .body(aRequest).post("/ticket-escalation")
+        .body(aRequest).post("/ticketEscalation")
         .then()
         .statusCode(201)
         .extract();
@@ -138,12 +142,15 @@ public class EscalationSwfTest {
   }
 
   private org.kie.kogito.index.model.ProcessInstance readCurrentState(String worflowInstanceId) {
+    await()
+        .atLeast(1, SECONDS)
+        .atMost(2, SECONDS);
     logger.infof("Reading status of %s", worflowInstanceId);
 
     Storage<String, org.kie.kogito.index.model.ProcessInstance> cache = dataIndexService
         .getProcessInstancesCache();
     org.kie.kogito.index.model.ProcessInstance processInstance = cache.get(worflowInstanceId);
-    logger.infof("Current status is %s", processInstance);
+    logger.debugf("Current status is %s", processInstance);
 
     return processInstance;
   }
@@ -158,5 +165,10 @@ public class EscalationSwfTest {
     return processInstance.getNodes().stream().filter(
         n -> n.getName().equals(nodeName) && n.getEnter() != null && n.getExit() != null)
         .findFirst().isPresent();
+  }
+
+  private boolean nodeExists(String nodeName, org.kie.kogito.index.model.ProcessInstance processInstance) {
+    return processInstance.getNodes().stream().filter(
+        n -> n.getName().equals(nodeName)).findFirst().isPresent();
   }
 }

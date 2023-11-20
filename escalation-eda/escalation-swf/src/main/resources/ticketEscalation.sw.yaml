@@ -1,5 +1,5 @@
 specVersion: "0.8"
-id: ticket-escalation
+id: ticketEscalation
 name: Ticket escalation
 annotations:
   - "workflow-type/infrastructure"
@@ -8,11 +8,18 @@ timeouts:
   workflowExecTimeout: PT24H
 start: CreateJiraIssue
 dataInputSchema: ticket-escalation-schema.json
+errors:
+  - name: timeoutError
+    code: TimedOut
+  - name: authError
+    code: '401'
 functions:
   - name: sendEmail
     operation: 'specs/mailtrap.yaml#sendEmail'
   - name: createJiraIssue
     operation: specs/jira.yaml#createIssue
+  - name: getJiraIssue
+    operation: specs/jira.yaml#getIssue
   - name: createK8sNamespace
     operation: specs/kube.yaml#createCoreV1Namespace
   - name: logInfo
@@ -26,52 +33,96 @@ events:
    type: dev.parodos.escalation
 states:
   - name: CreateJiraIssue
-    type: callback
-    action:
-      name: Create Jira Issue
-      functionRef:
-        refName: createJiraIssue
-        arguments:
-          update: {}
-          fields:
-            summary: '"Request For New Namespace: " + .namespace'
-            labels:
-              - '$SECRET.jira_label_workflowInstanceId + "=" + $WORKFLOW.instanceId'
-              - "$SECRET.jira_label_workflowName"
-            issuetype:
-              id: "$SECRET.jira_issue_type"
-            project:
-              key: "$SECRET.jira_project"
-      actionDataFilter:
-        toStateData: .jiraIssue
-    eventRef: approvalEvent
-    transition: CreateK8sNamespace
+    type: operation
+    actions:
+      - name: Create Jira Issue
+        functionRef:
+          refName: createJiraIssue
+          arguments:
+            update: {}
+            fields:
+              summary: '"Request For New Namespace: " + .namespace'
+              labels:
+                - $SECRET.jira_label_workflowInstanceId + "=" + $WORKFLOW.instanceId
+                - $SECRET.jira_label_workflowName
+              issuetype:
+                id: $SECRET.jira_issue_type
+              project:
+                key: $SECRET.jira_project
+        actionDataFilter:
+          toStateData: .jiraIssue
+    onErrors:
+      - errorRef: authError
+        transition: AuthError
+    transition: WaitForApprovalEvent
     stateDataFilter:
       output: ". += { jiraBrowser: ((.jiraIssue.self  | sub(\"rest/.*\"; \"browse/\")) + .jiraIssue.key) }"
-  # - name: Escalate
-  #   type: operation
-  #   actions:
-  #     - name: "printAction"
-  #       functionRef:
-  #         refName: "logInfo"
-  #         arguments:
-  #           message: "\"Escalate is \\(.)\""
-  #     - name: "sendEmail"
-  #       functionRef:
-  #         refName: sendEmail
-  #         arguments:
-  #           inbox_id: $SECRET.mailtrap_inbox_id | tonumber
-  #           to: 
-  #             - email: .manager
-  #               name: "Escalation Manager"
-  #           from:
-  #             email: $SECRET.sender_email
-  #             name: "Escalation service"
-  #           subject: " \"Escalation ticket \" + .jiraIssue.key "
-  #           html: '"Please manage escalation ticket <a href=\"" + .jiraBrowser + "\">" + .jiraIssue.key + "</a>"'
-  #   end: true
-  #   stateDataFilter:
-  #     output: ". += { timer: { triggered: true, startTime: .timer.startTime, elapsedSeconds: 0 }}"
+  - name: GetJiraIssue
+    type: operation
+    actions:
+      - functionRef:
+          refName: getJiraIssue
+          arguments:
+            issueIdOrKey: .jiraIssue.key
+            fields: status
+        actionDataFilter:
+          toStateData: .jiraIssue
+    transition: CheckTicketState
+  - name: CheckTicketState
+    type: switch
+    dataConditions:
+      - condition: (.jiraIssue.fields.status.statusCategory.key == "done")
+        transition:
+          nextState: CreateK8sNamespace
+    defaultCondition:
+      transition: WaitForApprovalEvent
+  - name: WaitForApprovalEvent
+    type: callback
+    action:
+      functionRef:
+        refName: logInfo
+        arguments:
+          message: "\"Waiting for approvalEvent: \\(.)\""
+    eventRef: approvalEvent
+    timeouts:
+      eventTimeout: PT30S
+      # This is not working for now, waiting for a fix to https://issues.redhat.com/browse/KOGITO-9811
+      # eventTimeout: $SECRET.timeout_seconds
+    onErrors:
+      - errorRef: timeoutError
+        transition: Escalate
+    transition: CreateK8sNamespace
+  - name: AuthError
+    type: operation
+    actions:
+      - name: printAction
+        functionRef:
+          refName: logInfo
+          arguments:
+            message: "\"Authentication error: \\(.)\""
+    end: true
+  - name: Escalate
+    type: operation
+    actions:
+      - name: printAction
+        functionRef:
+          refName: logInfo
+          arguments:
+            message: "\"Invoking escalation: \\(.)\""
+      - name: sendEmail
+        functionRef:
+          refName: sendEmail
+          arguments:
+            inbox_id: $SECRET.mailtrap_inbox_id | tonumber
+            to: 
+              - email: .manager
+                name: Escalation Manager
+            from:
+              email: $SECRET.sender_email
+              name: Escalation service
+            subject: " \"Escalation ticket \" + .jiraIssue.key "
+            html: '"Please manage escalation ticket <a href=\"" + .jiraBrowser + "\">" + .jiraIssue.key + "</a>"'
+    transition: GetJiraIssue
   - name: CreateK8sNamespace
     type: operation
     actions:
@@ -81,7 +132,7 @@ states:
             apiVersion: v1
             kind: Namespace
             metadata:
-              name: ".namespace"
+              name: .namespace
         actionDataFilter:
           toStateData: .createdNamespace
     stateDataFilter:
