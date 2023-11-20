@@ -10,7 +10,7 @@
       types: [prereleased]
   env:
     ESCALATION_SWF_PATH: "escalation-eda/escalation-swf"
-    MVN_OPTS: "-Dmaven.repo.remote=https://repository.jboss.org/nexus/content/groups/public -s escalation-eda/settings.xml"
+    MVN_OPTS: ""
   jobs:    
     build_and_deploy_java_apps:
       runs-on: ubuntu-latest
