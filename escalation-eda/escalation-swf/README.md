@@ -16,6 +16,17 @@ Email service is using [MailTrap Send email API](https://api-docs.mailtrap.io/do
 The value of the `.jiraIssue.fields.status.statusCategory.key` field is the one to be used to identify when the `done` status is reached, all the other
 similar fields are subject to translation to the configured language and cannot be used for a consistent check.
 
+### Dependencies on latest SonataFlow artifacts
+The current implementation depends on version `2.0.0-SNAPSHOT` of the SonataFlow platform artifacts as you can see in the [pom.xml](./pom.xml). 
+```xml
+<kogito.bom.version>2.0.0-SNAPSHOT</kogito.bom.version>
+```
+
+In order to build and execute the workflows, a specific reference to the `JBoss Public Repository Group` has beeen added to the pom.xml](./pom.xml), 
+following the instructions documented [here](https://openshift-knative.github.io/docs/docs/latest/serverless-logic/getting-started/create-your-first-workflow-service.html#proc-configuring-maven-rhbq).
+
+This section will be removed once the latest artifacts are finally released.
+
 ## Application configuration
 Application properties can be initialized from environment variables before running the application:
 
