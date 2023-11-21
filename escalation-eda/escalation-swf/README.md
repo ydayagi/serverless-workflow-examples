@@ -3,34 +3,32 @@ An escalation workflow integrated with a pluggable `Ticketing Service` orchestra
 [SonataFlow](https://sonataflow.org/serverlessworkflow/latest/index.html)
 and built on Event Driven Architecture (EDA).
 
-**Note**: current 
+The initial implementation of the `Ticketing Service` is using [Atlassian JIRA](https://www.atlassian.com/software/jira).
 
-The initial implementation of the `Ticketing Service` is using Atlassian JIRA.
+Email service is using [MailTrap Send email API](https://api-docs.mailtrap.io/docs/mailtrap-api-docs/bcf61cdc1547e-send-email-early-access).
 
-Email service is using [MailTrap Send email API](https://api-docs.mailtrap.io/docs/mailtrap-api-docs/bcf61cdc1547e-send-email-early-access) API
-
-## Prerequisite
+## Prerequisites
 * Access to a Jira server (URL, user and [API token](https://support.atlassian.com/atlassian-account/docs/manage-api-tokens-for-your-atlassian-account/))
-* Access to an OpenShift cluster with `admin` Role
+* [in-cluster deployment only] Access to an OpenShift cluster with `admin` Role
 * An account to [MailTrap](https://mailtrap.io/home) with a [testing Inbox](https://mailtrap.io/inboxes) and an [API token](https://mailtrap.io/api-tokens)
 
 ## Escalation flow
 The main escalation workflow is defined by the [ticketEscalation](./src/main/resources/ticketEscalation.sw.yaml) model:
-* Create a ticket using the configured `Ticketing Service` model
+* Create a ticket using the configured `Ticketing Service` subflow
 * Wait until the `approvalEvent` is received
   * If the waiting time exceeds the configured timeout, the error with `code: TimedOut` is handled to run the `Escalate` state which sends the warning email
   to the escalation manager
   * To ensure that an event coming during the escalation state is not lost, the `GetTicket` and `CheckTicketState` states are executed before returning
   to the waiting state
-* Only when the event is received the workflow is transisioned to the final state `CreateK8sNamespace`
+* Only when the event is received or the current status is `Approved` the workflow is transisioned to the final state `CreateK8sNamespace`
 
 ![SWF VIZ](./src/main/resources/ticketEscalation.svg)
 
 The generalized implementation delegates all the `Ticketing Service` requests (e.g., `CreateTicket` and `GetTicket`) to a subflow whose requirements are:
 * The `id` must be `ticketingService`
 * It must be packaged together with the main workflow
-* The workflow data input must comply with the schema defined in [specs/subflow-input-schema.json](./src/main/resources/specs/subflow-input-schema.json), e.g.:
-  * The subflow accepts a generic request with a `type` field that defines the kind of requests, as in:
+* The workflow data input must comply with the schema defined in [specs/subflow-input-schema.json](./src/main/resources/specs/subflow-input-schema.json), e.g. the subflow accepts a generic request with a `type` field that defines the kind of requests and
+returns a well-defined response:
 ```yaml
 # Create request 
 request:
@@ -62,7 +60,7 @@ status: "<one of: Created, Approved, Unknown>"
 The sample implementation using the Atlassian JIRA service is defined by the following diagram:
 ![SWF VIZ](./src/main/resources/jiraSwf.svg)
 
-The value of the `.jiraIssue.fields.status.statusCategory.key` field is the one to be used to identify when the `done` status is reached, all the other
+**Note about the Jira implementation**: The value of the `.jiraIssue.fields.status.statusCategory.key` field is the one to be used to identify when the `done` status is reached, all the other
 similar fields are subject to translation to the configured language and cannot be used for a consistent check.
 
 ### Dependencies on latest SonataFlow artifacts
@@ -71,10 +69,10 @@ The current implementation depends on version `2.0.0-SNAPSHOT` of the SonataFlow
 <kogito.bom.version>2.0.0-SNAPSHOT</kogito.bom.version>
 ```
 
-In order to build and execute the workflows, a specific reference to the `JBoss Public Repository Group` has beeen added to the pom.xml](./pom.xml), 
+In order to build and execute the workflows, a specific reference to the `JBoss Public Repository Group` has beeen added, 
 following the instructions documented [here](https://openshift-knative.github.io/docs/docs/latest/serverless-logic/getting-started/create-your-first-workflow-service.html#proc-configuring-maven-rhbq).
 
-**These changes allow to build and run the workflow but do not conytain the required fixes to manage the timeout error. 
+**These changes allow to build and run the workflow but do not contain the required fixes to manage the timeout error. 
 Expect some runtime issues**
 
 This section will be removed once the latest artifacts are finally released.
@@ -133,7 +131,7 @@ ESCALATION_SWF_URL=$(oc get route -n escalation escalation-swf -oyaml | yq '.sta
 ESCALATION_SWF_URL="${ESCALATION_SWF_URL//\"/}"
 ```
 
-Example of POST to trigger the flow (see input schema in [ticket-escalation-schema.json](./src/main/resources/ticket-escalation-schema.json)):
+Example of POST to trigger the flow (see input schema in [ticket-escalation-schema.json](./src/main/resources/specs/ticket-escalation-schema.json)):
 ```bash
 NAMESPACE=new-namespace
 MANAGER=manager@company.com
