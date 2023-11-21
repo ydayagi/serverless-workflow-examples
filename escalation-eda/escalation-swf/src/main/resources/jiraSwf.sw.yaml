@@ -1,7 +1,7 @@
 specVersion: "0.8"
 # id: jiraSwf
 id: ticketingService
-name: Ticket escalation
+name: Jira Ticketing Service
 annotations:
   - "workflow-type/infrastructure"
 version: 0.0.1

@@ -9,7 +9,6 @@
     <compiler-plugin.version>3.10.1</compiler-plugin.version>
     <kogito.bom.artifact-id>kogito-bom</kogito.bom.artifact-id>
     <kogito.bom.group-id>org.kie.kogito</kogito.bom.group-id>
-    <!-- <kogito.bom.version>1.43.0.Final</kogito.bom.version> -->
     <kogito.bom.version>2.0.0-SNAPSHOT</kogito.bom.version>
     <maven.compiler.release>11</maven.compiler.release>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -241,6 +240,11 @@
     </profile>
   </profiles>
   <!-- Temporary hack to use latest SonataFlow platform artifacts-->
+  <!-- https://openshift-knative.github.io/docs/docs/latest/serverless-logic/getting-started/create-your-first-workflow-service.html -->
+  <!-- WILLL BE REAPLACED WITH THE FOLLOWING ONCE THE VERSION IS RELEASED
+      <id>red-hat-earlyaccess-maven-repository</id>
+      <url>https://maven.repository.redhat.com/earlyaccess/all/</url>
+  -->
   <repositories>
     <repository>
       <id>jboss-public-repository-group</id>
@@ -249,13 +253,11 @@
       <layout>default</layout>
       <releases>
         <enabled>true</enabled>
-        <updatePolicy>never</updatePolicy>
       </releases>
       <snapshots>
         <enabled>true</enabled>
-        <updatePolicy>always</updatePolicy>
+        <updatePolicy>daily</updatePolicy>
       </snapshots>
     </repository>
-    <!-- ### configured repositories ### -->
   </repositories>
 </project>
