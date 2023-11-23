@@ -137,7 +137,9 @@ Example of POST to trigger the flow (see input schema in [ticket-escalation-sche
 ```bash
 NAMESPACE=new-namespace
 MANAGER=manager@company.com
-SWF_INSTANCE_ID=$(curl -k -XPOST -H "Content-Type: application/json" "${ESCALATION_SWF_URL}/ticketEscalation" -d "{\"namespace\": \"${NAMESPACE}\", \"manager\": \"${MANAGER}\"}" | jq '.id')
+USER=jdoe
+GROUP=jdoe
+SWF_INSTANCE_ID=$(curl -k -XPOST -H "Content-Type: application/json" "${ESCALATION_SWF_URL}/ticketEscalation" -d "{\"namespace\": \"${NAMESPACE}\", \"manager\": \"${MANAGER}\", \"user\": \"${USER}\", \"group\": \"${GROUP}\"}" | jq '.id')
 SWF_INSTANCE_ID="${SWF_INSTANCE_ID//\"/}"
 echo $SWF_INSTANCE_ID
 ```

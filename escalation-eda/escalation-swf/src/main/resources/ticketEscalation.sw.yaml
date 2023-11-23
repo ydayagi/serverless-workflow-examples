@@ -87,18 +87,13 @@ states:
         functionRef:
           refName: createNotification
           arguments:
-            title: "You have a pending action item"
-            message: "Please complete the action items assigned on Jira system."
+            title: '"ATTN: Escalation for ticket - " + .createResponse.ticketId'
+            message: '"Please manage escalation ticket <a href=\"" + .createResponse.browseUrl + "\">" + .createResponse.ticketId + "</a>"'
             origin: "Escalation Worflow"
             targetUsers:
-              - "jdoe" #TBD
+              - .user
             targetGroups:
-              - "jdoe" #TBD
-            actions:
-              - url: "http://localhost:8080/action"
-                title: "Sample action title 1"
-              - url: "http://localhost:8080/action"
-                title: "Sample action title 2"
+              - .group
       - name: sendEmail
         functionRef:
           refName: sendEmail
