@@ -15,6 +15,8 @@ errors:
   - name: timeoutError
     code: TimedOut
 functions:
+  - name: createNotification
+    operation: 'specs/notifications.yaml#createNotification'
   - name: sendEmail
     operation: 'specs/mailtrap.yaml#sendEmail'
   - name: createK8sNamespace
@@ -81,6 +83,17 @@ states:
           refName: logInfo
           arguments:
             message: "\"Invoking escalation: \\(.)\""
+      - name: createNotification
+        functionRef:
+          refName: createNotification
+          arguments:
+            title: '"ATTN: Escalation for ticket - " + .createResponse.ticketId'
+            message: '"Please manage escalation ticket <a href=\"" + .createResponse.browseUrl + "\">" + .createResponse.ticketId + "</a>"'
+            origin: "Escalation Worflow"
+            targetUsers:
+              - .user
+            targetGroups:
+              - .group
       - name: sendEmail
         functionRef:
           refName: sendEmail
