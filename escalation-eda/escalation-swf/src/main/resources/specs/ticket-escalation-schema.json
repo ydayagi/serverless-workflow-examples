@@ -6,14 +6,51 @@
       "type": "string",
       "description": "Name of the requested namespace"
     },
-    "manager": {
-      "type": "string",
-      "format": "email",
-      "description": "Email address of the escalation manager"
+    "email": {
+      "type": "object",
+      "description": "Optional email notification",
+      "properties": {
+        "manager": {
+          "type": "string",
+          "format": "email",
+          "description": "Email address of the escalation manager"
+        }
+      }
+    },
+    "notification": {
+      "type": "object",
+      "description": "Optional backstage notification",
+      "properties": {
+        "user": {
+          "type": "string",
+          "description": "User name"
+        },
+        "group": {
+          "type": "string",
+          "description": "Group name"
+        }
+      }
     }
   },
-  "required": [
-    "namespace",
-    "manager"
+  "anyOf": [
+    {
+      "required": [
+        "namespace",
+        "notification",
+        "email"
+      ]
+    },
+    {
+      "required": [
+        "namespace",
+        "notification"
+      ]
+    },
+    {
+      "required": [
+        "namespace",
+        "email"
+      ]
+    }
   ]
 }

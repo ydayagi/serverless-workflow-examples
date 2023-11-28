@@ -17,7 +17,8 @@ Email service is using [MailTrap Send email API](https://api-docs.mailtrap.io/do
 The main escalation workflow is defined by the [ticketEscalation](./src/main/resources/ticketEscalation.sw.yaml) model:
 * Create a ticket using the configured `Ticketing Service` subflow
 * Wait until the `approvalEvent` is received
-  * If the waiting time exceeds the configured timeout, the error with `code: TimedOut` is handled to run the `Escalate` state which sends the warning email
+  * If the waiting time exceeds the configured timeout, the error with `code: TimedOut` is handled to run the escalatino states `SendNotification` and
+  `SendEmail` state which send the warning notification and/or email
   to the escalation manager
   * To ensure that an event coming during the escalation state is not lost, the `GetTicket` and `CheckTicketState` states are executed before returning
   to the waiting state
@@ -135,15 +136,29 @@ ESCALATION_SWF_URL="${ESCALATION_SWF_URL//\"/}"
 
 Example of POST to trigger the flow (see input schema in [ticket-escalation-schema.json](./src/main/resources/specs/ticket-escalation-schema.json)):
 ```bash
-NAMESPACE=new-namespace
-MANAGER=manager@company.com
-USER=jdoe
-GROUP=jdoe
-SWF_INSTANCE_ID=$(curl -k -XPOST -H "Content-Type: application/json" "${ESCALATION_SWF_URL}/ticketEscalation" -d "{\"namespace\": \"${NAMESPACE}\", \"manager\": \"${MANAGER}\", \"user\": \"${USER}\", \"group\": \"${GROUP}\"}" | jq '.id')
+export NAMESPACE=new-namespace
+export MANAGER=manager@company.com
+export USER=jdoe
+export GROUP=jdoe
+envsubst < input.json > data.json
+SWF_INSTANCE_ID=$(curl -k -XPOST -H "Content-Type: application/json" "${ESCALATION_SWF_URL}/ticketEscalation" -d @data.json | jq '.id')
 SWF_INSTANCE_ID="${SWF_INSTANCE_ID//\"/}"
 echo $SWF_INSTANCE_ID
 ```
 
+Where [input.json](./input.json) defines the input document as:
+```json
+{
+  "namespace": "${NAMESPACE}",
+  "email": {
+    "manager": "${MANAGER}"
+  },
+  "notification": {
+    "user": "${USER}",
+    "group": "${GROUP}"
+  }
+}
+```
 To resume the pending instance, send a CloudEvent with:
 
 ```bash

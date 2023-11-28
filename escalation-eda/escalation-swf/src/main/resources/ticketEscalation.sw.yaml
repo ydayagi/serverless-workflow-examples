@@ -14,6 +14,8 @@ dataInputSchema:
 errors:
   - name: timeoutError
     code: TimedOut
+  - name: notAvailable
+    code: '404'
 functions:
   - name: createNotification
     operation: 'specs/notifications.yaml#createNotification'
@@ -76,37 +78,48 @@ states:
         transition: Escalate
     transition: CreateK8sNamespace
   - name: Escalate
-    type: operation
-    actions:
+    type: parallel
+    branches:
       - name: printAction
-        functionRef:
-          refName: logInfo
-          arguments:
-            message: "\"Invoking escalation: \\(.)\""
+        actions:
+          - name: printAction
+            functionRef:
+              refName: logInfo
+              arguments:
+                message: "\"Invoking escalation: \\(.)\""
       - name: createNotification
-        functionRef:
-          refName: createNotification
-          arguments:
-            title: '"ATTN: Escalation for ticket - " + .createResponse.ticketId'
-            message: '"Please manage escalation ticket <a href=\"" + .createResponse.browseUrl + "\">" + .createResponse.ticketId + "</a>"'
-            origin: "Escalation Worflow"
-            targetUsers:
-              - .user
-            targetGroups:
-              - .group
+        actions:
+          - name: createNotification
+            condition: .notification != null and (.notification.user != null or .notification.group != null)
+            functionRef:
+              refName: createNotification
+              arguments:
+                title: '"ATTN: Escalation for ticket - " + .createResponse.ticketId'
+                message: '"Please manage escalation ticket <a href=\"" + .createResponse.browseUrl + "\">" + .createResponse.ticketId + "</a>"'
+                origin: "Escalation Worflow"
+                targetUsers:
+                  - .notification.user
+                targetGroups:
+                  - .notification.group
       - name: sendEmail
-        functionRef:
-          refName: sendEmail
-          arguments:
-            inbox_id: $SECRET.mailtrap_inbox_id | tonumber
-            to: 
-              - email: .manager
-                name: Escalation Manager
-            from:
-              email: $SECRET.sender_email
-              name: Escalation service
-            subject: " \"Escalation ticket \" + .createResponse.ticketId "
-            html: '"Please manage escalation ticket <a href=\"" + .createResponse.browseUrl + "\">" + .createResponse.ticketId + "</a>"'
+        actions:
+          - name: sendEmail
+            condition: .email != null and .email.manager != null
+            functionRef:
+              refName: sendEmail
+              arguments:
+                inbox_id: $SECRET.mailtrap_inbox_id | tonumber
+                to: 
+                  - email: .email.manager
+                    name: Escalation Manager
+                from:
+                  email: $SECRET.sender_email
+                  name: Escalation service
+                subject: " \"Escalation ticket \" + .createResponse.ticketId "
+                html: '"Please manage escalation ticket <a href=\"" + .createResponse.browseUrl + "\">" + .createResponse.ticketId + "</a>"'
+    onErrors:
+      - errorRef: notAvailable
+        transition: GetTicket
     transition: GetTicket
   - name: CreateK8sNamespace
     type: operation
