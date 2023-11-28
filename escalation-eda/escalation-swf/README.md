@@ -17,8 +17,8 @@ Email service is using [MailTrap Send email API](https://api-docs.mailtrap.io/do
 The main escalation workflow is defined by the [ticketEscalation](./src/main/resources/ticketEscalation.sw.yaml) model:
 * Create a ticket using the configured `Ticketing Service` subflow
 * Wait until the `approvalEvent` is received
-  * If the waiting time exceeds the configured timeout, the error with `code: TimedOut` is handled to run the escalatino states `SendNotification` and
-  `SendEmail` state which send the warning notification and/or email
+  * If the waiting time exceeds the configured timeout, the error with `code: TimedOut` is handled to run the `Escalate` actions `SendNotification` and
+  `SendEmail` to send the warning notification and/or email
   to the escalation manager
   * To ensure that an event coming during the escalation state is not lost, the `GetTicket` and `CheckTicketState` states are executed before returning
   to the waiting state
