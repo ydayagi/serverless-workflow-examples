@@ -16,6 +16,7 @@ import javax.inject.Inject;
 import org.jboss.logging.Logger;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.kie.kogito.index.model.ProcessInstanceState;
 import org.kie.kogito.index.storage.DataIndexStorageService;
@@ -91,6 +92,7 @@ public class EscalationSwfTest {
   }
 
   @Test
+  @Disabled // Until the SF versioning issue is resolved
   public void when_RequestIsApproved_ThenTheNamespaceIsCreated() {
     CreateResponse createResponse = startRequest();
     String workflowInstanceId = createResponse.getId();
