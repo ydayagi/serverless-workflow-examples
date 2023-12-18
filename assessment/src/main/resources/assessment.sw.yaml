@@ -13,11 +13,13 @@ functions:
   - name: logOuput
     type: custom
     operation: "sysout:INFO"
+  - name: preCheck
+    operation: "specs/precheck.yaml#createResource_preCheck"
 states:
   - name: AssessRepository
     type: operation
-    stateDataFilter:
-      output: '{workflowOptions: .validatedResult}'
+    # stateDataFilter:
+    #   output: '{workflowOptions: .validatedResult}'
     actions:
       - name: executeAction
         functionRef:
@@ -27,12 +29,19 @@ states:
         actionDataFilter:
           toStateData: ".result"
       - name: preCheck
-        subFlowRef:
-          workflowId: preCheck
-          version: 0.0.1
+        functionRef:
+          refName: preCheck
+          arguments:
+            # replace workflowdata with any other words, then the call will be received by the precheck.
+            # but the result is unable to be fetched
+            workflowdata: 
+              result: .result
+        actionDataFilter:
+          results: "${ {preCheck: .workflowdata} }"
+          toStateData: "${ .preCheck }"
       - name: printAction
         functionRef:
           refName: logOuput
           arguments:
-            message: ".validatedResult"
+            message: ".preCheck"
     end: true
