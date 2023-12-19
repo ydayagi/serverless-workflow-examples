@@ -18,8 +18,8 @@ functions:
 states:
   - name: AssessRepository
     type: operation
-    # stateDataFilter:
-    #   output: '{workflowOptions: .validatedResult}'
+    stateDataFilter:
+      output: '{workflowOptions: .preCheck.workflowdata.validatedResult}'
     actions:
       - name: executeAction
         functionRef:
@@ -32,13 +32,11 @@ states:
         functionRef:
           refName: preCheck
           arguments:
-            # replace workflowdata with any other words, then the call will be received by the precheck.
-            # but the result is unable to be fetched
-            workflowdata: 
-              result: .result
+            workflowdata:
+              result: .
         actionDataFilter:
-          results: "${ {preCheck: .workflowdata} }"
-          toStateData: "${ .preCheck }"
+            fromStateData: .result
+            toStateData: ".preCheck"
       - name: printAction
         functionRef:
           refName: logOuput

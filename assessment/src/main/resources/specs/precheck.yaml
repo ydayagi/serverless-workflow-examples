@@ -27,10 +27,14 @@ paths:
       responses:
         "200":
           description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JsonNodeModelInput'
 components:
   schemas:
     JsonNodeModelInput:
       type: object
-      # properties:
-      #   workflowdata:
-      #     type: object
+      properties:
+        workflowdata:
+          type: object
