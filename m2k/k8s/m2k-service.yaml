@@ -1,0 +1,42 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: m2k-create-plan-func
+spec:
+  template:
+    metadata:
+      name: m2k-create-plan-func-v1
+    spec:
+      containers:
+        - image: quay.io/orchestrator/m2k-kfunc:latest
+          imagePullPolicy: Always
+          env:
+            - name: EXPORTED_FUNC
+              value: createPlan
+          name: user-container
+          readinessProbe:
+            successThreshold: 1
+            tcpSocket:
+              port: 0
+
+---
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: m2k-save-transformation-func
+spec:
+  template:
+    metadata:
+      name: m2k-save-transformation-func-v1
+    spec:
+      containers:
+        - image: quay.io/orchestrator/m2k-kfunc:latest
+          imagePullPolicy: Always
+          env:
+            - name: EXPORTED_FUNC
+              value: saveTransformation
+          name: user-container
+          readinessProbe:
+            successThreshold: 1
+            tcpSocket:
+              port: 0
