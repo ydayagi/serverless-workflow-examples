@@ -16,8 +16,6 @@ events:
     source: ''
     type: transformation_saved
 functions:
-  - name: sendEmail
-    operation: specs/shared/mailtrap.yaml#sendEmail
   - name: systemOut
     type: custom
     operation: sysout
@@ -125,36 +123,20 @@ states:
             message: '${"m2k workflow: " + $WORKFLOW.instanceId + " transformation ID: " + .transformId }'
     transition: NotifyTransformationWaiting
   - name: NotifyTransformationWaiting
-    type: parallel
-    branches:
-    - name: sendNotification
-      actions:
-        - name: createNotification
-          condition: .notification != null and (.notification.user != null or .notification.group != null)
-          functionRef:
-            refName: createNotification
-            arguments:
-              title: " \"Transformation \" + .transformationId + \" waiting for Q&A\" "
-              message: '"Please go to your <a href=\"" + $SECRET.move2kube_url + "/workspaces/"+ .workspaceId + "/projects/" + .projectId + "/outputs/"+ .transformId + "\">Move2Kube instance</a> and answers to questions in order to continue the Move2Kube workflow"'
-              origin: "Move2Kube Workflow"
-              targetUsers:
-                - .notification.user
-              targetGroups:
-                - .notification.group
-    - name: sendEmailNotification
-      actions:
-      - functionRef:
-          refName: sendEmail
+    type: operation
+    actions:
+      - name: createNotification
+        condition: .notification != null and (.notification.user != null or .notification.group != null)
+        functionRef:
+          refName: createNotification
           arguments:
-            inbox_id: $SECRET.mailtrap_inbox_id | tonumber
-            to:
-              - email: .user
-                name: "user"
-            from:
-              email: $SECRET.sender_email
-              name: "Move2Kube"
-            subject: " \"Transformation \" + .transformationId "
-            html: '"Please go to your <a href=\"" + $SECRET.move2kube_url + "/workspaces/"+ .workspaceId + "/projects/" + .projectId + "/outputs/"+ .transformId + "\">Move2Kube instance</a> and answers to questions in order to continue the Move2Kube workflow"'
+            title: " \"Transformation \" + .transformationId + \" waiting for Q&A\" "
+            message: '"Please go to your <a href=\"" + $SECRET.move2kube_url + "/workspaces/"+ .workspaceId + "/projects/" + .projectId + "/outputs/"+ .transformId + "\">Move2Kube instance</a> and answers to questions in order to continue the Move2Kube workflow"'
+            origin: "Move2Kube Workflow"
+            targetUsers:
+              - .notification.user
+            targetGroups:
+              - .notification.group
     transition: SaveTransformationOutput
   - name: SaveTransformationOutput
     type: operation
@@ -206,21 +188,6 @@ states:
             refName: systemOut
             arguments:
               message: '${"m2k workflow: " + $WORKFLOW.instanceId + " has finalized with error. Exit message: " + .exitMessage + " -- Context: "  + .error }'
-    - name: sendEmail
-      actions:
-        - name: sendEmail
-          functionRef:
-            refName: sendEmail
-            arguments:
-              inbox_id: $SECRET.mailtrap_inbox_id | tonumber
-              to:
-                - email: .user
-                  name: "user"
-              from:
-                email: $SECRET.sender_email
-                name: "Move2Kube"
-              subject: '"Move2Kube workflow " + $WORKFLOW.instanceId + " failed "'
-              html: '"Move2Kube workflow  " + $WORKFLOW.instanceId + " on workspace " + .workspaceId + " and project " + .projectId + " failed with exit message: "+ .exitMessage + " <br><br>Error: "  + .error'
     - name: createNotification
       actions:
         - name: createNotification
@@ -246,21 +213,6 @@ states:
              refName: systemOut
              arguments:
                message: '${"m2k workflow: " + $WORKFLOW.instanceId + " has finalized successfully}"'
-     - name: sendEmail
-       actions:
-         - name: sendEmail
-           functionRef:
-             refName: sendEmail
-             arguments:
-               inbox_id: $SECRET.mailtrap_inbox_id | tonumber
-               to:
-                 - email: .user
-                   name: "user"
-               from:
-                 email: $SECRET.sender_email
-                 name: "Move2Kube"
-               subject: '"Move2Kube workflow " + $WORKFLOW.instanceId + " success"'
-               html: '"Move2Kube workflow  " + $WORKFLOW.instanceId + " on workspace " + .workspaceId + " and project " + .projectId + " was successful"'
      - name: createNotification
        actions:
          - name: createNotification

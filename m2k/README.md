@@ -110,7 +110,7 @@ broker.eventing.knative.dev/default created
 
 You also need to fill the environment variables needed:
 
-/!\ You may need to change those value, especially the `image` and the env variables `MAILTRAP_API_TOKEN` and `MAILTRAP_INBOX_ID` /!\
+/!\ You may need to change those value, especially the `image` /!\
 ```bash
 kubectl -n m2k patch ksvc serverless-workflow-m2k --type merge -p '{
    "spec":{
@@ -129,24 +129,7 @@ kubectl -n m2k patch ksvc serverless-workflow-m2k --type merge -p '{
                      {
                         "name":"BROKER_URL",
                         "value":"http://broker-ingress.knative-eventing.svc.cluster.local/m2k/default"
-                     },
-                     {
-                        "name":"SENDER_EMAIL",
-                        "value":"move2kube@company.com"
-                     },
-                     {
-                        "name":"MAILTRAP_INBOX_ID",
-                        "value":"2445382"
-                     },
-                     {
-                        "name":"MAILTRAP_URL",
-                        "value":"https://sandbox.api.mailtrap.io"
-                     },
-                     {
-                        "name":"MAILTRAP_API_TOKEN",
-                        "value":"c267a26db8fbc6638d4690b766ed015f"
                      }
-                     
                   ]
                }
             ]
@@ -225,7 +208,6 @@ curl -X POST -H 'Content-Type: application/json'  serverless-workflow-m2k.m2k.sv
 "token": "<bitbucket auth token>",
 "workspaceId": "816fea47-84e6-43b4-81c8-9a7462cf9e1e",
 "projectId": "fc411095-4b3c-499e-8590-7ac09d89d5fc",
-"user":"<user email>",
 "notification": {
     "user": "<your user>",
     "group": "<your group>"
