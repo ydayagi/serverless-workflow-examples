@@ -90,17 +90,15 @@ states:
       - name: createNotification
         actions:
           - name: createNotification
-            condition: .notification != null and (.notification.user != null or .notification.group != null)
+            condition: .notification != null
             functionRef:
               refName: createNotification
               arguments:
                 title: '"ATTN: Escalation for ticket - " + .createResponse.ticketId'
                 message: '"Please manage escalation ticket <a href=\"" + .createResponse.browseUrl + "\">" + .createResponse.ticketId + "</a>"'
                 origin: "Escalation Worflow"
-                targetUsers:
-                  - .notification.user
-                targetGroups:
-                  - .notification.group
+                topic: "Escalation Workflow"
+                notifications-secret: .notifications_secret
       - name: sendEmail
         actions:
           - name: sendEmail
@@ -109,7 +107,7 @@ states:
               refName: sendEmail
               arguments:
                 inbox_id: $SECRET.mailtrap_inbox_id | tonumber
-                to: 
+                to:
                   - email: .email.manager
                     name: Escalation Manager
                 from:

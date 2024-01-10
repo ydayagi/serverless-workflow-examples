@@ -12,6 +12,7 @@ Email service is using [MailTrap Send email API](https://api-docs.mailtrap.io/do
 * [in-cluster deployment only] Access to an OpenShift cluster with `admin` Role
 * An account to [MailTrap](https://mailtrap.io/home) with a [testing Inbox](https://mailtrap.io/inboxes) and an [API token](https://mailtrap.io/api-tokens)
 * Available or Running [Backstage Notification Service](https://github.com/mareklibra/janus-idp-backstage-plugins/commits/flpath560)
+  * This readme is made with [SHA c3ff659](https://github.com/mareklibra/janus-idp-backstage-plugins/tree/c3ff659a0a2a9fba97b9e520568c93da09f150ae) 
 
 ## Escalation flow
 The main escalation workflow is defined by the [ticketEscalation](./src/main/resources/ticketEscalation.sw.yaml) model:
@@ -83,16 +84,17 @@ This section will be removed once the latest artifacts are finally released.
 Application properties can be initialized from environment variables before running the application.
 
 ### Ticket escalation properties
-| Environment variable  | Description                                                                                                     | Mandatory | Default value |
-|-----------------------|-----------------------------------------------------------------------------------------------------------------|-----------|---------------|
-| `BACKSTAGE_NOTIFICATIONS_URL`        | The Backstage Notification Service URL                                                                           | ✅ | `http://localhost:7007/api/notifications/` |
-| `MAILTRAP_URL`        | The MailTrail API Token                                                                                         | ❌ | `https://sandbox.api.mailtrap.io` |
-| `MAILTRAP_API_TOKEN`  | The MailTrail API Token                                                                                         | ✅ | |
-| `MAILTRAP_INBOX_ID`   | The ID of the MailTrap inbox                                                                                    | ✅ | |
-| `MAILTRAP_SENDER_EMAIL` | The email address of the mail sender                                                                            | ❌ | `escalation@company.com` |
-| `OCP_API_SERVER_URL`  | The OpensShift API Server URL                                                                                   | ✅ | |
-| `OCP_API_SERVER_TOKEN`| The OpensShift API Server Token                                                                                 | ✅ | |
-| `ESCALATION_TIMEOUT_SECONDS` | The ISO 8601 duration format to wait before triggering the escalation request, after the issue has been created | ❌ | `PT60S` |
+| Environment variable  | Description                                                                                                    | Mandatory | Default value                              |
+|-----------------------|----------------------------------------------------------------------------------------------------------------|-----------|--------------------------------------------|
+| `NOTIFICATIONS_SECRET`        | Shared secret to invoke the Backstage Notification Service                                                  | ✅ | `example-secret-value`                                |
+| `BACKSTAGE_NOTIFICATIONS_URL`        | The Backstage Notification Service URL                                                                         | ✅ | `http://localhost:7007/api/notifications/` |
+| `MAILTRAP_URL`        | The MailTrail API Token                                                                                        | ❌ | `https://sandbox.api.mailtrap.io`          |
+| `MAILTRAP_API_TOKEN`  | The MailTrail API Token                                                                                        | ✅ |                                            |
+| `MAILTRAP_INBOX_ID`   | The ID of the MailTrap inbox                                                                                   | ✅ |                                            |
+| `MAILTRAP_SENDER_EMAIL` | The email address of the mail sender                                                                           | ❌ | `escalation@company.com`                   |
+| `OCP_API_SERVER_URL`  | The OpensShift API Server URL                                                                                  | ✅ |                                            |
+| `OCP_API_SERVER_TOKEN`| The OpensShift API Server Token                                                                                | ✅ |                                            |
+| `ESCALATION_TIMEOUT_SECONDS` | The ISO 8601 duration format to wait before triggering the escalation request, after the issue has been created | ❌ | `PT60S`                                    |
 
 ### Jira Ticketing Service properties
 
@@ -140,6 +142,7 @@ export NAMESPACE=new-namespace
 export MANAGER=manager@company.com
 export USER=jdoe
 export GROUP=jdoe
+export NOTIFICATIONS_SECRET=an-example-secret
 envsubst < input.json > data.json
 SWF_INSTANCE_ID=$(curl -k -XPOST -H "Content-Type: application/json" "${ESCALATION_SWF_URL}/ticketEscalation" -d @data.json | jq '.id')
 SWF_INSTANCE_ID="${SWF_INSTANCE_ID//\"/}"
@@ -149,6 +152,7 @@ echo $SWF_INSTANCE_ID
 Where [input.json](./input.json) defines the input document as:
 ```json
 {
+  "notifications_secret": "${NOTIFICATIONS_SECRET}",
   "namespace": "${NAMESPACE}",
   "email": {
     "manager": "${MANAGER}"
