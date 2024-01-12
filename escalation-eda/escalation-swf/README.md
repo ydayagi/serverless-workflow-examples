@@ -10,13 +10,22 @@ Email service is using [MailTrap Send email API](https://api-docs.mailtrap.io/do
 ## Prerequisites
 * Access to a Jira server (URL, user and [API token](https://support.atlassian.com/atlassian-account/docs/manage-api-tokens-for-your-atlassian-account/))
 * [in-cluster deployment only] Access to an OpenShift cluster with `admin` Role
-  * An account to [MailTrap](https://mailtrap.io/home) with a [testing Inbox](https://mailtrap.io/inboxes) and an [API token](https://mailtrap.io/api-tokens)
-    * Available or Running [Backstage Notification Service](https://github.com/mareklibra/janus-idp-backstage-plugins/commits/flpath560)
-      * This readme is made with [SHA c3ff659](https://github.com/mareklibra/janus-idp-backstage-plugins/tree/c3ff659a0a2a9fba97b9e520568c93da09f150ae)
-      * Be sure the following create notification command (as given in Notification Plugin readme) works without errors 
-      ```shell
-        curl -X POST http://localhost:7007/api/notifications/notifications -H "Content-Type: application/json" -H "notifications-secret: <Replace_this_with_your_shared_secret>" -d '{"title":"my-title","origin":"my-origin","message":"message one","topic":"my-topic"}'
-        ```
+* An account to [MailTrap](https://mailtrap.io/home) with a [testing Inbox](https://mailtrap.io/inboxes) and an [API token](https://mailtrap.io/api-tokens)
+* Available or Running [Janus IDP Backstage Notification Service](https://github.com/janus-idp/backstage-plugins/tree/4d4cb781ca9fc331a2c621583e9203f9e4585ee7), please note the following:
+  * This readme is made with Janus IDP version merged after Notification plugin's [PR #933](https://github.com/janus-idp/backstage-plugins/pull/933)
+  ```shell
+    git clone https://github.com/janus-idp/backstage-plugins.git
+    git checkout 4d4cb781ca9fc331a2c621583e9203f9e4585ee7
+    cd <your project directory>/backstage-plugins
+  ```
+  * Follow the [Notification Backend Plugin Readme](https://github.com/mareklibra/janus-idp-backstage-plugins/tree/c3ff659a0a2a9fba97b9e520568c93da09f150ae/plugins/notifications-backend) to configure the plugin and run.
+  ```shell
+      yarn start:backstage
+  ```
+  * After Janus IDP successfully starts, be sure the following create notification command (as given in Notification Plugin Backend readme) works without errors 
+  ```shell
+    curl -X POST http://localhost:7007/api/notifications/notifications -H "Content-Type: application/json" -H "notifications-secret: <Replace_this_with_your_shared_secret>" -d '{"title":"my-title","origin":"my-origin","message":"message one","topic":"my-topic"}'
+    ```
 
 ## Escalation flow
 The main escalation workflow is defined by the [ticketEscalation](./src/main/resources/ticketEscalation.sw.yaml) model:
