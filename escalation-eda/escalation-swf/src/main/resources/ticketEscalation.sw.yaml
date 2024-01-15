@@ -90,7 +90,7 @@ states:
       - name: createNotification
         actions:
           - name: createNotification
-            condition: .notification != null
+            condition: .notifications_secret != null
             functionRef:
               refName: createNotification
               arguments:

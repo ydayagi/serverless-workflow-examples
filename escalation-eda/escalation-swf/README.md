@@ -80,11 +80,7 @@ The sample implementation using the Atlassian JIRA service is defined by the fol
 similar fields are subject to translation to the configured language and cannot be used for a consistent check.
 
 ### Dependencies on latest SonataFlow artifacts
-* Earlier the implementation was dependent on version `2.0.0-SNAPSHOT` of the SonataFlow platform artifacts. However, this version is no longer supported or exists. 
-```xml
-<kogito.bom.version>2.0.0-SNAPSHOT</kogito.bom.version>
-```
-* Recently the implementation is dependent on version `999-SNAPSHOT` of the SonataFlow platform artifacts as you can see in the [pom.xml](./pom.xml)..
+* This implementation is dependent on version `999-SNAPSHOT` of the SonataFlow platform artifacts as you can see in the [pom.xml](./pom.xml)..
 ```xml
 <kogito.bom.version>999-SNAPSHOT</kogito.bom.version>
 ```
@@ -157,8 +153,6 @@ Example of POST to trigger the flow (see input schema in [ticket-escalation-sche
 ```bash
 export NAMESPACE=new-namespace
 export MANAGER=manager@company.com
-export USER=jdoe
-export GROUP=jdoe
 export NOTIFICATIONS_SECRET=an-example-secret
 envsubst < input.json > data.json
 SWF_INSTANCE_ID=$(curl -k -XPOST -H "Content-Type: application/json" "${ESCALATION_SWF_URL}/ticketEscalation" -d @data.json | jq '.id')
@@ -173,10 +167,6 @@ Where [input.json](./input.json) defines the input document as:
   "namespace": "${NAMESPACE}",
   "email": {
     "manager": "${MANAGER}"
-  },
-  "notification": {
-    "user": "${USER}",
-    "group": "${GROUP}"
   }
 }
 ```
