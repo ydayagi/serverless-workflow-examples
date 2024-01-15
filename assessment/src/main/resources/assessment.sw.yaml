@@ -6,6 +6,9 @@ annotations:
 version: 0.0.1
 start: AssessRepository
 dataInputSchema: schema/input-schema.json
+extensions:
+  - extensionid: workflow-output-schema
+    outputSchema: schema/workflow-options-output-schema.json
 functions:
   - name: execute
     type: custom
@@ -19,7 +22,7 @@ states:
   - name: AssessRepository
     type: operation
     stateDataFilter:
-      output: '{workflowOptions: .preCheck.workflowdata.validatedResult}'
+      output: '. +={workflowOptions: .preCheck.workflowdata.validatedResult}'
     actions:
       - name: executeAction
         functionRef:
