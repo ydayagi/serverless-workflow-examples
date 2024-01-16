@@ -87,18 +87,16 @@ states:
   - name: NotifyTransformationWaiting
     type: operation
     actions:
-      - name: createNotification
-        condition: .notification != null and (.notification.user != null or .notification.group != null)
+      - name: create
+        condition: .notifications_secret != null
         functionRef:
           refName: createNotification
           arguments:
             title: " \"Transformation \" + .transformationId + \" waiting for Q&A\" "
             message: '"Please go to your <a href=\"" + $SECRET.move2kube_url + "/workspaces/"+ .workspaceId + "/projects/" + .projectId + "/outputs/"+ .transformId + "\">Move2Kube instance</a> and answers to questions in order to continue the Move2Kube workflow"'
             origin: "Move2Kube Workflow"
-            targetUsers:
-              - .notification.user
-            targetGroups:
-              - .notification.group
+            topic: "Move2Kube Workflow"
+            notifications-secret: .notifications_secret
     transition: SaveTransformationOutput
   - name: SaveTransformationOutput
     type: operation
@@ -153,17 +151,15 @@ states:
     - name: createNotification
       actions:
         - name: createNotification
-          condition: .notification != null and (.notification.user != null or .notification.group != null)
+          condition: .notifications_secret != null
           functionRef:
             refName: createNotification
             arguments:
               title: '"Move2Kube workflow " + $WORKFLOW.instanceId + " failed"'
               message: '"Move2Kube workflow  " + $WORKFLOW.instanceId + " on workspace " + .workspaceId + " and project " + .projectId + " failed with exit message: "+ .exitMessage + " <br><br>Error: "  + .error'
               origin: "Move2Kube Workflow"
-              targetUsers:
-                - .notification.user
-              targetGroups:
-                - .notification.group
+              topic: "Move2Kube Workflow"
+              notifications-secret: .notifications_secret
     end: true
   - name: PrintExitSuccessMessage
     type: parallel
@@ -178,15 +174,13 @@ states:
      - name: createNotification
        actions:
          - name: createNotification
-           condition: .notification != null and (.notification.user != null or .notification.group != null)
+           condition: .notifications_secret != null
            functionRef:
              refName: createNotification
              arguments:
                title: '"Move2Kube workflow " + $WORKFLOW.instanceId + " success"'
                message: '"Move2Kube workflow  " + $WORKFLOW.instanceId + " on workspace " + .workspaceId + " and project " + .projectId + " was successful"'
                origin: "Move2Kube Worflow"
-               targetUsers:
-                 - .notification.user
-               targetGroups:
-                 - .notification.group
+               topic: "Move2Kube Workflow"
+               notifications-secret: .notifications_secret
     end: true

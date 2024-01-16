@@ -32,19 +32,9 @@
             "description": "the ID of the Move2Kube project",
             "type": "string"
         },
-        "notification": {
-            "type": "object",
-            "description": "Optional backstage notification",
-            "properties": {
-                "user": {
-                    "type": "string",
-                    "description": "User name"
-                },
-                "group": {
-                    "type": "string",
-                    "description": "Group name"
-                }
-            }
+        "notifications_secret": {
+          "description": "Notification secret of Backstage API",
+            "type": "string"
         }
     },
     "required": [
@@ -53,6 +43,6 @@
         "targetBranch",
         "workspaceId",
         "projectId",
-        "notification"
+        "notifications_secret"
     ]
 }
