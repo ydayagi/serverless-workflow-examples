@@ -15,8 +15,6 @@ public class EventGenerator {
 
   public static final String TRANSFORMATION_SAVED_EVENT = ConfigProvider.getConfig().getValue("transformation-saved.event.name",String.class);
 
-  public static final String PLAN_CREATED_EVENT = ConfigProvider.getConfig().getValue("plan-created.event.name",String.class);
-
   public static CloudEvent<EventGenerator.EventPOJO> createCloudEvent(String workflowId, EventPOJO data, String eventType, String source) {
     return baseCloudEventBuilder(workflowId, eventType, source)
         .build(data);
@@ -29,11 +27,6 @@ public class EventGenerator {
 
   public static CloudEvent<EventGenerator.EventPOJO> createTransformationSavedEvent(String workflowId, String source) {
     return baseCloudEventBuilder(workflowId, TRANSFORMATION_SAVED_EVENT, source)
-        .build(new EventPOJO());
-  }
-
-  public static CloudEvent<EventGenerator.EventPOJO> createPlanCreatedEvent(String workflowId, String source) {
-    return baseCloudEventBuilder(workflowId, PLAN_CREATED_EVENT, source)
         .build(new EventPOJO());
   }
 
