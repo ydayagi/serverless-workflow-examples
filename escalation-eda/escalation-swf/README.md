@@ -99,7 +99,6 @@ Application properties can be initialized from environment variables before runn
 ### Ticket escalation properties
 | Environment variable  | Description                                                                                                    | Mandatory | Default value                              |
 |-----------------------|----------------------------------------------------------------------------------------------------------------|-----------|--------------------------------------------|
-| `NOTIFICATIONS_SECRET`        | Shared secret to invoke the Backstage Notification Service                                                  | ✅ | `example-secret-value`                                |
 | `BACKSTAGE_NOTIFICATIONS_URL`        | The Backstage Notification Service URL                                                                         | ✅ | `http://localhost:7007/api/notifications/` |
 | `MAILTRAP_URL`        | The MailTrail API Token                                                                                        | ❌ | `https://sandbox.api.mailtrap.io`          |
 | `MAILTRAP_API_TOKEN`  | The MailTrail API Token                                                                                        | ✅ |                                            |
@@ -153,7 +152,6 @@ Example of POST to trigger the flow (see input schema in [ticket-escalation-sche
 ```bash
 export NAMESPACE=new-namespace
 export MANAGER=manager@company.com
-export NOTIFICATIONS_SECRET=an-example-secret
 envsubst < input.json > data.json
 SWF_INSTANCE_ID=$(curl -k -XPOST -H "Content-Type: application/json" "${ESCALATION_SWF_URL}/ticketEscalation" -d @data.json | jq '.id')
 SWF_INSTANCE_ID="${SWF_INSTANCE_ID//\"/}"
@@ -163,7 +161,6 @@ echo $SWF_INSTANCE_ID
 Where [input.json](./input.json) defines the input document as:
 ```json
 {
-  "notifications_secret": "${NOTIFICATIONS_SECRET}",
   "namespace": "${NAMESPACE}",
   "email": {
     "manager": "${MANAGER}"
