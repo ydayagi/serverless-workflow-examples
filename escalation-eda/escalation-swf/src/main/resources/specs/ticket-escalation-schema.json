@@ -16,41 +16,6 @@
           "description": "Email address of the escalation manager"
         }
       }
-    },
-    "notification": {
-      "type": "object",
-      "description": "Optional backstage notification",
-      "properties": {
-        "user": {
-          "type": "string",
-          "description": "User name"
-        },
-        "group": {
-          "type": "string",
-          "description": "Group name"
-        }
-      }
     }
-  },
-  "anyOf": [
-    {
-      "required": [
-        "namespace",
-        "notification",
-        "email"
-      ]
-    },
-    {
-      "required": [
-        "namespace",
-        "notification"
-      ]
-    },
-    {
-      "required": [
-        "namespace",
-        "email"
-      ]
-    }
-  ]
+  }
 }
