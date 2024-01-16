@@ -12,6 +12,9 @@ In this example, the assessment flow consists of:
   - check whether the repositoryUrl is a java project or not and return workflow options
     - _For simplicity's sake, the java project check is simulated by verifying the presence of the keyword `java` in the repositoryUrl_
   - print workflow options grouped into six categories (current version, upgrade options, migrate options, new options, continuation options, other options) to the user
+- **PreCheck**
+  - validate whether the workflows in the returned assessment options exist
+  - if there are non-existed workflows in the options, then remove them from the options and output the remaining valid ones
 - **End**
 
 **Note**:

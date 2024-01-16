@@ -1,5 +1,4 @@
 {
-    "$id": "classpath:/schema/workflow-options-schema.json",
     "$schema": "http://json-schema.org/draft-04/schema#",
     "title": "Workflow Options",
     "description": "Workflow options",

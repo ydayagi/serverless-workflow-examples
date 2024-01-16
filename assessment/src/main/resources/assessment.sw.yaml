@@ -16,11 +16,13 @@ functions:
   - name: logOuput
     type: custom
     operation: "sysout:INFO"
+  - name: preCheck
+    operation: "specs/precheck.yaml#createResource_preCheck"
 states:
   - name: AssessRepository
     type: operation
     stateDataFilter:
-      output: '{workflowOptions: .result}'
+      output: '. +={workflowOptions: .preCheck.workflowdata.validatedResult}'
     actions:
       - name: executeAction
         functionRef:
@@ -29,9 +31,18 @@ states:
             repositoryUrl: ".repositoryUrl"
         actionDataFilter:
           toStateData: ".result"
+      - name: preCheck
+        functionRef:
+          refName: preCheck
+          arguments:
+            workflowdata:
+              result: .
+        actionDataFilter:
+            fromStateData: .result
+            toStateData: ".preCheck"
       - name: printAction
         functionRef:
           refName: logOuput
           arguments:
-            message: ".workflowOptions"
+            message: ".preCheck"
     end: true
