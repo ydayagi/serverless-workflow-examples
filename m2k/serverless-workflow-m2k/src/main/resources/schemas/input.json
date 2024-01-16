@@ -43,6 +43,6 @@
         "targetBranch",
         "workspaceId",
         "projectId",
-        "notification"
+        "notifications_secret"
     ]
 }
