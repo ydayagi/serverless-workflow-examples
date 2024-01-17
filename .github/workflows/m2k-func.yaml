@@ -31,14 +31,12 @@ jobs:
       id: build-image
       uses: redhat-actions/buildah-build@v2
       with:
-        workdir: ${{ env.WORKDIR }}
+        context: ${{ env.WORKDIR }}
         image: serverless-workflow-m2k-kfunc
         tags: latest ${{ github.sha }}
         extra-args: --ulimit nofile=4096:4096
         containerfiles: |
-          src/main/docker/Dockerfile.jvm
-        build-args: |
-          WF_RESOURCES=${{ inputs.workflow_id }}/
+          ${{ env.WORKDIR }}/src/main/docker/Dockerfile.jvm
 
     - name: Push To quay.io
       id: push-to-quay
