@@ -23,6 +23,9 @@ jobs:
     - name: Build Java projects
       run: |
         cd ${WORKDIR}
+        cd move2kubeAPI
+        make install
+        cd ..
         mvn ${MVN_OPTS} -B clean package -DskipTests
     - name: Buildah Action
       id: build-image
