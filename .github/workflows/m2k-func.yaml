@@ -12,7 +12,7 @@ env:
   MVN_OPTS: ""
     
 jobs:
-  build:
+  build-and-push-m2k-func:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -27,6 +27,7 @@ jobs:
         make install
         cd ..
         mvn ${MVN_OPTS} -B clean package -DskipTests
+
     - name: Buildah Action
       id: build-image
       uses: redhat-actions/buildah-build@v2
