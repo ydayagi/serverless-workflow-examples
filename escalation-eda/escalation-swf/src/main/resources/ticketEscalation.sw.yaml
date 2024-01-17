@@ -97,7 +97,6 @@ states:
                 message: '"Please manage escalation ticket <a href=\"" + .createResponse.browseUrl + "\">" + .createResponse.ticketId + "</a>"'
                 origin: "Escalation Worflow"
                 topic: "Escalation Workflow"
-                notifications-secret: .notifications_secret
       - name: sendEmail
         actions:
           - name: sendEmail
