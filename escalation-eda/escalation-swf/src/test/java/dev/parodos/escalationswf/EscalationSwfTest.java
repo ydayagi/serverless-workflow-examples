@@ -20,7 +20,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.kie.kogito.index.model.ProcessInstanceState;
 import org.kie.kogito.index.storage.DataIndexStorageService;
-import org.kie.kogito.persistence.api.Storage;
+import org.kie.kogito.persistence.api.StorageFetcher;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -149,8 +149,8 @@ public class EscalationSwfTest {
         .atMost(2, SECONDS);
     logger.infof("Reading status of %s", worflowInstanceId);
 
-    Storage<String, org.kie.kogito.index.model.ProcessInstance> cache = dataIndexService
-        .getProcessInstancesCache();
+    StorageFetcher<String, org.kie.kogito.index.model.ProcessInstance> cache = dataIndexService
+        .getProcessInstanceStorage();
     org.kie.kogito.index.model.ProcessInstance processInstance = cache.get(worflowInstanceId);
     logger.debugf("Current status is %s", processInstance);
 
