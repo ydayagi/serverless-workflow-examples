@@ -18,7 +18,7 @@
     <quarkus.platform.version>3.2.9.Final</quarkus.platform.version>
     <skipITs>true</skipITs>
     <surefire-plugin.version>3.0.0-M7</surefire-plugin.version>
-    <version.io.quarkiverse.embedded.postgresql>0.0.8</version.io.quarkiverse.embedded.postgresql>
+    <version.io.quarkiverse.embedded.postgresql>0.1.3</version.io.quarkiverse.embedded.postgresql>
     <quarkus.container-image.builder>jib</quarkus.container-image.builder>
   </properties>
   <dependencyManagement>
