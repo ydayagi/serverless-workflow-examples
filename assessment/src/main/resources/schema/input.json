@@ -27,11 +27,11 @@
         "repositoryUrl": {
             "type": "string"
         },
-        "workspace-id": {
+        "workspaceId": {
             "description": "the ID of the Move2Kube workspace",
             "type": "string"
         },
-        "project-id": {
+        "projectId": {
             "description": "the ID of the Move2Kube project",
             "type": "string"
         }
