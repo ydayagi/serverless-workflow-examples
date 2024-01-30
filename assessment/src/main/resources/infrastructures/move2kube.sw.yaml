@@ -4,6 +4,7 @@ name: Move2Kube
 annotations:
   - "workflow-type/infrastructure"
 version: 0.0.1
+dataInputSchema: schema/input.json
 start: Move2Kube
 states:
     - name: Move2Kube
