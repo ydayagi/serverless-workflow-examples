@@ -12,7 +12,7 @@ Working assumptions:
 * The user workflow is implemented using the SonataFlow platform
 
 ## Architectural components
-![Escalation architecture](./doc/arch.png)
+![Escalation architecture][1]
 
 ## Jira server
 A ticketing service configured to create tickets and notify webhooks any time the tickets are updated.
@@ -20,12 +20,12 @@ A ticketing service configured to create tickets and notify webhooks any time th
 # Escalation workflow
 A Serverless Workflow receiving the user request and then creating the ticket: once it is approved, it take care of provisioning the given namespace.
 
-See the [README](./escalation-swf/README.md)
+See the [README][2]
 
 ### Jira listener
 A Java application configured to receive webhooks from the ticketing service, extract the relevant data and notify the Escalation workflow about the approval.
 
-See the [README](./jira-listener/README.md)
+See the [README][3]
 
 ### Serverless infrastructure
 It is made of the following components:
@@ -39,12 +39,12 @@ This is a two steps deployment:
 2. [Deploy the escalation services](#escalation-eda-chart)
 
 ### eda-infra chart
-The [eda-infra](./helm/eda-infra/Chart.yaml) Helm creates the `Red Hat Serverless Operator`, and default instances of `KnativeEventing` and `KnativeServing`.
+The [eda-infra][4] Helm creates the `Red Hat Serverless Operator`, and default instances of `KnativeEventing` and `KnativeServing`.
 This chart requires a user with `cluster-admin` role.
 
 **Note**: as an alternative, you can provision the same resources manually, using the OpenShift UI console or the `oc` CLI command.
 
-It also created the needed [CRDs](./helm/eda-infra/crds/operator.yaml) according to the latest release of the
+It also created the needed [CRDs][5] according to the latest release of the
 [OpenShift Serverless 1.30 operator](https://access.redhat.com/documentation/en-us/red_hat_openshift_serverless/1.30/html-single/about_serverless/index#new-features-1-30-0_serverless-release-notes).
 
 CRDs were downloaded from:
@@ -52,7 +52,8 @@ CRDs were downloaded from:
 curl -LJO https://github.com/knative/operator/releases/download/knative-v1.9.6/operator.yaml
 ```
 
-The following commands install, upgrade and delete the [eda-infra](./helm/eda-infra/Chart.yaml) Helm chart in the `default` namespace with name `eda-infra`:
+The following commands install, upgrade and delete the [eda-infra][6]
+Helm chart in the `default` namespace with name `eda-infra`:
 ```bash
 helm install -n default eda-infra helm/eda-infra --debug
 helm status -n default eda-infra
@@ -82,8 +83,9 @@ oc patch -n knative-serving knativeserving/knative-serving -p '{"metadata":{"fin
 ```
 
 ### escalation-eda chart
-The [escalation-eda](./helm/escalation-eda/Chart.yaml) Helm creates all the services related to the deployment of the [Escalation workflow](#escalation-workflow) 
+The [escalation-eda][7] Helm creates all the services related to the deployment of the [Escalation workflow](#escalation-workflow) 
 and the [Jira listener](#jira-listener).
+
 This chart requires a user with `admin` role.
 
 Helm properties:
@@ -93,7 +95,7 @@ Helm properties:
 | `namespace.create` | Flag to create the target namespace | ❌ | `true` |
 | `namespace.name` | Target namespace name | ❌ | `escalation` |
 | `jiralistener.image` | Container image of the `Jira listener` application | ❌ | `quay.io/orchestrator/jira-listener-jvm` |
-| `jiralistener.name` | The name of the `Jira listener` service (see [Troubleshooting the Duplicate Certificate Limit error](./jira-listener/README.md#troubleshooting-the-duplicate-certificate-limit-error)) | ❌ | `jira-listener` |
+| `jiralistener.name` | The name of the `Jira listener` service [see Troubleshooting the Duplicate Certificate Limit error][8] | ❌ | `jira-listener` |
 | `escalationSwf.name` | The name of te `Escalation SWF` service | ❌ | `escalation-swf` |
 | `escalationSwf.image` | Container image of the `Escalation SWF` application | ❌ | `quay.io/orchestrator/escalation-swf:1.0` |
 | `escalationSwf.jira.url` | The Jira server URL | ✅ | |
@@ -105,11 +107,11 @@ Helm properties:
 | `escalationSwf.mailTrap.inboxId` | The ID of the MailTrap inbox | ✅ | |
 | `escalationSwf.ocp.apiServerUrl` | The OpenShift API server URL | ✅ | |
 | `escalationSwf.ocp.apiServerToken` | The OpenShift API server token | ✅ | |
-| `escalationSwf.escalationTimeoutSeconds` | The time to wait (in seconds) before escalating  | ❌ | `30` |
+| `escalationSwf.escalationTimeoutSeconds` | The time to wait (in seconds) before escalating | ❌ | `30` |
 | `eventdisplay.enabled` | Flag to install the optional `event-display` application for debugging purposes | ❌ | `true` |
 | `letsEncryptCertificate` | Flag to use the `Lets Encrypt` certificate to expose the `Jira listener` service as the webhook receiver | ❌ | `false` |
 
-The following commands install, upgrade and delete the [escalation-eda](./helm/escalation-eda/Chart.yaml) Helm chart in the `default` namespace
+The following commands install, upgrade and delete the [escalation-eda][7] Helm chart in the `default` namespace
  with name `escalation-eda`, assuming you provided the mandatory values in a file `escalation-eda-values.yaml`:
 ```bash
 helm install -n default escalation-eda helm/escalation-eda --debug -f ./escalation-eda-values.yaml
@@ -147,4 +149,11 @@ namespace:
   name: <value of $SANDBOX_NS>
 ```
 
-
+[1]: https://github.com/rhkp/serverless-workflow-examples/blob/flpath1025/escalation-eda/doc/arch.png
+[2]: https://github.com/rhkp/serverless-workflow-examples/blob/flpath1025/escalation-eda/escalation-swf/README.md
+[3]: https://github.com/rhkp/serverless-workflow-examples/blob/flpath1025/escalation-eda/jira-listener/README.md
+[4]: https://github.com/rhkp/serverless-workflow-examples/blob/flpath1025/escalation-eda/helm/eda-infra/Chart.yaml 
+[5]: https://github.com/rhkp/serverless-workflow-examples/blob/flpath1025/escalation-eda/helm/eda-infra/crds/operator.yaml
+[6]: https://github.com/rhkp/serverless-workflow-examples/blob/flpath1025/escalation-eda/helm/eda-infra/Chart.yaml
+[7]: https://github.com/rhkp/serverless-workflow-examples/blob/flpath1025/escalation-eda/helm/escalation-eda/Chart.yaml
+[8]: https://github.com/rhkp/serverless-workflow-examples/blob/flpath1025/escalation-eda/jira-listener/README.md#troubleshooting-the-duplicate-certificate-limit-error
