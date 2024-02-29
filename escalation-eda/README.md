@@ -156,4 +156,4 @@ namespace:
 [5]: https://github.com/parodos-dev/serverless-workflow-examples/blob/main/escalation-eda/helm/eda-infra/crds/operator.yaml
 [6]: https://github.com/parodos-dev/serverless-workflow-examples/blob/main/escalation-eda/helm/eda-infra/Chart.yaml
 [7]: https://github.com/parodos-dev/serverless-workflow-examples/blob/main/escalation-eda/helm/escalation-eda/Chart.yaml
-[8]: https://github.com/rhkp/serverless-workflow-examples/blob/flpath1025/escalation-eda/jira-listener/README.md#troubleshooting-the-duplicate-certificate-limit-error
+[8]: https://github.com/parodos-dev/serverless-workflow-examples/blob/main/escalation-eda/jira-listener/README.md#troubleshooting-the-duplicate-certificate-limit-error
