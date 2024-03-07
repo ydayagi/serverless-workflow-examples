@@ -5,7 +5,7 @@ export ADMIN_ROLE_SYS_ID="\"2831a114c611228501d4ea6c309d626d\""
 export APPROVER_USER_ROLE_SYS_ID="\"debab85bff02110053ccffffffffffb6\""
 
 #   SERVICE NOW URLs
-export SN_USER_URL=${SN_SERVER}/api/now/table/sys_user?sysparm_input_display_value=true&sysparm_display_value=true
+export SN_USER_URL="${SN_SERVER}/api/now/table/sys_user?sysparm_input_display_value=true&sysparm_display_value=true"
 export SN_ASSIGN_USER_ROLE_URL="${SN_SERVER}/api/now/table/sys_user_has_role"
 export SN_CREATE_GROUP_URL="${SN_SERVER}/api/now/table/sys_user_group"
 export SN_ASSIGN_GROUP_ROLE_URL="${SN_SERVER}/api/now/table/sys_group_has_role"
@@ -32,7 +32,6 @@ export NEW_REQ_USER_SYS_ID=`curl -s \
 --variable %CONTENT_TYPE \
 --variable %AUTH_HEADER \
 --variable %CREATE_REQ_USER_PAYLOAD \
---variable %DEFAULT_PWD \
 --expand-url {{SN_USER_URL}} \
 --expand-header {{CONTENT_TYPE}} \
 --expand-header {{AUTH_HEADER}} \
