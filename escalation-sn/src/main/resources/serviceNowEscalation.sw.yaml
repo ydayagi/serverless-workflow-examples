@@ -1,0 +1,38 @@
+specVersion: "0.8"
+id: servicenow-escalation
+name: ServiceNow Change Request escalation
+annotations:
+  - "workflow-type/infrastructure"
+version: 0.0.1
+timeouts:
+  workflowExecTimeout: PT24H
+start: CreateChangeRequest
+dataInputSchema: servicenow-escalation-schema.json
+functions:
+  # - name: sendNotification
+  #   operation: 'specs/mailtrap.yaml#sendNotification'
+  - name: createChangeRequest
+    operation: specs/servicenow.yaml#createChangeRequest
+  # - name: getChangeRequest
+  #   operation: specs/servicenow.yaml#getChangeRequest
+  - name: logInfo
+    type: custom
+    operation: "sysout:INFO"
+
+states:
+  - name: CreateChangeRequest
+    type: operation
+    actions:
+      - functionRef:
+          refName: createChangeRequest
+          arguments:
+            description: ".description"
+            short_description: ".short_description"
+            comments: ".comments"
+            state: ".state"
+            assigned_to: ".assigned_to"
+            additional_assignee_list: ".additional_assignee_list"
+            assignment_group: ".assignment_group"
+        actionDataFilter:
+          toStateData: .createdChangeRequest
+    end: true
