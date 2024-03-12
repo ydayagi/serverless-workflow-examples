@@ -26,6 +26,24 @@ paths:
                 $ref: '#/components/schemas/CreateChangeRequestResponse'
       security:
         - basicAuth: [ ]
+  /api/now/table/change_request/{sys_id}:
+    get:
+      description: "Retrieve a record"
+      operationId: getChangeRequest
+      parameters:
+      - name: "sys_id"
+        in: "path"
+        required: true
+        schema: {}
+      responses:
+        "200":
+          description: "ok"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetChangeRequestResponse'
+      security:
+        - basicAuth: [ ]
 
 components:
   schemas:
@@ -47,6 +65,18 @@ components:
         assignment_group: 
           type: string
     CreateChangeRequestResponse:
+      type: object
+      properties:
+        result: 
+          type: object
+          properties: 
+            sys_id: 
+              type: string
+            state: 
+              type: string
+            number: 
+              type: string
+    GetChangeRequestResponse:
       type: object
       properties:
         result: 
