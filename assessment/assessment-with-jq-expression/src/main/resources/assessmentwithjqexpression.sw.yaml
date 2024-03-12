@@ -1,0 +1,50 @@
+specVersion: "0.8"
+id: assessmentWithJqExpression
+name: Assessment with jq expression
+annotations:
+  - "workflow-type/assessment"
+version: 0.0.1
+start: AssessState
+dataInputSchema: schema/input-schema.json
+extensions:
+  - extensionid: workflow-output-schema
+    outputSchema: schema/workflow-options-output-schema.json
+functions:
+  - name: logOuput
+    type: custom
+    operation: "sysout:INFO"
+states:
+  - name: AssessState
+    type: switch
+    dataConditions:
+    - condition: "${ .repositoryUrl | contains(\"java\") }" # // basic check for workflow options recommendation
+      transition: JavaWorkflowOptions
+    defaultCondition:
+      transition: NoWorkflowOptions
+  - name: JavaWorkflowOptions
+    type: operation
+    stateDataFilter:
+      output: '. +={workflowOptions: {currentVersion: {id: \"move2kube\", name: \"Move2Kube\"}, "upgradeOptions": [], "migrationOptions": [], "newOptions": [], "continuationOptions": [], "otherOptions": []}}'
+    transition: PrecheckState
+  - name: NoWorkflowOptions
+    type: operation
+    stateDataFilter:
+      output: '. +={workflowOptions: {currentVersion: {}, "upgradeOptions": [], "migrationOptions": [], "newOptions": [], "continuationOptions": [], "otherOptions": []}}'
+    transition: PrecheckState
+  - name: PrecheckState
+    type: operation
+    stateDataFilter:
+      output: '. +={workflowOptions: .preCheck.workflowdata.validatedResult}'
+    actions:
+      - name: preCheck
+        subFlowRef:
+          workflowId: preCheck
+          version: 0.0.1
+        actionDataFilter:
+            toStateData: ".preCheck"
+      - name: printAction
+        functionRef:
+          refName: logOuput
+          arguments:
+            message: ".preCheck"
+    end: true
