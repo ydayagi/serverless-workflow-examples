@@ -13,6 +13,8 @@ functions:
     operation: specs/servicenow.yaml#createChangeRequest
   - name: getChangeRequest
     operation: specs/servicenow.yaml#getChangeRequest
+  - name: createNotification
+    operation: specs/notifications.yaml#createNotification
   - name: logInfo
     type: custom
     operation: "sysout:INFO"
@@ -67,16 +69,28 @@ states:
     actions:
       - name: "RemindManagerToApprove"
         functionRef:
-          refName: "logInfo"
+          refName: "createNotification"
           arguments:
-            message: "\"Manager, please approve this change request \\(.createdChangeRequest.result.number)\""
+            title: " \"Please approve: \" + (.createdChangeRequest.result.number) "
+            message: "\"Manager, please approve this change request: \\(.createdChangeRequest.result.number)\""
+            origin: "Serverless Workflow Example"
+            targetUsers: "[\"default/manager\"]"
+            actions: []
+            topic: "Approval Request"
+            targetGroups: []
     transition: GetChangeRequest
   - name: ThankAndTerminate
     type: operation
     actions:
       - name: "ThankAndTerminate"
         functionRef:
-          refName: "logInfo"
+          refName: "createNotification"
           arguments:
-            message: "\"Thanks Manager for approving this change request \\(.createdChangeRequest.result.number)\""
+            title: " \"Thanks for approving: \" + (.createdChangeRequest.result.number) "
+            message: "\"Manager, thanks a ton for approving this change request: \\(.createdChangeRequest.result.number)\""
+            origin: "Serverless Workflow Example"
+            targetUsers: "[\"default/manager\"]"
+            actions: []
+            topic: "Approval Request"
+            targetGroups: []
     end: true
