@@ -4,7 +4,6 @@
   xmlns="http://maven.apache.org/POM/4.0.0"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>dev.parodos</groupId>
   <artifactId>servicenow-escalation</artifactId>
   <parent>
     <groupId>dev.parodos</groupId>
@@ -14,24 +13,23 @@
   </parent>  
   <version>1.0.0-SNAPSHOT</version>
   <properties>
-    <kogito.bom.version>1.43.0.Final</kogito.bom.version>
-
-    <quarkus.platform.version>2.16.10.Final</quarkus.platform.version>
-    <version.io.quarkiverse.embedded.postgresql>0.0.8</version.io.quarkiverse.embedded.postgresql>
+    <version.io.quarkiverse.embedded.postgresql>0.1.3</version.io.quarkiverse.embedded.postgresql>
   </properties>
   <dependencyManagement>
     <dependencies>
       <dependency>
         <groupId>${quarkus.platform.group-id}</groupId>
-        <artifactId>quarkus-kogito-bom</artifactId>
+        <artifactId>${quarkus.platform.artifact-id}</artifactId>
         <version>${quarkus.platform.version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
-        <groupId>io.quarkiverse.embedded.postgresql</groupId>
-        <artifactId>quarkus-embedded-postgresql</artifactId>
-        <version>${version.io.quarkiverse.embedded.postgresql}</version>
+        <groupId>${kogito.bom.group-id}</groupId>
+        <artifactId>${kogito.bom.artifact-id}</artifactId>
+        <version>${kogito.bom.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -57,6 +55,7 @@
     <dependency>
       <groupId>io.quarkiverse.embedded.postgresql</groupId>
       <artifactId>quarkus-embedded-postgresql</artifactId>
+      <version>${version.io.quarkiverse.embedded.postgresql}</version>
     </dependency>
     <dependency>
       <groupId>io.quarkus</groupId>
