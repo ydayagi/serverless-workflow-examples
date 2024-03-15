@@ -2,23 +2,13 @@
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>com.redhat.rhdh.orchestrator</groupId>
   <artifactId>serverless-workflow-aap-job</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
-  <properties>
-    <maven.compiler.release>17</maven.compiler.release>
-    <compiler-plugin.version>3.10.1</compiler-plugin.version>
-    <kogito.bom.artifact-id>kogito-bom</kogito.bom.artifact-id>
-    <kogito.bom.group-id>org.kie.kogito</kogito.bom.group-id>
-    <kogito.bom.version>2.44.0.Alpha</kogito.bom.version>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
-    <quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
-    <quarkus.platform.version>3.2.9.Final</quarkus.platform.version>
-    <skipITs>true</skipITs>
-    <surefire-plugin.version>3.0.0-M7</surefire-plugin.version>
-  </properties>
+  <parent>
+    <groupId>dev.parodos</groupId>
+    <artifactId>swf-parent</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <relativePath>../swf-parent</relativePath>
+  </parent>
   <dependencyManagement>
     <dependencies>
       <dependency>

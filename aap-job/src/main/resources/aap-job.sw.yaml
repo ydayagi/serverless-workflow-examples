@@ -66,29 +66,21 @@ states:
     type: operation
     actions:
       - functionRef:
-          refName: "logInfo"
+          refName: createNotification
           arguments:
+            title: '"AAP Job Workflow " + $WORKFLOW.instanceId + " Failed"'
             message: '"AAP job workflow id: " + $WORKFLOW.instanceId + " for job template id: " + (.jobTemplateId|tostring) + " failed. Click the link for details: " + .launchedJob.outputUrl'
-      # - functionRef:
-      #     refName: createNotification
-      #     arguments:
-      #       title: '"AAP Job Workflow " + $WORKFLOW.instanceId + " Failed"'
-      #       message: '"AAP job workflow id: " + $WORKFLOW.instanceId + " for job template id: " + (.jobTemplateId|tostring) + " failed. Click the link for details: " + .launchedJob.outputUrl'
-      #       origin: "AAP Job Workflow"
-      #       topic: "AAP Job Workflow"
+            origin: "AAP Job Workflow"
+            topic: "AAP Job Workflow"
     end: true
   - name: SendSuccessNotification
     type: operation
     actions:
       - functionRef:
-          refName: "logInfo"
+          refName: createNotification
           arguments:
+            title: '"AAP Job Workflow " + $WORKFLOW.instanceId + " Succeeded"'
             message: '"AAP job workflow id: " + $WORKFLOW.instanceId + " for job template id: " + (.jobTemplateId|tostring) + " succeeded. Click the link for details: " + .launchedJob.outputUrl'
-      # - functionRef:
-      #     refName: createNotification
-      #     arguments:
-      #       title: '"AAP Job Workflow " + $WORKFLOW.instanceId + " Succeeded"'
-      #       message: '"AAP job workflow id: " + $WORKFLOW.instanceId + " for job template id: " + (.jobTemplateId|tostring) + " succeeded. Click the link for details: " + .launchedJob.outputUrl'
-      #       origin: "AAP Job Workflow"
-      #       topic: "AAP Job Workflow"
+            origin: "AAP Job Workflow"
+            topic: "AAP Job Workflow"
     end: true
