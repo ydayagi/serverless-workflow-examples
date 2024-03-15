@@ -70,7 +70,8 @@ curl -XPOST -H "Content-Type: application/json" http://localhost:8080/servicenow
     "state": "new",
     "assigned_to": "<ServiceNow Approver user sys_id> e.g. 950597b6973002102425b39fe153af41",
     "additional_assignee_list": "<ServiceNow Approver user sys_id> e.g. 950597b6973002102425b39fe153af41",
-    "assignment_group": "<ServiceNow Approver group sys_id> e.g. e50597b6973002102425b39fe153afb2"
+    "assignment_group": "<ServiceNow Approver group sys_id> e.g. e50597b6973002102425b39fe153afb2",
+    "sn_url": "https://<ServiceNow URL>"
 }' | jq '.'
 ```
 * You should see a response similar to the following
@@ -126,7 +127,7 @@ Note: this may appear after a few seconds, as the workflow needs to wait for com
 ```text
                   id                  |                               message                               
 --------------------------------------+---------------------------------------------------------------------
- 3e9cd0a6-c4c8-4ea1-973a-dbb063279397 | Manager, thanks a ton for approving this change request: CHG0030045
+ 3e9cd0a6-c4c8-4ea1-973a-dbb063279397 | Manager, thanks a ton for approving the change request: CHG0030045
 ```
 
 Tips:

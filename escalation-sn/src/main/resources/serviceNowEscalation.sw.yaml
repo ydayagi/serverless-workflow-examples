@@ -7,14 +7,18 @@ version: 0.0.1
 timeouts:
   workflowExecTimeout: PT24H
 start: CreateChangeRequest
-dataInputSchema: servicenow-escalation-schema.json
+extensions:
+  - extensionid: workflow-uri-definitions
+    definitions:
+      notifications: "https://raw.githubusercontent.com/janus-idp/backstage-plugins/%40janus-idp/plugin-notifications-backend%401.0.3/plugins/notifications-backend/src/openapi.yaml"
+dataInputSchema: schemas/servicenow-escalation-schema.json
 functions:
   - name: createChangeRequest
     operation: specs/servicenow.yaml#createChangeRequest
   - name: getChangeRequest
     operation: specs/servicenow.yaml#getChangeRequest
   - name: createNotification
-    operation: specs/notifications.yaml#createNotification
+    operation: notifications#createNotification
   - name: logInfo
     type: custom
     operation: "sysout:INFO"
@@ -75,9 +79,11 @@ states:
             message: "\"Manager, please approve this change request: \\(.createdChangeRequest.result.number)\""
             origin: "Serverless Workflow Example"
             targetUsers: "[\"default/manager\"]"
-            actions: []
             topic: "Approval Request"
             targetGroups: []
+            actions:
+              - title: "Approve"
+                url: " (.sn_url) + \"/nav_to.do?uri=change_request.do?sys_id=\" + (.createdChangeRequest.result.sys_id) "
     transition: GetChangeRequest
   - name: ThankAndTerminate
     type: operation
@@ -87,10 +93,12 @@ states:
           refName: "createNotification"
           arguments:
             title: " \"Thanks for approving: \" + (.createdChangeRequest.result.number) "
-            message: "\"Manager, thanks a ton for approving this change request: \\(.createdChangeRequest.result.number)\""
+            message: "\"Manager, thanks a ton for approving the change request: \\(.createdChangeRequest.result.number)\""
             origin: "Serverless Workflow Example"
             targetUsers: "[\"default/manager\"]"
-            actions: []
             topic: "Approval Request"
             targetGroups: []
+            actions:
+              - title: "Approved Change Request"
+                url: " (.sn_url) + \"/nav_to.do?uri=change_request.do?sys_id=\" + (.createdChangeRequest.result.sys_id) "
     end: true
