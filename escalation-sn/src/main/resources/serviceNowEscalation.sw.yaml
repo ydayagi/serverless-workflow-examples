@@ -60,10 +60,16 @@ states:
   - name: IsApproved
     type: switch
     dataConditions:
+      # Change request state is new, wait for it to come to assessment phase
       - condition: (.readChangeRequest.result.state == "-5")
         transition:
+          nextState: GetChangeRequest
+      # Change request is now in assessment phase
+      - condition: (.readChangeRequest.result.state == "-4")
+        transition:
           nextState: RemindManagerToApprove
-      - condition: (.readChangeRequest.result.state != "-5")
+      # Change request is approved
+      - condition: (.readChangeRequest.result.state == "-3")
         transition:
           nextState: ThankAndTerminate
     defaultCondition:

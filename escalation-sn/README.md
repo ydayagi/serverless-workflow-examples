@@ -63,7 +63,7 @@ mvn clean quarkus:dev
 * Example of POST to trigger the flow (see input schema in [servicenow-escalation-schema.json](./src/main/resources/servicenow-escalation-schema.json)):
 ```bash
 # This is a request sent to the workflow instance
-curl -XPOST -H "Content-Type: application/json" http://localhost:8080/servicenow-escalation -d '{
+CREATE_CR_RESP=$(curl -XPOST -H "Content-Type: application/json" http://localhost:8080/servicenow-escalation -d '{
     "description": "<ServiceNow change request description>",
     "short_description": "<ServiceNow change request short_description>",
     "comments": "<ServiceNow change request comments>",
@@ -72,9 +72,10 @@ curl -XPOST -H "Content-Type: application/json" http://localhost:8080/servicenow
     "additional_assignee_list": "<ServiceNow Approver user sys_id> e.g. 950597b6973002102425b39fe153af41",
     "assignment_group": "<ServiceNow Approver group sys_id> e.g. e50597b6973002102425b39fe153afb2",
     "sn_url": "https://<ServiceNow URL>"
-}' | jq '.'
+}');
+echo $CREATE_CR_RESP |  jq '.';
 ```
-* You should see a response similar to the following
+* You should see a response similar to the following, which provides newly create change request information.
 ```json
 {
   "id": "99203918-3e8c-46a6-ba43-9a025172f8c2",
@@ -96,6 +97,26 @@ curl -XPOST -H "Content-Type: application/json" http://localhost:8080/servicenow
   }
 }
 ```
+
+* From the response above extract the sys_id of the newly created change request.
+```shell
+CREATED_CR_SYS_ID=$( jq -r  '.workflowdata.createdChangeRequest.result.sys_id' <<< "${CREATE_CR_RESP}" );
+echo "${CREATED_CR_SYS_ID}";
+```
+
+* Trigger the newly created change request for approval by changing its state to `assessment` state.
+```shell
+TRIGGER_CR_CMD="curl --location --request PUT 'https://dev143716.service-now.com/api/now/table/change_request/${CREATED_CR_SYS_ID}' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: Basic <your auth header value>' \
+--data '{
+    \"state\": \"-4\",
+    \"approval\": \"requested\"
+}'";
+
+eval $TRIGGER_CR_CMD | jq '.';
+```
+
 * Wait for a minute or two before proceeding to the next step, to view notifications created by the workflow, to remind the approver to approve the created change request.
     * In the current implementation this reminder is generated every `30s` by the workflow.  
 
@@ -105,24 +126,15 @@ curl -XPOST -H "Content-Type: application/json" http://localhost:8080/servicenow
 ```text
                   id                  |                               message                               
 --------------------------------------+---------------------------------------------------------------------
- 8a3c945d-9009-4188-a28e-17ceee853a99 | Manager, please approve this change request: CHG0030045
+ 8a3c945d-9009-4188-a28e-17ceee853a99 | Manager, please approve the change request: CHG0030045
 ```
 
-### End the workflow by updating the change request
+### End the workflow by approving the change request
 
-* Update the Change Request state on ServiceNow instance to help terminate the workflow
-```bash
-# This is a request sent to the ServiceNow instance
-curl --location --request PUT 'https://<your servicenow instance>/api/now/table/change_request/<sys_id of the created change request above>' \
---header 'Content-Type: application/json' \
---header 'Authorization: Basic <your authorization header value>' \
---data '{
-    "state": "-4",
-    "approval": "requested"
-}'
-```
-
-* You will see a `thank you` notification created by `Notifications service` as shown in the following example. 
+* Login to the ServiceNow instance UI with `manager` user and credentials. 
+* Click All -> My Approvals menu item, in the resulting list, click the change request that was created.
+* In the change request detail screen, set the `State` to `Approved` and click `Update`.
+* As the change request is approved, you will see a `thank you` notification created by `Notifications service` as shown in the following example. 
 Note: this may appear after a few seconds, as the workflow needs to wait for completion of the timeout event of `30s`, before this notification is created.
 ```text
                   id                  |                               message                               
