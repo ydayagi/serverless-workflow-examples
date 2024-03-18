@@ -1,9 +1,10 @@
+specVersion: "0.8"
 id: preCheck
 name: PreCheck
-version: "0.0.1"
+version: 0.0.1
 start: ExtractWorkflows
 functions:
-  - name: logOuput
+  - name: logOutput
     type: custom
     operation: "sysout:ERROR"
   - name: extract
@@ -53,7 +54,7 @@ states:
     actions:
     - name: error
       functionRef:
-        refName: logOuput
+        refName: logOutput
         arguments:
           message: "\"workflows: \\(.infrasWorkflows-.fetchResults) are not found\""
     stateDataFilter:

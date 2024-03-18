@@ -19,7 +19,7 @@ In this example, the assessment flow consists of:
 
 **Note**:
 This example assumes that the workflow options returned upon assessment are available.
-The list of workflows provided into `resources/infrastructures` are purely illustrative.
+The workflow provided into `resources/infra` is purely illustrative.
 
 ## How to run
 
@@ -29,25 +29,27 @@ mvn clean quarkus:dev
 
 Example of POST to trigger the flow:
 ```bash
-curl -XPOST -H "Content-Type: application/json" http://localhost:8080/assessmentwithjqexpression -d '{"repositoryUrl": "_YOUR_JAVA_REPOSITORY_"}'
+curl -XPOST -H "Content-Type: application/json" http://localhost:8080/assessment-with-jq-expression -d '{"repositoryUrl": "_YOUR_JAVA_REPOSITORY_"}'
 ```
 
 Response:
 ```
 {
-    "id": "c9a0ce80-8cd2-49d2-81e1-05606e52c9c9",
-    "workflowdata": {
-        "workflowOptions": {
-            "currentVersion": {
-                "id": "move2kube",
-                "name": "Move2Kube"
-            },
-            "upgradeOptions": [],
-            "migrationOptions": [],
-            "newOptions": [],
-            "continuationOptions": [],
-            "otherOptions": []
-        }
+  "workflowdata": {
+    "result": {...},
+    "preCheck": {...},
+    "repositoryUrl": "_YOUR_JAVA_REPOSITORY_",
+    "workflowOptions": {
+      "newOptions": [],
+      "otherOptions": [],
+      "currentVersion": {
+        "id": "move2kube",
+        "name": "Move2Kube"
+      },
+      "upgradeOptions": [],
+      "migrationOptions": [],
+      "continuationOptions": []
     }
+  }
 }
 ```

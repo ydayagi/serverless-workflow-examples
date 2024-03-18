@@ -1,5 +1,5 @@
 specVersion: "0.8"
-id: assessmentWithJqExpression
+id: assessment-with-jq-expression
 name: Assessment with jq expression
 annotations:
   - "workflow-type/assessment"
@@ -10,31 +10,33 @@ extensions:
   - extensionid: workflow-output-schema
     outputSchema: schema/workflow-options-output-schema.json
 functions:
-  - name: logOuput
+  - name: logOutput
     type: custom
     operation: "sysout:INFO"
 states:
   - name: AssessState
     type: switch
     dataConditions:
-    - condition: "${ .repositoryUrl | contains(\"java\") }" # // basic check for workflow options recommendation
+    - condition: "${ .repositoryUrl | ascii_downcase | contains(\"java\") }" # // basic check for workflow options recommendation
       transition: JavaWorkflowOptions
     defaultCondition:
       transition: NoWorkflowOptions
   - name: JavaWorkflowOptions
     type: operation
+    actions: []
     stateDataFilter:
-      output: '. +={workflowOptions: {currentVersion: {id: \"move2kube\", name: \"Move2Kube\"}, "upgradeOptions": [], "migrationOptions": [], "newOptions": [], "continuationOptions": [], "otherOptions": []}}'
+      output: '. +={result: {currentVersion: {id: "move2kube", name: "Move2Kube"}, upgradeOptions: [], migrationOptions: [], newOptions: [], continuationOptions: [], otherOptions: []}}'
     transition: PrecheckState
   - name: NoWorkflowOptions
     type: operation
+    actions: []
     stateDataFilter:
-      output: '. +={workflowOptions: {currentVersion: {}, "upgradeOptions": [], "migrationOptions": [], "newOptions": [], "continuationOptions": [], "otherOptions": []}}'
-    transition: PrecheckState
+      output: '. +={workflowOptions: {currentVersion: {}, upgradeOptions: [], migrationOptions: [], newOptions: [], continuationOptions: [], otherOptions: []}}'
+    end: true
   - name: PrecheckState
     type: operation
     stateDataFilter:
-      output: '. +={workflowOptions: .preCheck.workflowdata.validatedResult}'
+      output: '. +={workflowOptions: .preCheck.validatedResult}'
     actions:
       - name: preCheck
         subFlowRef:
@@ -44,7 +46,7 @@ states:
             toStateData: ".preCheck"
       - name: printAction
         functionRef:
-          refName: logOuput
+          refName: logOutput
           arguments:
             message: ".preCheck"
     end: true
