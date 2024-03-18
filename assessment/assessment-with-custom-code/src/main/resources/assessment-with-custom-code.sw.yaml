@@ -1,5 +1,5 @@
 specVersion: "0.8"
-id: assessmentWithCustomCode
+id: assessment-with-custom-code
 name: Assessment with custom code
 annotations:
   - "workflow-type/assessment"
@@ -20,7 +20,7 @@ states:
   - name: AssessState
     type: operation
     stateDataFilter:
-      output: '. +={workflowOptions: .preCheck.workflowdata.validatedResult}'
+      output: '. +={workflowOptions: .preCheck.validatedResult}'
     actions:
       - name: executeAction
         functionRef:
