@@ -38,7 +38,7 @@ Response:
             "id": 29,
             "failed": false,
             "status": "pending",
-            "outputUrl": "https://student1.2df46.example.opentlc.com/#/jobs/playbook/29/output"
+            "outputUrl": "https://your-app-platform.io/#/jobs/playbook/29/output"
         }
     }
 }
