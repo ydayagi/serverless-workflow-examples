@@ -30,6 +30,9 @@ states:
           refName: launchJob
           arguments:
             job_template_id: .jobTemplateId
+            limit: .limit
+            extra_vars:
+              rhel_inventory_group: .inventoryGroup
         actionDataFilter:
           toStateData: .launchedJob
     stateDataFilter:
@@ -69,9 +72,12 @@ states:
           refName: createNotification
           arguments:
             title: '"AAP Job Workflow " + $WORKFLOW.instanceId + " Failed"'
-            message: '"AAP job workflow id: " + $WORKFLOW.instanceId + " for job template id: " + (.jobTemplateId|tostring) + " failed. Click the link for details: " + .launchedJob.outputUrl'
+            message: '"AAP job workflow id: " + $WORKFLOW.instanceId + " for job template id: " + (.jobTemplateId|tostring) + " failed."'
             origin: "AAP Job Workflow"
             topic: "AAP Job Workflow"
+            actions:
+              - title: "AAP Job Output"
+                url: .launchedJob.outputUrl
     end: true
   - name: SendSuccessNotification
     type: operation
@@ -80,7 +86,10 @@ states:
           refName: createNotification
           arguments:
             title: '"AAP Job Workflow " + $WORKFLOW.instanceId + " Succeeded"'
-            message: '"AAP job workflow id: " + $WORKFLOW.instanceId + " for job template id: " + (.jobTemplateId|tostring) + " succeeded. Click the link for details: " + .launchedJob.outputUrl'
+            message: '"AAP job workflow id: " + $WORKFLOW.instanceId + " for job template id: " + (.jobTemplateId|tostring) + " succeeded."'
             origin: "AAP Job Workflow"
             topic: "AAP Job Workflow"
+            actions:
+              - title: "AAP Job Output"
+                url: .launchedJob.outputUrl
     end: true

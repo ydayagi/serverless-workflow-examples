@@ -5,9 +5,25 @@
     "jobTemplateId": {
       "type": "integer",
       "description": "Job template id"
+    },
+    "inventoryGroup": {
+      "type": "string",
+      "description": "Inventory group"
+    },
+    "limit": {
+      "type": "string",
+      "description": "Exta variables"
     }
   },
   "required": [
-    "jobTemplateId"
+    "jobTemplateId",
+    "inventoryGroup"
+  ],
+  "examples": [
+    {
+        "jobTemplateId": 17,
+        "limit": "fancy-seal",
+        "inventoryGroup": "ALL_rhel"
+    }
   ]
 }

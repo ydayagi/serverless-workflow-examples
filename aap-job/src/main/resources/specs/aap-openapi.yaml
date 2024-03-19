@@ -15,6 +15,11 @@ paths:
           required: true
           schema:
             type: integer
+      requestBody:
+        content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LaunchJobRequest'
       responses:
         "201":
           description: Created
@@ -57,6 +62,17 @@ paths:
         - basicAuth: []
 components:
   schemas:
+    LaunchJobRequest:
+      type: object
+      properties:
+        limit:
+          type: string
+        extra_vars:
+          type: object
+          properties:
+            rhel_inventory_group:
+              type: string
+      additionalProperties: false
     LaunchJobResponse:
       type: object
       properties:
