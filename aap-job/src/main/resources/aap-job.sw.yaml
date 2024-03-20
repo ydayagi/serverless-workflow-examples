@@ -1,17 +1,16 @@
 specVersion: "0.8"
 id: aap-job
+version: 0.0.1
 name: Aap job
+description: Workflow to launch a AAP job
 annotations:
   - "workflow-type/infrastructure"
-version: 0.0.1
-timeouts:
-  workflowExecTimeout: PT24H
+dataInputSchema: schemas/app-job-input-schema.json
 start: LaunchJob
 extensions:
   - extensionid: workflow-uri-definitions
     definitions:
       notifications: "https://raw.githubusercontent.com/janus-idp/backstage-plugins/%40janus-idp/plugin-notifications-backend%401.0.3/plugins/notifications-backend/src/openapi.yaml"
-dataInputSchema: schemas/app-job-input-schema.json
 functions:
   - name: launchJob
     operation: specs/aap-openapi.yaml#launchJob

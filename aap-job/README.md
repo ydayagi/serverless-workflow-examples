@@ -4,16 +4,21 @@ The following two (2) inputs are required:
 - Job template Id
 - Inventory group
 
-## Prerequisite
+## Prerequisites
 * A running instance of AAP with admin credentials. 
 * A running instance of Backstage notification plugin.
 
-### Requiqued Properties 
-List of required properties to run the workflow:
-- BACKSTAGE_NOTIFICATIONS_URL
-- AAP_URL 
-- AAP_USERNAME
-- AAP_PASSWORD
+## AAP job flow
+![SWF VIZ](https://github.com/parodos-dev/serverless-workflow-examples/blob/main/aap-job/aap-job.svg)
+
+## Workflow application configuration
+Application properties can be initialized from environment variables before running the application:
+
+| Environment variable  | Description | Mandatory |
+|-----------------------|-------------|-----------|
+| `AAP_URL`       | The AAP server URL | ✅ |
+| `AAP_USERNAME`      | The AAP server password | ✅ |
+| `AAP_PASSWORD`      | The AAP server password | ✅ |
 
 ## How to run
 
@@ -31,9 +36,9 @@ Response:
 {
     "id": "832685aa-0df0-4cf9-9e91-820b013efda6",
     "workflowdata": {
-        "jobTemplateId": 17,
-        "inventoryGroup": "ALL_rhel",
-        "limit": "fancy-seal",
+        "jobTemplateId": _JOB_TEMPLATE_ID_,
+        "inventoryGroup": "_INVENTORY_GROUP_",
+        "limit": "_LIMIT_",
         "launchedJob": {
             "id": 29,
             "failed": false,
