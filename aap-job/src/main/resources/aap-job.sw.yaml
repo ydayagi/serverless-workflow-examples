@@ -74,6 +74,9 @@ states:
             message: '"AAP job workflow id: " + $WORKFLOW.instanceId + " for job template id: " + (.jobTemplateId|tostring) + " failed."'
             origin: "AAP Job Workflow"
             topic: "AAP Job Workflow"
+            targetUsers:
+              - "default/guest"
+            targetGroups: []
             actions:
               - title: "AAP Job Output"
                 url: .launchedJob.outputUrl
@@ -88,6 +91,9 @@ states:
             message: '"AAP job workflow id: " + $WORKFLOW.instanceId + " for job template id: " + (.jobTemplateId|tostring) + " succeeded."'
             origin: "AAP Job Workflow"
             topic: "AAP Job Workflow"
+            targetUsers:
+              - "default/guest"
+            targetGroups: []
             actions:
               - title: "AAP Job Output"
                 url: .launchedJob.outputUrl
