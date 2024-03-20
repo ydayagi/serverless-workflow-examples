@@ -1,14 +1,15 @@
 specVersion: "0.8"
 id: assessment-with-jq-expression
+version: 0.0.1
 name: Assessment with jq expression
+description: Workflow of type assessment to perform a basic assessment with jq expression
+dataInputSchema: schemas/input-schema.json
 annotations:
   - "workflow-type/assessment"
-version: 0.0.1
 start: AssessState
-dataInputSchema: schema/input-schema.json
 extensions:
   - extensionid: workflow-output-schema
-    outputSchema: schema/workflow-options-output-schema.json
+    outputSchema: schemas/workflow-options-output-schema.json
 functions:
   - name: logOutput
     type: custom
@@ -17,7 +18,7 @@ states:
   - name: AssessState
     type: switch
     dataConditions:
-    - condition: "${ .repositoryUrl | ascii_downcase | contains(\"java\") }" # // basic check for workflow options recommendation
+    - condition: "${ .inputText | ascii_downcase | contains(\"dummy\") }" # // basic check for workflow options recommendation
       transition: JavaWorkflowOptions
     defaultCondition:
       transition: NoWorkflowOptions
@@ -25,7 +26,7 @@ states:
     type: operation
     actions: []
     stateDataFilter:
-      output: '. +={result: {currentVersion: {id: "move2kube", name: "Move2Kube"}, upgradeOptions: [], migrationOptions: [], newOptions: [], continuationOptions: [], otherOptions: []}}'
+      output: '. +={result: {currentVersion: {id: "dummy-infra-workflow-option", name: "Dummy infra workflow option"}, upgradeOptions: [], migrationOptions: [], newOptions: [], continuationOptions: [], otherOptions: []}}'
     transition: PrecheckState
   - name: NoWorkflowOptions
     type: operation
