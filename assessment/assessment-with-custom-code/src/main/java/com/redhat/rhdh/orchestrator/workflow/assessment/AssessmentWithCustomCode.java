@@ -6,10 +6,10 @@ import java.util.List;
 
 @ApplicationScoped
 public class AssessmentWithCustomCode {
-    public WorkflowOptions execute(String repositoryUrl) {
+    public WorkflowOptions execute(String inputText) {
         WorkflowOptions workflowOptions = new WorkflowOptions();
-        if (repositoryUrl.toLowerCase().contains("java")) { // basic check for workflow options recommendation
-            workflowOptions.setCurrentVersion(new WorkflowOption("move2kube", "Move2Kube"));
+        if (inputText.toLowerCase().contains("dummy")) { // basic check for infrastructure workflow options recommendation
+            workflowOptions.setCurrentVersion(new WorkflowOption("dummy-infra-workflow-option", "Dummy infra workflow option"));
             workflowOptions.setUpgradeOptions(new ArrayList<>());
             workflowOptions.setMigrationOptions(new ArrayList<>());
             workflowOptions.setNewOptions(new ArrayList<>());

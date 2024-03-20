@@ -18,7 +18,7 @@ states:
   - name: AssessState
     type: switch
     dataConditions:
-    - condition: "${ .inputText | ascii_downcase | contains(\"dummy\") }" # // basic check for infrastructure workflow options recommendation
+    - condition: "${ .inputText | ascii_downcase | contains(\"dummy\") }" # basic check for infrastructure workflow options recommendation
       transition: JavaWorkflowOptions
     defaultCondition:
       transition: NoWorkflowOptions

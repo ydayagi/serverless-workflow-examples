@@ -1,14 +1,15 @@
 specVersion: "0.8"
 id: assessment-with-custom-code
+version: 0.0.1
 name: Assessment with custom code
+description: Workflow of type assessment to perform a basic assessment with custom code
+dataInputSchema: schemas/input-schema.json
 annotations:
   - "workflow-type/assessment"
-version: 0.0.1
 start: AssessState
-dataInputSchema: schema/input-schema.json
 extensions:
   - extensionid: workflow-output-schema
-    outputSchema: schema/workflow-options-output-schema.json
+    outputSchema: schemas/workflow-options-output-schema.json
 functions:
   - name: execute
     type: custom
@@ -26,7 +27,7 @@ states:
         functionRef:
           refName: execute
           arguments:
-            repositoryUrl: ".repositoryUrl"
+            inputText: ".inputText"
         actionDataFilter:
           toStateData: ".result"
       - name: preCheck
