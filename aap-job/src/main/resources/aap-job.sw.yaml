@@ -1,0 +1,100 @@
+specVersion: "0.8"
+id: aap-job
+version: 0.0.1
+name: Aap job
+description: Workflow to launch a AAP job
+annotations:
+  - "workflow-type/infrastructure"
+dataInputSchema: schemas/app-job-input-schema.json
+start: LaunchJob
+extensions:
+  - extensionid: workflow-uri-definitions
+    definitions:
+      notifications: "https://raw.githubusercontent.com/janus-idp/backstage-plugins/%40janus-idp/plugin-notifications-backend%401.0.3/plugins/notifications-backend/src/openapi.yaml"
+functions:
+  - name: launchJob
+    operation: specs/aap-openapi.yaml#launchJob
+  - name: getJob
+    operation: specs/aap-openapi.yaml#getJob
+  - name: createNotification
+    operation: notifications#createNotification
+  - name: logInfo
+    type: custom
+    operation: "sysout:INFO"
+states:
+  - name: LaunchJob
+    type: operation
+    actions:
+      - functionRef:
+          refName: launchJob
+          arguments:
+            job_template_id: .jobTemplateId
+            limit: .limit
+            extra_vars:
+              rhel_inventory_group: .inventoryGroup
+        actionDataFilter:
+          toStateData: .launchedJob
+    stateDataFilter:
+      output: ".launchedJob += { outputUrl: $SECRET.app_url +  \"/#/jobs/playbook/\" + (.launchedJob.id|tostring) + \"/output\" }"
+    transition: GetJob
+  - name: GetJob
+    type: operation
+    actions:
+      - functionRef:
+          refName: logInfo
+          arguments:
+            message: "\"Sleeping before checking the aap job \\(.launchedJob)\""
+        sleep:
+          after: PT30S
+      - functionRef:
+          refName: getJob
+          arguments:
+            job_id: .launchedJob.id
+        actionDataFilter:
+          toStateData: .readJob
+    transition: IsJobDone
+  - name: IsJobDone
+    type: switch
+    dataConditions:
+      - condition: (.readJob.status == "successful")
+        transition:
+          nextState: SendSuccessNotification
+      - condition: (.readJob.failed == true)
+        transition:
+          nextState: SendFailureNotification
+    defaultCondition:
+      transition: GetJob
+  - name: SendFailureNotification
+    type: operation
+    actions:
+      - functionRef:
+          refName: createNotification
+          arguments:
+            title: '"AAP Job Workflow " + $WORKFLOW.instanceId + " Failed"'
+            message: '"AAP job workflow id: " + $WORKFLOW.instanceId + " for job template id: " + (.jobTemplateId|tostring) + " failed."'
+            origin: "AAP Job Workflow"
+            topic: "AAP Job Workflow"
+            targetUsers:
+              - "default/guest"
+            targetGroups: []
+            actions:
+              - title: "AAP Job Output"
+                url: .launchedJob.outputUrl
+    end: true
+  - name: SendSuccessNotification
+    type: operation
+    actions:
+      - functionRef:
+          refName: createNotification
+          arguments:
+            title: '"AAP Job Workflow " + $WORKFLOW.instanceId + " Succeeded"'
+            message: '"AAP job workflow id: " + $WORKFLOW.instanceId + " for job template id: " + (.jobTemplateId|tostring) + " succeeded."'
+            origin: "AAP Job Workflow"
+            topic: "AAP Job Workflow"
+            targetUsers:
+              - "default/guest"
+            targetGroups: []
+            actions:
+              - title: "AAP Job Output"
+                url: .launchedJob.outputUrl
+    end: true

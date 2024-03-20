@@ -7,7 +7,6 @@ These examples showcase various applications and use cases of serverless archite
 
 - [Introduction](#introduction)
 - [Getting Started](#getting-started)
-- [Examples](#examples)
 - [Contribution Guidelines](#contribution-guidelines)
 - [License](#license)
 
@@ -20,17 +19,6 @@ The `serverless-workflow-examples` repository offers a wide range of examples th
 1. **Clone the Repository:** `git clone https://github.com/your_organization/serverless-workflow-examples.git`
 2. **Navigate to Desired Example:** Check the folder structure to find the example that suits your needs.
 3. **Follow Individual Example README:** Each example contains its README file with specific instructions and requirements.
-
-### Examples
-
-This repository is structured into several categories for ease of navigation. Each category contains relevant serverless workflow examples:
-
-- [Basic Functions](./basic-functions)
-- [API Integration](./api-integration)
-- [Complex Workflows](./complex-workflows)
-- [Custom Solutions](./custom-solutions)
-
-Find more details in the corresponding folders.
 
 ### Contribution Guidelines
 
