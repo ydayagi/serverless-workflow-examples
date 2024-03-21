@@ -1,0 +1,44 @@
+specVersion: "0.8"
+id: assessment-with-kn-function
+version: 0.0.1
+name: Assessment with kn function
+description: Workflow of type assessment to perform a basic assessment with kn function
+dataInputSchema: schemas/input-schema.json
+annotations:
+  - "workflow-type/assessment"
+start: AssessState
+extensions:
+  - extensionid: workflow-output-schema
+    outputSchema: schemas/workflow-options-output-schema.json
+functions:
+  - name: execute
+    type: custom
+    operation: "knative:services.v1.serving.knative.dev/assessment-func?path=/execute"
+  - name: logOuput
+    type: custom
+    operation: "sysout:INFO"
+states:
+  - name: AssessState
+    type: operation
+    stateDataFilter:
+      output: '. +={workflowOptions: .preCheck.validatedResult}'
+    actions:
+      - name: executeAction
+        functionRef:
+          refName: execute
+          arguments:
+            inputText: ".inputText"
+        actionDataFilter:
+          toStateData: ".result"
+      - name: preCheck
+        subFlowRef:
+          workflowId: preCheck
+          version: 0.0.1
+        actionDataFilter:
+            toStateData: ".preCheck"
+      - name: printAction
+        functionRef:
+          refName: logOuput
+          arguments:
+            message: ".preCheck"
+    end: true
