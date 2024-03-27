@@ -9,7 +9,7 @@ The goal in these examples is to show how an assessment workflow can be implemen
   - where the assessment logic in order to return suitable workflow options is implemented in the workflow definition.
 - using **custom java code** convenient for complex use cases:
   - where the assessment logic in order to return suitable workflow options is implemented java classes.
-- using **knative function** convenient for complex use cases where high volumes and scalability matter more:
+- using **knative function** convenient for complex use cases where efficiency and scalability matter more:
   - where the assessment logic in order to return suitable workflow options is implemented a kn functions invoked via REST call.
 
 ## Flow
