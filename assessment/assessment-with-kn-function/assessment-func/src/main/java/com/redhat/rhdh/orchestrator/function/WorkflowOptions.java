@@ -5,15 +5,15 @@ import java.util.List;
 public class WorkflowOptions {
     private WorkflowOption currentVersion;
 
-    private List<WorkflowOption> upgradeOptions;
+    private List<WorkflowOption> upgradeOptions = new ArrayList<>();
 
-    private List<WorkflowOption> migrationOptions;
+    private List<WorkflowOption> migrationOptions = new ArrayList<>();
 
-    private List<WorkflowOption> newOptions;
+    private List<WorkflowOption> newOptions = new ArrayList<>();
 
-    private List<WorkflowOption> continuationOptions;
+    private List<WorkflowOption> continuationOptions = new ArrayList<>();
 
-    private List<WorkflowOption> otherOptions;
+    private List<WorkflowOption> otherOptions = new ArrayList<>();
 
     public WorkflowOption getCurrentVersion() {
         return currentVersion;

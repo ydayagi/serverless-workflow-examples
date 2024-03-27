@@ -14,11 +14,6 @@ public class AssessmentFunc {
             null != input.getInputText() && 
             input.getInputText().toLowerCase().contains("dummy")) { // basic check for infrastructure workflow options recommendation
             workflowOptions.setCurrentVersion(new WorkflowOption("dummy-infra-workflow-option", "Dummy infra workflow option"));
-            workflowOptions.setUpgradeOptions(new ArrayList<>());
-            workflowOptions.setMigrationOptions(new ArrayList<>());
-            workflowOptions.setNewOptions(new ArrayList<>());
-            workflowOptions.setContinuationOptions(new ArrayList<>());
-            workflowOptions.setOtherOptions(new ArrayList<>());
             return workflowOptions;
         }
         return workflowOptions;
