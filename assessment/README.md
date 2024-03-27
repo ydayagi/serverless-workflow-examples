@@ -5,9 +5,12 @@ A workflow of type assessment is then a workflow that performs some checks on us
 
 ## Goal
 The goal in these examples is to show how an assessment workflow can be implemented:
-- using **jq expression**
-- using **custom java code**
-- using **knative function**
+- using **jq expression** convenient for simple use cases:
+  - where the assessment logic in order to return suitable workflow options is implemented in the workflow definition.
+- using **custom java code** convenient for complex use cases:
+  - where the assessment logic in order to return suitable workflow options is implemented java classes.
+- using **knative function** convenient for complex use cases where high volumes and scalability matter more:
+  - where the assessment logic in order to return suitable workflow options is implemented a kn functions invoked via REST call.
 
 ## Flow
 An assessment flow usually consists of:
@@ -16,9 +19,9 @@ An assessment flow usually consists of:
 - **Assessment**
   - perform the desired check or evaluation against the user's input(s)
   - return suitable infrastructure workflow options
-- **PreCheck**
+- **Precheck**
   - validate whether the workflows in the returned assessment options exist
   - if there are non-existed workflows in the options, then remove them from the options and output the remaining valid ones
 - **End**
 
-**Note:** The workflow options must be an object with six fields: _currentVersion, upgradeOptions, migrateOptions, newOptions, continuationOptions, otherOptions_.
+**Note:** the workflow options must be an object with six fields: _currentVersion, upgradeOptions, migrateOptions, newOptions, continuationOptions, otherOptions_. See `workflow-option-output-schema.json` file definied the data output schema of an assessment workflow in each example.
