@@ -1,5 +1,6 @@
 # Tekton workflow example
 This workflow demonstrates creating Tekton resources in a Kubernetes cluster.
+
 We create the following Kubernetes resources (in order as they appear):
  - a namespace called tekton-example
  - 2 Tasks, task-1 and task-2, that echo the message:

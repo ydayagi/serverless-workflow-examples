@@ -4,12 +4,11 @@ The following two (2) inputs are required:
 - Job template Id
 - Inventory group
 
+![SWF VIZ](https://github.com/parodos-dev/serverless-workflow-examples/blob/main/aap-job/aap-job.svg)
+
 ## Prerequisites
 * A running instance of AAP with admin credentials. 
 * A running instance of Backstage notification plugin.
-
-## AAP job flow
-![SWF VIZ](https://github.com/parodos-dev/serverless-workflow-examples/blob/main/aap-job/aap-job.svg)
 
 ## Workflow application configuration
 Application properties can be initialized from environment variables before running the application:
