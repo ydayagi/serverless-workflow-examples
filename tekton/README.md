@@ -10,7 +10,7 @@ We create the following Kubernetes resources (in order as they appear):
  - a Pipeline that executes the tasks one after the other
  - a PipelineRun for executing the Pipeline
 
-![SWF VIZ](https://github.com/parodos-dev/serverless-workflows-example/blob/main/tekton/tekton.svg)
+![SWF VIZ](https://github.com/parodos-dev/serverless-workflows-example/blob/main/tekton/src/tekton.svg)
 
 ## Prerequisite
 * Access to an OCP cluster with Tekton operator (Openshift pipelines) installed. The cluster credentials must allow creating the resources listed above.
