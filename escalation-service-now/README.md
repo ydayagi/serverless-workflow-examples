@@ -1,5 +1,7 @@
 An escalation workflow integrated with ServiceNow using [SonataFlow](https://sonataflow.org/serverlessworkflow/latest/index.html).
 
+![SWF VIZ](https://github.com/parodos-dev/serverless-workflow-examples/blob/main/escalation-service-now/serviceNowEscalation.svg)
+
 ## Prerequisite
 * An available ServiceNow instance with admin credentials.
 * Prerequisite data being available on ServiceNow instance with setup instructions [found here](instance-setup/readme.md)
@@ -43,7 +45,7 @@ curl -X POST http://localhost:7007/api/notifications/notifications -H "Content-T
 }
 ```
 
-## Workflow Application configuration
+## Workflow application configuration
 Application properties can be initialized from environment variables before running the application:
 
 | Environment variable  | Description | Mandatory |
