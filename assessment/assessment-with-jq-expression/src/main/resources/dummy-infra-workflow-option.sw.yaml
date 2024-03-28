@@ -1,0 +1,14 @@
+specVersion: "0.8"
+id: dummy-infra-workflow-option
+name: Dummy infra workflow option
+description: Workflow of type infrastructure used as a dummy workflow option
+annotations:
+  - "workflow-type/infrastructure"
+version: 0.0.1
+start: StartState
+states:
+    - name: StartState
+      type: inject
+      data:
+          message: StartState...
+      end: true

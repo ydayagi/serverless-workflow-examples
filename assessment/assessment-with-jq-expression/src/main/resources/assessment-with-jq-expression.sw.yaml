@@ -1,0 +1,53 @@
+specVersion: "0.8"
+id: assessment-with-jq-expression
+version: 0.0.1
+name: Assessment with jq expression
+description: Workflow of type assessment to perform a basic assessment with jq expression
+dataInputSchema: schemas/input-schema.json
+annotations:
+  - "workflow-type/assessment"
+start: AssessState
+extensions:
+  - extensionid: workflow-output-schema
+    outputSchema: schemas/workflow-options-output-schema.json
+functions:
+  - name: logOutput
+    type: custom
+    operation: "sysout:INFO"
+states:
+  - name: AssessState
+    type: switch
+    dataConditions:
+    - condition: "${ .inputText | ascii_downcase | contains(\"dummy\") }" # basic check for infrastructure workflow options recommendation
+      transition: JavaWorkflowOptions
+    defaultCondition:
+      transition: NoWorkflowOptions
+  - name: JavaWorkflowOptions
+    type: operation
+    actions: []
+    stateDataFilter:
+      output: '. +={result: {currentVersion: {id: "dummy-infra-workflow-option", name: "Dummy infra workflow option"}, upgradeOptions: [], migrationOptions: [], newOptions: [], continuationOptions: [], otherOptions: []}}'
+    transition: PrecheckState
+  - name: NoWorkflowOptions
+    type: operation
+    actions: []
+    stateDataFilter:
+      output: '. +={workflowOptions: {currentVersion: {}, upgradeOptions: [], migrationOptions: [], newOptions: [], continuationOptions: [], otherOptions: []}}'
+    end: true
+  - name: PrecheckState
+    type: operation
+    stateDataFilter:
+      output: '. +={workflowOptions: .preCheck.validatedResult}'
+    actions:
+      - name: preCheck
+        subFlowRef:
+          workflowId: preCheck
+          version: 0.0.1
+        actionDataFilter:
+            toStateData: ".preCheck"
+      - name: printAction
+        functionRef:
+          refName: logOutput
+          arguments:
+            message: ".preCheck"
+    end: true
