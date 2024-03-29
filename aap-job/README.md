@@ -4,7 +4,8 @@ The following two (2) inputs are required:
 - Job template Id
 - Inventory group
 
-![SWF VIZ](https://github.com/parodos-dev/serverless-workflow-examples/blob/main/aap-job/aap-job.svg)
+## Workflow diagram
+![AAP job workflow diagram](https://github.com/parodos-dev/serverless-workflow-examples/blob/main/aap-job/aap-job.svg?raw=true)
 
 ## Prerequisites
 * A running instance of AAP with admin credentials. 

@@ -1,6 +1,7 @@
 An escalation workflow integrated with ServiceNow using [SonataFlow](https://sonataflow.org/serverlessworkflow/latest/index.html).
 
-![SWF VIZ](https://github.com/parodos-dev/serverless-workflow-examples/blob/main/escalation-service-now/serviceNowEscalation.svg)
+## Workflow diagram
+![Escalation with serviceNow workflow diagram](https://github.com/parodos-dev/serverless-workflow-examples/blob/main/escalation-service-now/serviceNowEscalation.svg?raw=true)
 
 ## Prerequisite
 * An available ServiceNow instance with admin credentials.
