@@ -8,6 +8,9 @@ Users are encouraged to use this workflow as self-service alternative for intera
 a mass-migration of project from a managed place, the project stakeholders can use this (or automation) to regularly check
 the cloud-readiness compatibility of their code.
 
+- For MTA v6.2, refer to v6.2 specific version [here](./v6.2/openshift-local-setup/readme.md)
+- For MTA v7.0.x, refer to v7.0.x specific version [here](./v7.0.2/openshift-local-setup/readme.md)
+
 # Prerequisites
 * An OpenShift cluster available with MTA Operator 7.x installed
 * The MTA Hub instance with configured [Jira Tracker](https://access.redhat.com/documentation/en-us/migration_toolkit_for_applications/7.0/html/user_interface_guide/creating-configuring-jira-connection#doc-wrapper)

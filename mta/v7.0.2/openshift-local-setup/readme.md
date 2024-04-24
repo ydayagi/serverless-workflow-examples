@@ -10,6 +10,19 @@ Setup OpenShift Local Instance with MTA Operator (for use with only development/
 ```shell
 ./envup.sh
 ```
+* Once the script completes you will see the URLs and credentials for MTA and MTA Keycloak, as shown in the example below.
+```text
+NAME           HOST/PORT                                     PATH   SERVICES   PORT       TERMINATION     WILDCARD
+mta            mta-openshift-mta.apps-crc.testing                   mta-ui     <all>      edge/Redirect   None
+mta-keycloak   mta-keycloak-openshift-mta.apps-crc.testing          keycloak   keycloak   passthrough     None
+Keycloak Credentials: admin  <Generated Password>
+MTA UI Credentials: admin Passw0rd!
+```
+
+* NOTE: In some cases even though the script completes successfully, the pods may still be in pending state. Be sure to check the state of all pods is `RUNNING` before configuring or using the MTA instance.
+```shell
+oc get pod -n openshift-mta
+```
 
 ## Setup the MTA Instance
 * Get the MTA UI Route and in your browser navigate to the MTA UI. 
@@ -89,6 +102,9 @@ crc config
 
 # E.g. to set the memory to 30GiB use the following
 crc config set memory 30000
+
+# Set the cpus
+crc config set cpus 16
 ```
 
 ## Known Issue

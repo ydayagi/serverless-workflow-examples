@@ -98,28 +98,26 @@ states:
         functionRef:
           refName: createTaskgroup
           arguments:
-            name: taskgroup.analyzer
-            addon: analyzer
+            name: taskgroup.windup
+            addon: windup
             data:
+              output: /windup/report
               rules: 
                 labels:
-                  included:
-                    - konveyor.io/target=cloud-readiness
+                  - konveyor.io/target=cloud-readiness
+                rulesets:
+                  - name: Containerization
+                    id: 2                    
               tagger:
                 enabled: true
-              verbosity: 0
               mode:
                 binary: false
                 withDeps: false
-                artifact: ''
-              targets: []
-              sources: []
+                diva: false
               scope:
-                withKnownLibs: false
-                packages:
-                  included: []
-                  excluded: []
-            tasks: []
+                withKnown: false
+              # targets:
+              #   - cloud-readiness  
     transition: SubmitAnalysis
   - name: SubmitAnalysis
     type: operation
@@ -131,16 +129,14 @@ states:
           arguments:
             id: .taskgroup.id
             createUser: "admin"
-            updateUser: ''
-            name: "taskgroup.analyzer"
-            addon: analyzer
+            name: "taskgroup.windup"
+            addon: windup
             data: .taskgroup.data
             bucket:
               id: .application.bucket.id
             state: Created
             tasks:
               - name: .application.name + ".1.windup"
-                data: {}
                 application:
                   id: .application.id
                   name: .application.name
