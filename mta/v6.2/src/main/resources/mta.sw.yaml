@@ -64,7 +64,7 @@ states:
         actionDataFilter:
           toStateData: ".applications"
     stateDataFilter:
-      output: "{backstageUser: .backstageUser, backstageGroup: .backstageGroup, repositoryURL: .repositoryURL, migrationStartDt: .migrationStartDt, migrationEndDt: .migrationEndDt, exportToIssueManager: .exportToIssueManager, application: .repositoryURL as $r| if .applications == null then null else .applications|map(select(.repository.url == $r))[0] end}"
+      output: "{backstageUser: .backstageUser, backstageGroup: .backstageGroup, repositoryURL: .repositoryURL, migrationStartDatetime: .migrationStartDatetime, migrationEndDatetime: .migrationEndDatetime, exportToIssueManager: .exportToIssueManager, application: .repositoryURL as $r| if .applications == null then null else .applications|map(select(.repository.url == $r))[0] end}"
     transition: AppExist
   - name: AppExist
     type: switch
@@ -304,8 +304,8 @@ states:
           refName: createMigrationwave
           arguments:
             name: ("migrationWave_" + .application.name)
-            startDate: (.migrationStartDt)
-            endDate: (.migrationEndDt)
+            startDate: (.migrationStartDatetime)
+            endDate: (.migrationEndDatetime)
             applications:
             - id: .application.id
               name: .application.name
@@ -356,12 +356,7 @@ states:
   - name: report
     type: operation
     stateDataFilter:
-      output: '{result: (.taskgroup.tasks[0]| "report will be ready here -> " + $SECRET.mta.url + "/hub/applications/" + (.application.id|tostring) + "/bucket" + .data.output), repositoryURL: .repositoryURL}'
-    transition: GetWorkflowOptions
-  - name: GetWorkflowOptions
-    type: operation
-    stateDataFilter:
-      output: '{workflowOptions: {migrationOptions: [{id: "m2k", name: "Move2Kube workflow"}]}, repositoryURL: .repositoryURL}'
+      output: '{mtaAnalysisResultURL: ($SECRET.mta.url + "/hub/applications/" + (.application.id|tostring) + "/bucket/windup/report/"), repositoryURL: .repositoryURL, workflowOptions: {migrationOptions: [{id: "m2k", name: "Move2Kube workflow"}]}}'
     end: true
   - name: NotifyFailureBackstage
     type: operation

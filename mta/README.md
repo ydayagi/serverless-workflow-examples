@@ -18,8 +18,8 @@ the cloud-readiness compatibility of their code.
 # Inputs
 - `repositoryUrl` [mandatory] - the git repo url to examine
 - `exportToIssueManager` [mandatory] - if true creates migration wave in Jira instance
-- `migrationStartDt` [conditional] - Must be provided, if `exportToIssueManager="true"`. e.g. "2024-07-01T00:00:00Z"
-- `migrationEndDt` [conditional] - Must be provided, if `exportToIssueManager="true"`. e.g. "2024-07-31T00:00:00Z"
+- `migrationStartDatetime` [conditional] - Must be provided, if `exportToIssueManager="true"`. e.g. "2024-07-01T00:00:00Z"
+- `migrationEndDatetime` [conditional] - Must be provided, if `exportToIssueManager="true"`. e.g. "2024-07-31T00:00:00Z"
 - `backstageUser` [optional] - the backstage user to send backstage notification with the analysis results
 - `backstageGroup` [optional] - the backstage group to send backstage notification with the analysis results
 
@@ -48,8 +48,8 @@ curl --location 'http://localhost:8080/mta-analysis' \
 --data '{
     "repositoryURL": "https://github.com/rhkp/mock-service.git",
     "exportToIssueManager": "true",
-    "migrationStartDt" : "2024-07-01T00:00:00Z",
-    "migrationEndDt" : "2024-07-31T00:00:00Z"
+    "migrationStartDatetime" : "2024-07-01T00:00:00Z",
+    "migrationEndDatetime" : "2024-07-31T00:00:00Z"
 }'
 ```
 
