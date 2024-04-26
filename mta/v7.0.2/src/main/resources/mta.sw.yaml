@@ -187,8 +187,6 @@ states:
     dataConditions:
       - condition: (.trackers != null)
         transition: GetTracker
-      - condition: (.trackers == null)
-        transition: NotifyFailureBackstage
     defaultCondition:
       transition: NotifyFailureBackstage
   - name: GetTracker
@@ -207,8 +205,6 @@ states:
     dataConditions:
       - condition: (.tracker != null)
         transition: GetTrackerProjects
-      - condition: (.tracker == null)
-        transition: NotifyFailureBackstage
     defaultCondition:
       transition: NotifyFailureBackstage        
   - name: GetTrackerProjects
@@ -227,8 +223,6 @@ states:
     dataConditions:
       - condition: (.trackerProjects != null)
         transition: GetTrackerProject
-      - condition: (.trackerProjects == null)
-        transition: NotifyFailureBackstage
     defaultCondition:
       transition: NotifyFailureBackstage        
   - name: GetTrackerProject
@@ -248,8 +242,6 @@ states:
     dataConditions:
       - condition: (.trackerProject != null)
         transition: GetTrackerProjectIssueTypes
-      - condition: (.trackerProject == null)
-        transition: NotifyFailureBackstage
     defaultCondition:
       transition: NotifyFailureBackstage        
   - name: GetTrackerProjectIssueTypes
@@ -269,8 +261,6 @@ states:
     dataConditions:
       - condition: (.trackerProjectIssueTypes != null)
         transition: GetMigrationWaves
-      - condition: (.trackerProjectIssueTypes == null)
-        transition: NotifyFailureBackstage
     defaultCondition:
       transition: NotifyFailureBackstage        
   - name: GetMigrationWaves
