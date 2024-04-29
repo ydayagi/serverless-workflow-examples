@@ -2,14 +2,22 @@
 
 # Synopsis
 This workflow is an assessment workflow type, that invokes an application analysis workflow using [MTA][1]
-and returns the [move2kube][3] workflow reference, to run next if the analysis is considered to be successful.
+and returns the [move2kube][3] workflow reference to run next and creates a migration wave in the Jira instance configured, if the analysis is considered to be successful.
+
+Largely the steps for this workflow are as follows:
+- User initiates the workflow by providing the Git Hub repo link to analyze.
+- The workflow submits the repo for analysis to MTA.
+- Upon successful completion of the analysis, the workflow queries MTA for details to create migration wave such as Jira instance projects, issue types and others.
+- The workflow creates migration wave in Jira with the details gathered from the step above.
+
+The unique differentiator about this workflow is that it supports two major MTA versions v6.2.2 and v7.0.2 and integrates with configured Jira instance for creation of the migration wave.
 
 Users are encouraged to use this workflow as self-service alternative for interacting with the MTA UI. Instead of running
 a mass-migration of project from a managed place, the project stakeholders can use this (or automation) to regularly check
 the cloud-readiness compatibility of their code.
 
-- For MTA v6.2, refer to v6.2 specific version [here](./v6.2/openshift-local-setup/readme.md)
-- For MTA v7.0.x, refer to v7.0.x specific version [here](./v7.0.2/openshift-local-setup/readme.md)
+- MTA v6.2.2 [instructions](./v6.2.2/openshift-local-setup/readme.md)
+- MTA v7.0.2 [instructions](./v7.0.2/openshift-local-setup/readme.md)
 
 # Prerequisites
 * An OpenShift cluster available with MTA Operator 7.x installed

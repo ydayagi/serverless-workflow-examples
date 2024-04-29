@@ -1,4 +1,4 @@
-Setup OpenShift Local Instance with MTA Operator (for use with only development/testing. Not for production use)
+Setup OpenShift Local Instance with MTA Operator v7.0.2 (for use with only development/testing. Not for production use)
 
 ## Prerequisites
 * Developer machine OS: macos
