@@ -49,6 +49,8 @@ functions:
     operation: specs/mta.json#batchCreateTickets
   - name: createTicket
     operation: specs/mta.json#createTicket
+  - name: getTickets
+    operation: specs/mta.json#getTickets
   - name: createNotification
     operation: notifications#createNotification
   - name: logInfo
@@ -276,7 +278,7 @@ states:
     type: switch
     dataConditions:
       - condition: (.migrationWaves != null)
-        transition: CreateJira
+        transition: GetJiraTickets
       - condition: (.migrationWaves == null)
         transition: CreateMigrationWave
     defaultCondition:
@@ -296,7 +298,27 @@ states:
               name: .application.name
         actionDataFilter:
           toStateData: ".createdMigrationWave"
-    transition: CreateJira
+    transition: GetJiraTickets      
+  - name: GetJiraTickets
+    type: operation
+    actionMode: sequential
+    actions:
+      - name: getTickets
+        functionRef: getTickets
+        actionDataFilter:
+          toStateData: ".jiraTickets"
+    stateDataFilter:
+      output: "{repositoryURL: .repositoryURL, tracker: .tracker, trackerProject: .trackerProject, trackerProjectIssueTypes: .trackerProjectIssueTypes, application: .application, migrationWaveJiraTicket: .repositoryURL as $r| if .jiraTickets == null then null else .jiraTickets|map(select(.application.name == $r))[0] end}"
+    transition: MigrationWaveJiraTicketExists
+  - name: MigrationWaveJiraTicketExists
+    type: switch
+    dataConditions:
+      - condition: (.migrationWaveJiraTicket != null)
+        transition: NotifyCompletion
+      - condition: (.migrationWaveJiraTicket == null)
+        transition: CreateJira
+    defaultCondition:
+      transition: NotifyFailureBackstage
   - name: CreateJira
     type: operation
     actionMode: sequential
@@ -319,7 +341,7 @@ states:
               id: .application.id
               name: .application.name
         actionDataFilter:
-          toStateData: ".createdJira"
+          toStateData: ".migrationWaveJiraTicket"
     transition: NotifyCompletion          
   - name: NotifyCompletion
     type: operation
@@ -341,7 +363,7 @@ states:
   - name: report
     type: operation
     stateDataFilter:
-      output: '{mtaAnalysisResultURL: ($SECRET.mta.url + "/hub/applications/" + (.application.id|tostring) + "/bucket/windup/report/"), repositoryURL: .repositoryURL, workflowOptions: {migrationOptions: [{id: "m2k", name: "Move2Kube workflow"}]}}'
+      output: '{mtaAnalysisResultURL: ($SECRET.mta.url + "/hub/applications/" + (.application.id|tostring) + "/bucket/windup/report/"), migrationWaveJiraTicketURL: .migrationWaveJiraTicket.link, repositoryURL: .repositoryURL, workflowOptions: {migrationOptions: [{id: "m2k", name: "Move2Kube workflow"}]}}'
     end: true
   - name: NotifyFailureBackstage
     type: operation
