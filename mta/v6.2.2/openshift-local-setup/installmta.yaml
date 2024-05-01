@@ -1,0 +1,420 @@
+---
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  name: openshift-mta-j6f7l
+  namespace: openshift-mta
+spec:
+  targetNamespaces:
+  - openshift-mta
+
+---
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    olm.skipRange: '>=6.0.0 <6.2.2'
+    features.operators.openshift.io/token-auth-azure: 'false'
+    operators.openshift.io/valid-subscription: '["OpenShift Kubernetes Engine", "OpenShift Container Platform", "OpenShift Platform Plus"]'
+    features.operators.openshift.io/token-auth-gcp: 'false'
+    operatorframework.io/initialization-resource: |-
+      {
+        "apiVersion": "tackle.konveyor.io/v1alpha1",
+        "kind": "Tackle",
+        "metadata": {
+          "name": "tackle",
+          "namespace": "openshift-mta"
+        },
+        "spec": {
+            "feature_auth_required": "true"
+        }
+      }
+    certified: 'false'
+    olm.targetNamespaces: openshift-mta
+    operatorframework.io/properties: '{"properties":[{"type":"olm.gvk","value":{"group":"tackle.konveyor.io","kind":"Addon","version":"v1alpha1"}},{"type":"olm.gvk","value":{"group":"tackle.konveyor.io","kind":"Tackle","version":"v1alpha1"}},{"type":"olm.package","value":{"packageName":"mta-operator","version":"6.2.2"}},{"type":"olm.package.required","value":{"packageName":"rhsso-operator","versionRange":"\u003e=7.5.9 \u003c7.7.0"}},{"type":"olm.package.required","value":{"packageName":"rhsso-operator","versionRange":"\u003e=7.5.9 \u003c7.7.0"}}]}'
+    repository: 'https://github.com/konveyor/operator'
+    features.operators.openshift.io/token-auth-aws: 'false'
+    support: Red Hat
+    operators.openshift.io/infrastructure-features: '["disconnected"]'
+    alm-examples: |-
+      [
+        {
+          "apiVersion": "tackle.konveyor.io/v1alpha1",
+          "kind": "Tackle",
+          "metadata": {
+            "name": "tackle",
+            "namespace": "openshift-mta"
+          },
+          "spec": {
+            "feature_auth_required": "true"
+          }
+        },
+        {
+          "apiVersion": "tackle.konveyor.io/v1alpha1",
+          "kind": "Addon",
+          "metadata": {
+            "name": "addon-example",
+            "namespace": "openshift-mta"
+          },
+          "spec": {
+            "image": "addon-fqin"
+          }
+        }
+      ]
+    capabilities: Seamless Upgrades
+    features.operators.openshift.io/csi: 'false'
+    features.operators.openshift.io/fips-compliant: 'false'
+    features.operators.openshift.io/cnf: 'false'
+    olm.operatorNamespace: openshift-mta
+    containerImage: 'registry.redhat.io/mta/mta-rhel8-operator@sha256:9aaf990f4fd7c4a1c5c26e34579a467c16039a8bde085681fd28c9e8dd5bc611'
+    createdAt: '2024-02-15T19:08:05Z'
+    features.operators.openshift.io/cni: 'false'
+    categories: 'OpenShift Optional, Modernization & Migration'
+    features.operators.openshift.io/proxy-aware: 'false'
+    operatorframework.io/suggested-namespace: openshift-mta
+    description: MTA is an application modernization platform that helps organizations safely and predictably modernize applications to OpenShift at scale.
+    olm.operatorGroup: openshift-mta-j6f7l
+    features.operators.openshift.io/disconnected: 'true'
+    features.operators.openshift.io/tls-profiles: 'false'
+  name: mta-operator.v6.2.2
+  namespace: openshift-mta
+  labels:
+    olm.managed: 'true'
+    operators.coreos.com/mta-operator.openshift-mta: ''
+spec:
+  customresourcedefinitions:
+    owned:
+      - description: Represents a Tackle Instance
+        displayName: Tackle
+        kind: Tackle
+        name: tackles.tackle.konveyor.io
+        version: v1alpha1
+      - description: Represents a Tackle Addon Instance
+        displayName: Addon
+        kind: Addon
+        name: addons.tackle.konveyor.io
+        version: v1alpha1
+  relatedImages:
+    - image: 'registry.redhat.io/mta/mta-rhel8-operator@sha256:9aaf990f4fd7c4a1c5c26e34579a467c16039a8bde085681fd28c9e8dd5bc611'
+      name: mta-rhel8-operator-9aaf990f4fd7c4a1c5c26e34579a467c16039a8bde085681fd28c9e8dd5bc611-annotation
+    - image: 'registry.redhat.io/mta/mta-rhel8-operator@sha256:9aaf990f4fd7c4a1c5c26e34579a467c16039a8bde085681fd28c9e8dd5bc611'
+      name: mta-operator
+    - image: 'registry.redhat.io/openshift4/ose-oauth-proxy@sha256:65515661a7d719f1a8984c8fe3869a8c479c735b601d820c077797fe78b8e6b3'
+      name: oauth_proxy
+    - image: 'registry.redhat.io/mta/mta-hub-rhel9@sha256:572b729dd8ee9e075bb6fc9e04292b32a808caf2d40636cea9d27cd5d851aa64'
+      name: tackle_hub
+    - image: 'registry.redhat.io/rhel8/postgresql-12@sha256:493358aa1f1f9aa0862fca14e27f972f73a6356b5032fe3b372432f0b6db880a'
+      name: pathfinder_database
+    - image: 'registry.redhat.io/mta/mta-pathfinder-rhel9@sha256:d2722ba719e2f7e4376418d7b97a1053b300cf6030f666c7a570c7f05f2f9bd4'
+      name: pathfinder
+    - image: 'registry.redhat.io/rhel8/postgresql-12@sha256:493358aa1f1f9aa0862fca14e27f972f73a6356b5032fe3b372432f0b6db880a'
+      name: keycloak_database
+    - image: 'registry.redhat.io/mta/mta-ui-rhel9@sha256:9bc025d0e4e8a998bc4349ac7ef651726c5cd1d6afb4480aa1f078183c08f02e'
+      name: tackle_ui
+    - image: 'registry.redhat.io/mta/mta-windup-addon-rhel9@sha256:6f906c1b1d6c7872ce0efe9318c66ca78ae8ca8044ca0cc8e03b80f1892e924c'
+      name: addon_windup
+  cleanup:
+    enabled: false
+  apiservicedefinitions: {}
+  keywords:
+    - modernization
+    - migration
+    - konveyor
+    - tackle
+    - mta
+  displayName: Migration Toolkit for Applications Operator
+  provider:
+    name: Red Hat
+  maturity: alpha
+  installModes:
+    - supported: true
+      type: OwnNamespace
+    - supported: true
+      type: SingleNamespace
+    - supported: true
+      type: MultiNamespace
+    - supported: false
+      type: AllNamespaces
+  version: 6.2.2
+  icon:
+    - base64data: PHN2ZyBpZD0iTGF5ZXJfMSIgZGF0YS1uYW1lPSJMYXllciAxIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTIgMTQ1Ij48ZGVmcz48c3R5bGU+LmNscy0xe2ZpbGw6I2UwMDt9PC9zdHlsZT48L2RlZnM+PHRpdGxlPlJlZEhhdC1Mb2dvLUhhdC1Db2xvcjwvdGl0bGU+PHBhdGggZD0iTTE1Ny43Nyw2Mi42MWExNCwxNCwwLDAsMSwuMzEsMy40MmMwLDE0Ljg4LTE4LjEsMTcuNDYtMzAuNjEsMTcuNDZDNzguODMsODMuNDksNDIuNTMsNTMuMjYsNDIuNTMsNDRhNi40Myw2LjQzLDAsMCwxLC4yMi0xLjk0bC0zLjY2LDkuMDZhMTguNDUsMTguNDUsMCwwLDAtMS41MSw3LjMzYzAsMTguMTEsNDEsNDUuNDgsODcuNzQsNDUuNDgsMjAuNjksMCwzNi40My03Ljc2LDM2LjQzLTIxLjc3LDAtMS4wOCwwLTEuOTQtMS43My0xMC4xM1oiLz48cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Ik0xMjcuNDcsODMuNDljMTIuNTEsMCwzMC42MS0yLjU4LDMwLjYxLTE3LjQ2YTE0LDE0LDAsMCwwLS4zMS0zLjQybC03LjQ1LTMyLjM2Yy0xLjcyLTcuMTItMy4yMy0xMC4zNS0xNS43My0xNi42QzEyNC44OSw4LjY5LDEwMy43Ni41LDk3LjUxLjUsOTEuNjkuNSw5MCw4LDgzLjA2LDhjLTYuNjgsMC0xMS42NC01LjYtMTcuODktNS42LTYsMC05LjkxLDQuMDktMTIuOTMsMTIuNSwwLDAtOC40MSwyMy43Mi05LjQ5LDI3LjE2QTYuNDMsNi40MywwLDAsMCw0Mi41Myw0NGMwLDkuMjIsMzYuMywzOS40NSw4NC45NCwzOS40NU0xNjAsNzIuMDdjMS43Myw4LjE5LDEuNzMsOS4wNSwxLjczLDEwLjEzLDAsMTQtMTUuNzQsMjEuNzctMzYuNDMsMjEuNzdDNzguNTQsMTA0LDM3LjU4LDc2LjYsMzcuNTgsNTguNDlhMTguNDUsMTguNDUsMCwwLDEsMS41MS03LjMzQzIyLjI3LDUyLC41LDU1LC41LDc0LjIyYzAsMzEuNDgsNzQuNTksNzAuMjgsMTMzLjY1LDcwLjI4LDQ1LjI4LDAsNTYuNy0yMC40OCw1Ni43LTM2LjY1LDAtMTIuNzItMTEtMjcuMTYtMzAuODMtMzUuNzgiLz48L3N2Zz4=
+      mediatype: image/svg+xml
+  minKubeVersion: 1.22.0
+  links:
+    - name: Documentation
+      url: 'https://access.redhat.com/documentation/en-us/migration_toolkit_for_applications'
+    - name: Developers
+      url: 'https://developers.redhat.com/products/mta'
+    - name: Konveyor
+      url: 'https://www.konveyor.io'
+  install:
+    spec:
+      clusterPermissions:
+        - rules:
+            - apiGroups:
+                - operator.openshift.io
+              resources:
+                - dnses
+              verbs:
+                - list
+                - get
+            - apiGroups:
+                - config.openshift.io
+              resources:
+                - clusterversions
+                - proxies
+              verbs:
+                - get
+            - apiGroups:
+                - keycloak.org
+              resources:
+                - keycloaks
+                - keycloakrealms
+                - keycloakclients
+                - keycloakusers
+              verbs:
+                - get
+                - list
+                - watch
+                - create
+                - update
+                - patch
+                - delete
+          serviceAccountName: mta-operator
+        - rules: []
+          serviceAccountName: mta-ui
+      deployments:
+        - name: mta-operator
+          spec:
+            replicas: 1
+            selector:
+              matchLabels:
+                app: mta
+                name: mta-operator
+            strategy: {}
+            template:
+              metadata:
+                creationTimestamp: null
+                labels:
+                  app: mta
+                  name: mta-operator
+                  role: mta-operator
+              spec:
+                containers:
+                  - resources:
+                      limits:
+                        cpu: 500m
+                        memory: 768Mi
+                      requests:
+                        cpu: 10m
+                        memory: 256Mi
+                    readinessProbe:
+                      httpGet:
+                        path: /readyz
+                        port: 6789
+                      initialDelaySeconds: 5
+                      periodSeconds: 10
+                    name: mta-operator
+                    livenessProbe:
+                      httpGet:
+                        path: /healthz
+                        port: 6789
+                      initialDelaySeconds: 15
+                      periodSeconds: 20
+                    env:
+                      - name: WATCH_NAMESPACE
+                        valueFrom:
+                          fieldRef:
+                            fieldPath: 'metadata.annotations[''olm.targetNamespaces'']'
+                      - name: ANSIBLE_GATHERING
+                        value: explicit
+                      - name: APP_NAME
+                        value: mta
+                      - name: PROFILE
+                        value: mta
+                      - name: VERSION
+                        value: 6.2.2
+                      - name: RELATED_IMAGE_OAUTH_PROXY
+                        value: 'registry.redhat.io/openshift4/ose-oauth-proxy@sha256:65515661a7d719f1a8984c8fe3869a8c479c735b601d820c077797fe78b8e6b3'
+                      - name: RELATED_IMAGE_TACKLE_HUB
+                        value: 'registry.redhat.io/mta/mta-hub-rhel9@sha256:572b729dd8ee9e075bb6fc9e04292b32a808caf2d40636cea9d27cd5d851aa64'
+                      - name: RELATED_IMAGE_PATHFINDER_DATABASE
+                        value: 'registry.redhat.io/rhel8/postgresql-12@sha256:493358aa1f1f9aa0862fca14e27f972f73a6356b5032fe3b372432f0b6db880a'
+                      - name: RELATED_IMAGE_PATHFINDER
+                        value: 'registry.redhat.io/mta/mta-pathfinder-rhel9@sha256:d2722ba719e2f7e4376418d7b97a1053b300cf6030f666c7a570c7f05f2f9bd4'
+                      - name: RELATED_IMAGE_KEYCLOAK_DATABASE
+                        value: 'registry.redhat.io/rhel8/postgresql-12@sha256:493358aa1f1f9aa0862fca14e27f972f73a6356b5032fe3b372432f0b6db880a'
+                      - name: RELATED_IMAGE_TACKLE_UI
+                        value: 'registry.redhat.io/mta/mta-ui-rhel9@sha256:9bc025d0e4e8a998bc4349ac7ef651726c5cd1d6afb4480aa1f078183c08f02e'
+                      - name: RELATED_IMAGE_ADDON_WINDUP
+                        value: 'registry.redhat.io/mta/mta-windup-addon-rhel9@sha256:6f906c1b1d6c7872ce0efe9318c66ca78ae8ca8044ca0cc8e03b80f1892e924c'
+                    securityContext:
+                      allowPrivilegeEscalation: false
+                    imagePullPolicy: Always
+                    image: 'registry.redhat.io/mta/mta-rhel8-operator@sha256:9aaf990f4fd7c4a1c5c26e34579a467c16039a8bde085681fd28c9e8dd5bc611'
+                    args:
+                      - '--health-probe-bind-address=:6789'
+                      - '--metrics-bind-address=127.0.0.1:8080'
+                      - '--leader-elect'
+                      - '--leader-election-id=mta-operator'
+                securityContext:
+                  runAsNonRoot: true
+                serviceAccountName: mta-operator
+      permissions:
+        - rules:
+            - apiGroups:
+                - ''
+              resources:
+                - pods
+                - services
+                - services/finalizers
+                - endpoints
+                - persistentvolumeclaims
+                - events
+                - configmaps
+                - secrets
+                - serviceaccounts
+              verbs:
+                - '*'
+            - apiGroups:
+                - route.openshift.io
+              resources:
+                - routes
+              verbs:
+                - '*'
+            - apiGroups:
+                - networking.k8s.io
+              resources:
+                - ingresses
+                - networkpolicies
+              verbs:
+                - '*'
+            - apiGroups:
+                - apps
+              resources:
+                - deployments
+                - daemonsets
+                - replicasets
+                - statefulsets
+              verbs:
+                - '*'
+            - apiGroups:
+                - monitoring.coreos.com
+              resources:
+                - servicemonitors
+              verbs:
+                - get
+                - list
+                - watch
+                - create
+                - update
+                - patch
+                - delete
+            - apiGroups:
+                - apps.openshift.io
+              resources:
+                - deploymentconfigs
+              verbs:
+                - get
+                - list
+                - watch
+                - create
+                - update
+                - patch
+                - delete
+            - apiGroups:
+                - apps
+              resourceNames:
+                - tackle-operator
+                - mta-operator
+              resources:
+                - deployments/finalizers
+              verbs:
+                - update
+            - apiGroups:
+                - tackle.konveyor.io
+              resources:
+                - tackles
+                - tackles/status
+                - tackles/finalizers
+                - addons
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - coordination.k8s.io
+              resources:
+                - leases
+              verbs:
+                - get
+                - list
+                - watch
+                - create
+                - update
+                - patch
+                - delete
+          serviceAccountName: mta-operator
+        - rules:
+            - apiGroups:
+                - ''
+                - tackle.konveyor.io
+                - batch
+              resources:
+                - '*'
+              verbs:
+                - '*'
+            - apiGroups:
+                - security.openshift.io
+              resourceNames:
+                - anyuid
+              resources:
+                - securitycontextconstraints
+              verbs:
+                - use
+          serviceAccountName: mta-hub
+    strategy: deployment
+  maintainers:
+    - email: openshift-operators@redhat.com
+      name: Red Hat
+  description: |+
+    Migration Toolkit for Applications is an application modernization platform that helps organizations safely and predictably modernize applications to new technologies, with an initial focus on accelerating the adoption of legacy applications to OpenShift.
+
+    ### Install
+
+    Once you have successfully installed the Operator, proceed to deploy components by creating the required Tackle CR.
+
+    By default, the Operator installs the following components on a target cluster:
+
+    * Hub, to manage the application inventory and coordinate the migration process.
+    * UI, the web console to manage the application inventory and drive the migration waves.
+    * Pathfinder, a service to manage the assessment questionnaires.
+    * Keycloak, to manage authentication, including with 3rd-party providers.
+
+    ### Documentation
+    Documentation can be found on our [website](https://access.redhat.com/documentation/en-us/migration_toolkit_for_applications).
+
+    ### Getting help
+    If you encounter any issues while using Migration Toolkit for Applications Operator, create a [support case](https://access.redhat.com/support/cases/) for bugs, enhancements, or other requests.
+
+  replaces: mta-operator.v6.2.1
+
+---
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  labels:
+    operators.coreos.com/mta-operator.openshift-mta: ""
+  name: mta-operator
+  namespace: openshift-mta
+spec:
+  channel: stable-v6.2
+  installPlanApproval: Automatic
+  name: mta-operator
+  source: redhat-operators
+  sourceNamespace: openshift-marketplace
+  startingCSV: mta-operator.v6.2.2
