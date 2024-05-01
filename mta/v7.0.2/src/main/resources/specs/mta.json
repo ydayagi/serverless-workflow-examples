@@ -625,6 +625,72 @@
           }
         ],
         "x-codegen-request-body-name": "ticket"
+      },
+      "get": {
+        "operationId": "getTickets",
+        "tags": [
+          "tickets"
+        ],
+        "summary": "List all tickets.",
+        "description": "List all tickets.",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/api.Ticket"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/tickets/{id}": {
+      "get": {
+        "operationId": "getTicket",
+        "tags": [
+          "tickets"
+        ],
+        "summary": "Get a ticket by ID.",
+        "description": "Get a ticket by ID.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Ticket ID",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/api.Ticket"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/hub/batch/tickets": {
