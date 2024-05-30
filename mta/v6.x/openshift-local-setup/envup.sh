@@ -56,9 +56,5 @@ while true; do
     fi
 done
 
-oc apply -f keycloak-route.yaml
 oc get route
-KEYCLOAK_USER=$(oc get secret credential-mta-rhsso --template={{.data.ADMIN_USERNAME}} | base64 -d)
-KEYCLOAK_PWD=$(oc get secret credential-mta-rhsso --template={{.data.ADMIN_PASSWORD}} | base64 -d)
-echo "Keycloak Credentials: $KEYCLOAK_USER  $KEYCLOAK_PWD"
 echo 'MTA UI Credentials: admin Passw0rd!'
