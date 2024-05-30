@@ -25,11 +25,11 @@ oc apply -f installmta.yaml
 oc project openshift-mta
 echo "Installing: MTA operator - please be patient, takes a few minutes"
 sleep 60
-oc delete clusterserviceversion mta-operator.v7.0.2 -n openshift-mta
+oc delete clusterserviceversion mta-operator.v7.0.3 -n openshift-mta
 
 sleep 120
 while true; do
-    OPERATOR_INSTALLED=$(oc get clusterserviceversions/mta-operator.v7.0.2 | grep Succeeded)
+    OPERATOR_INSTALLED=$(oc get clusterserviceversions/mta-operator.v7.0.3 | grep Succeeded)
     if [ -n "$OPERATOR_INSTALLED" ]; then
         echo "Installed: MTA operator "
         break
@@ -56,9 +56,5 @@ while true; do
     fi
 done
 
-oc apply -f keycloak-route.yaml
 oc get route
-KEYCLOAK_USER=$(oc get secret credential-mta-rhsso --template={{.data.ADMIN_USERNAME}} | base64 -d)
-KEYCLOAK_PWD=$(oc get secret credential-mta-rhsso --template={{.data.ADMIN_PASSWORD}} | base64 -d)
-echo "Keycloak Credentials: $KEYCLOAK_USER  $KEYCLOAK_PWD"
 echo 'MTA UI Credentials: admin Passw0rd!'

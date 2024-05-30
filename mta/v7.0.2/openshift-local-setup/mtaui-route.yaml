@@ -1,0 +1,20 @@
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: mtaui
+  namespace: openshift-mta
+  labels:
+    app.kubernetes.io/component: ui
+    app.kubernetes.io/name: mta-ui
+    app.kubernetes.io/part-of: mta
+  annotations:
+    openshift.io/host.generated: 'true'
+spec:
+  host: mtaui-openshift-mta.apps-crc.testing
+  to:
+    kind: Service
+    name: mta-ui
+    weight: 100
+  port:
+    targetPort: ui
+  wildcardPolicy: None
