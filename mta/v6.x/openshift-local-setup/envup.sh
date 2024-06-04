@@ -1,3 +1,4 @@
+#!/bin/bash
 # Cleanup previous instance
 crc stop
 crc delete -f
@@ -19,17 +20,25 @@ open $WEB_CONSOLE_URL/k8s/all-namespaces/operators.coreos.com~v1alpha1~ClusterSe
 oc login -s=$API_URL -u=$ADMIN_USER -p=$ADMIN_PWD
 oc create ns openshift-mta
 
+if [ -z "$MTA_OPERATOR_VERSION" ]; then
+    MTA_OPERATOR_VERSION=v6.2.2 # Note: The resources in installmta.yaml should match this version
+    echo "Using the MTA Operator version: $MTA_OPERATOR_VERSION"
+fi
+
+MTA_OPERATOR_NAME=mta-operator."$MTA_OPERATOR_VERSION"
+echo "Using the MTA Operator: $MTA_OPERATOR_NAME"
+
 # Install MTA Operator
 oc apply -f installmta.yaml
 
 oc project openshift-mta
 echo "Installing: MTA operator - please be patient, takes a few minutes"
 sleep 60
-oc delete clusterserviceversion mta-operator.v6.2.2 -n openshift-mta
+oc delete clusterserviceversion "$MTA_OPERATOR_NAME" -n openshift-mta
 
 sleep 120
 while true; do
-    OPERATOR_INSTALLED=$(oc get clusterserviceversions/mta-operator.v6.2.2 | grep Succeeded)
+    OPERATOR_INSTALLED=$(oc get clusterserviceversions/"$MTA_OPERATOR_NAME" | grep Succeeded)
     if [ -n "$OPERATOR_INSTALLED" ]; then
         echo "Installed: MTA operator "
         break
