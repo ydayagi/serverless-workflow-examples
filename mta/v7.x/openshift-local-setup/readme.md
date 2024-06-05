@@ -1,4 +1,4 @@
-Setup OpenShift Local Instance with MTA Operator v6.2.2 (for use with only development/testing. Not for production use)
+Setup OpenShift Local Instance with MTA Operator v7.0.3 (for use with only development/testing. Not for production use)
 
 ## Prerequisites
 * Developer machine OS: macos
@@ -14,9 +14,6 @@ Setup OpenShift Local Instance with MTA Operator v6.2.2 (for use with only devel
 ```text
 NAME           HOST/PORT                                     PATH   SERVICES   PORT       TERMINATION     WILDCARD
 mta            mta-openshift-mta.apps-crc.testing                   mta-ui     <all>      edge/Redirect   None
-mta-keycloak   mta-keycloak-openshift-mta.apps-crc.testing          keycloak   keycloak   passthrough     None
-Keycloak Credentials: admin  <Generated Password>
-MTA UI Credentials: admin Passw0rd!
 ```
 
 * NOTE: In some cases even though the script completes successfully, the pods may still be in pending state. Be sure to check the state of all pods is `RUNNING` before configuring or using the MTA instance.
@@ -31,27 +28,13 @@ oc project openshift-mta
 oc get route
 ```
 
-* Login to the MTA UI with initial default credentials `admin/Passw0rd!` and change the password to your liking.
-
-* Follow the [Jira Connection Guide](https://access.redhat.com/documentation/en-us/migration_toolkit_for_applications/6.2/html/user_interface_guide/creating-configuring-jira-connection#doc-wrapper) and setup the Jira instance connection for the workflow
+* Follow the [Jira Connection Guide](https://access.redhat.com/documentation/en-us/migration_toolkit_for_applications/7.0/html/user_interface_guide/creating-configuring-jira-connection#doc-wrapper) and setup the Jira instance connection for the workflow
 
 * Test the setup and see if you are getting the tracker you just configured
-    * To get the Auth Token for the following call use this command.
-    ```shell
-    curl --location 'https://<YOUR MTA UI URL>/hub/auth/login' \
-        --header 'Accept: application/json, text/plain, */*' \
-        --header 'Content-Type: application/json' \
-        --data '{
-            "user": "admin",
-            "password": "<YOUR PASSWORD>"
-    }'
-    ```
-
     * Be sure the following call returns the Jira Connection you just configured.
     ```shell
     curl --location 'https://<YOUR MTA UI URL>/hub/trackers' \
-        --header 'Accept: application/json, text/plain, */*' \
-        --header 'Authorization: Bearer <YOUR AUTH TOKEN>' 
+        --header 'Accept: application/json, text/plain, */*' 
     ```
 
 ## Appendix
@@ -61,7 +44,6 @@ oc get route
 curl --location 'https://<Your MTA URL>/hub/identities' \
 --header 'Accept: application/json, text/plain, */*' \
 --header 'Content-Type: application/json' \
---header 'Authorization: Bearer <Your Auth Token>' \
 --data-raw '{
     "name": "jira",
     "description": "",
@@ -78,7 +60,6 @@ curl --location 'https://<Your MTA URL>/hub/identities' \
 curl --location 'https://<Your MTA URL>/hub/trackers' \
 --header 'Accept: application/json, text/plain, */*' \
 --header 'Content-Type: application/json' \
---header 'Authorization: Bearer <Your Auth Token>' \
 --data '{
     "name": "jira",
     "url": "https://<your instance name>.atlassian.net/",

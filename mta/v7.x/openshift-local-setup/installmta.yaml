@@ -13,11 +13,9 @@ apiVersion: operators.coreos.com/v1alpha1
 kind: ClusterServiceVersion
 metadata:
   annotations:
-    olm.skipRange: '>=6.2.0 <7.0.2'
+    olm.skipRange: '>=6.2.0 <7.0.3'
     features.operators.openshift.io/token-auth-azure: 'false'
-    operators.openshift.io/valid-subscription: >-
-      ["OpenShift Kubernetes Engine", "OpenShift Container Platform", "OpenShift
-      Platform Plus"]
+    operators.openshift.io/valid-subscription: '["OpenShift Kubernetes Engine", "OpenShift Container Platform", "OpenShift Platform Plus"]'
     features.operators.openshift.io/token-auth-gcp: 'false'
     operatorframework.io/initialization-resource: |-
       {
@@ -33,10 +31,7 @@ metadata:
       }
     certified: 'false'
     olm.targetNamespaces: openshift-mta
-    operatorframework.io/properties: >-
-      {"properties":[{"type":"olm.gvk","value":{"group":"tackle.konveyor.io","kind":"Addon","version":"v1alpha1"}},{"type":"olm.gvk","value":{"group":"tackle.konveyor.io","kind":"Tackle","version":"v1alpha1"}},{"type":"olm.package","value":{"packageName":"mta-operator","version":"7.0.2"}},{"type":"olm.package.required","value":{"packageName":"rhsso-operator","versionRange":"\u003e=7.5.9
-      \u003c7.7.0"}},{"type":"olm.package.required","value":{"packageName":"rhsso-operator","versionRange":"\u003e=7.5.9
-      \u003c7.7.0"}}]}
+    operatorframework.io/properties: '{"properties":[{"type":"olm.gvk","value":{"group":"tackle.konveyor.io","kind":"Addon","version":"v1alpha1"}},{"type":"olm.gvk","value":{"group":"tackle.konveyor.io","kind":"Tackle","version":"v1alpha1"}},{"type":"olm.package","value":{"packageName":"mta-operator","version":"7.0.3"}},{"type":"olm.package.required","value":{"packageName":"rhsso-operator","versionRange":"\u003e=7.5.9 \u003c7.7.0"}},{"type":"olm.package.required","value":{"packageName":"rhsso-operator","versionRange":"\u003e=7.5.9 \u003c7.7.0"}}]}'
     repository: 'https://github.com/konveyor/operator'
     features.operators.openshift.io/token-auth-aws: 'false'
     support: Red Hat
@@ -71,22 +66,19 @@ metadata:
     features.operators.openshift.io/fips-compliant: 'false'
     features.operators.openshift.io/cnf: 'false'
     olm.operatorNamespace: openshift-mta
-    containerImage: >-
-      registry.redhat.io/mta/mta-rhel8-operator@sha256:35c77bebe8097195de844a71dff331a88e67dad1d1fb1de7fc832fbe30fda507
-    createdAt: '2024-03-12T18:48:22Z'
+    containerImage: 'registry.redhat.io/mta/mta-rhel8-operator@sha256:268ecf5efc51af71f9b2bc2d01b410f8cfcf81a948b82d2d476fef6c0cd3e033'
     features.operators.openshift.io/cni: 'false'
     categories: 'OpenShift Optional, Modernization & Migration'
     features.operators.openshift.io/proxy-aware: 'false'
     operatorframework.io/suggested-namespace: openshift-mta
-    description: >-
-      MTA is an application modernization platform that helps organizations
-      safely and predictably modernize applications to OpenShift at scale.
+    description: MTA is an application modernization platform that helps organizations safely and predictably modernize applications to OpenShift at scale.
     olm.operatorGroup: openshift-mta-qd6nx
     features.operators.openshift.io/disconnected: 'true'
     features.operators.openshift.io/tls-profiles: 'false'
-  name: mta-operator.v7.0.2
+  name: mta-operator.v7.0.3
   namespace: openshift-mta
   labels:
+    olm.managed: 'true'
     operators.coreos.com/mta-operator.openshift-mta: ''
 spec:
   customresourcedefinitions:
@@ -102,36 +94,25 @@ spec:
         name: addons.tackle.konveyor.io
         version: v1alpha1
   relatedImages:
-    - image: >-
-        registry.redhat.io/mta/mta-rhel8-operator@sha256:35c77bebe8097195de844a71dff331a88e67dad1d1fb1de7fc832fbe30fda507
-      name: >-
-        mta-rhel8-operator-35c77bebe8097195de844a71dff331a88e67dad1d1fb1de7fc832fbe30fda507-annotation
-    - image: >-
-        registry.redhat.io/mta/mta-rhel8-operator@sha256:35c77bebe8097195de844a71dff331a88e67dad1d1fb1de7fc832fbe30fda507
+    - image: 'registry.redhat.io/mta/mta-rhel8-operator@sha256:268ecf5efc51af71f9b2bc2d01b410f8cfcf81a948b82d2d476fef6c0cd3e033'
+      name: mta-rhel8-operator-268ecf5efc51af71f9b2bc2d01b410f8cfcf81a948b82d2d476fef6c0cd3e033-annotation
+    - image: 'registry.redhat.io/mta/mta-rhel8-operator@sha256:268ecf5efc51af71f9b2bc2d01b410f8cfcf81a948b82d2d476fef6c0cd3e033'
       name: mta-operator
-    - image: >-
-        registry.redhat.io/openshift4/ose-oauth-proxy@sha256:65515661a7d719f1a8984c8fe3869a8c479c735b601d820c077797fe78b8e6b3
+    - image: 'registry.redhat.io/openshift4/ose-oauth-proxy@sha256:af879d8b9b5e396a5308fb675a1d6dba6d70151b9bdbe7829362e081a6adab1c'
       name: oauth_proxy
-    - image: >-
-        registry.redhat.io/mta/mta-hub-rhel9@sha256:a384ced35ff458dd597c222ce1494e1bdac958fcd8450ba0c6fab8918cb22f74
+    - image: 'registry.redhat.io/mta/mta-hub-rhel9@sha256:18c611415589a093e16e9c2f2fba9f3c83d9514f79c8e4fde9704ef0679ea4d5'
       name: tackle_hub
-    - image: >-
-        registry.redhat.io/rhel8/postgresql-12@sha256:b96be9d3e8512046bae7d5a3e04fa151043eca051416305629b3ffd547370453
+    - image: 'registry.redhat.io/rhel8/postgresql-12@sha256:da619f6617d99790b4fe00fdb23ab4aea0cdb0592590162d51b3ef94aca01a7b'
       name: tackle_postgres
-    - image: >-
-        registry.redhat.io/mta/mta-ui-rhel9@sha256:bac6c899624af8798e52240c20f7743764214fe6c5a22122605e3b0f68731657
+    - image: 'registry.redhat.io/mta/mta-ui-rhel9@sha256:0e1ec99af5666a060176adc52612f20209e3398a9a5a2aa1dcff11ef260b2006'
       name: tackle_ui
-    - image: >-
-        registry.redhat.io/mta/mta-analyzer-addon-rhel9@sha256:c95f722289dd3d754e723abe6f9554e754e90e5f424f075afd56c9b13423b744
+    - image: 'registry.redhat.io/mta/mta-analyzer-addon-rhel9@sha256:1b5e016046d93b6a2674d63f08e0a46f8050e785bd58fd94ba7a70487efe7e2a'
       name: addon_analyzer
-    - image: >-
-        registry.redhat.io/mta/mta-analyzer-lsp-rhel9@sha256:d3184de7b254570627360de1133910d525bcb4e684ffee73bd7014424657a8cc
+    - image: 'registry.redhat.io/mta/mta-analyzer-lsp-rhel9@sha256:0c8f59f35a950ea8b45f16cf71362128ccc335b58a996a099384fd737dd6ff90'
       name: analyzer_lsp
-    - image: >-
-        registry.redhat.io/mta/mta-windup-shim-rhel9@sha256:8f67fafe972bd18263bd9bc01b273a2baeb60fefb62737354d88ae240c9e31cc
+    - image: 'registry.redhat.io/mta/mta-windup-shim-rhel9@sha256:e2ea89055936d7ad229b5e890c6ba234c6cb22d8b688515ed4d6a34848efea83'
       name: windup_shim
-    - image: >-
-        registry.redhat.io/mta/mta-cli-rhel9@sha256:5d0eaf6cd5f9b92fcb2d6c3ed7bab710249f66ab3711cd600562a3ddd10063b9
+    - image: 'registry.redhat.io/mta/mta-cli-rhel9@sha256:d554cc36748fc05e30eb10e6fe816ff6aab2fe07b61cc60e9d93de5c3cf17748'
       name: cli
   cleanup:
     enabled: false
@@ -155,16 +136,14 @@ spec:
       type: MultiNamespace
     - supported: false
       type: AllNamespaces
-  version: 7.0.2
+  version: 7.0.3
   icon:
-    - base64data: >-
-        PHN2ZyBpZD0iTGF5ZXJfMSIgZGF0YS1uYW1lPSJMYXllciAxIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTIgMTQ1Ij48ZGVmcz48c3R5bGU+LmNscy0xe2ZpbGw6I2UwMDt9PC9zdHlsZT48L2RlZnM+PHRpdGxlPlJlZEhhdC1Mb2dvLUhhdC1Db2xvcjwvdGl0bGU+PHBhdGggZD0iTTE1Ny43Nyw2Mi42MWExNCwxNCwwLDAsMSwuMzEsMy40MmMwLDE0Ljg4LTE4LjEsMTcuNDYtMzAuNjEsMTcuNDZDNzguODMsODMuNDksNDIuNTMsNTMuMjYsNDIuNTMsNDRhNi40Myw2LjQzLDAsMCwxLC4yMi0xLjk0bC0zLjY2LDkuMDZhMTguNDUsMTguNDUsMCwwLDAtMS41MSw3LjMzYzAsMTguMTEsNDEsNDUuNDgsODcuNzQsNDUuNDgsMjAuNjksMCwzNi40My03Ljc2LDM2LjQzLTIxLjc3LDAtMS4wOCwwLTEuOTQtMS43My0xMC4xM1oiLz48cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Ik0xMjcuNDcsODMuNDljMTIuNTEsMCwzMC42MS0yLjU4LDMwLjYxLTE3LjQ2YTE0LDE0LDAsMCwwLS4zMS0zLjQybC03LjQ1LTMyLjM2Yy0xLjcyLTcuMTItMy4yMy0xMC4zNS0xNS43My0xNi42QzEyNC44OSw4LjY5LDEwMy43Ni41LDk3LjUxLjUsOTEuNjkuNSw5MCw4LDgzLjA2LDhjLTYuNjgsMC0xMS42NC01LjYtMTcuODktNS42LTYsMC05LjkxLDQuMDktMTIuOTMsMTIuNSwwLDAtOC40MSwyMy43Mi05LjQ5LDI3LjE2QTYuNDMsNi40MywwLDAsMCw0Mi41Myw0NGMwLDkuMjIsMzYuMywzOS40NSw4NC45NCwzOS40NU0xNjAsNzIuMDdjMS43Myw4LjE5LDEuNzMsOS4wNSwxLjczLDEwLjEzLDAsMTQtMTUuNzQsMjEuNzctMzYuNDMsMjEuNzdDNzguNTQsMTA0LDM3LjU4LDc2LjYsMzcuNTgsNTguNDlhMTguNDUsMTguNDUsMCwwLDEsMS41MS03LjMzQzIyLjI3LDUyLC41LDU1LC41LDc0LjIyYzAsMzEuNDgsNzQuNTksNzAuMjgsMTMzLjY1LDcwLjI4LDQ1LjI4LDAsNTYuNy0yMC40OCw1Ni43LTM2LjY1LDAtMTIuNzItMTEtMjcuMTYtMzAuODMtMzUuNzgiLz48L3N2Zz4=
+    - base64data: PHN2ZyBpZD0iTGF5ZXJfMSIgZGF0YS1uYW1lPSJMYXllciAxIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTIgMTQ1Ij48ZGVmcz48c3R5bGU+LmNscy0xe2ZpbGw6I2UwMDt9PC9zdHlsZT48L2RlZnM+PHRpdGxlPlJlZEhhdC1Mb2dvLUhhdC1Db2xvcjwvdGl0bGU+PHBhdGggZD0iTTE1Ny43Nyw2Mi42MWExNCwxNCwwLDAsMSwuMzEsMy40MmMwLDE0Ljg4LTE4LjEsMTcuNDYtMzAuNjEsMTcuNDZDNzguODMsODMuNDksNDIuNTMsNTMuMjYsNDIuNTMsNDRhNi40Myw2LjQzLDAsMCwxLC4yMi0xLjk0bC0zLjY2LDkuMDZhMTguNDUsMTguNDUsMCwwLDAtMS41MSw3LjMzYzAsMTguMTEsNDEsNDUuNDgsODcuNzQsNDUuNDgsMjAuNjksMCwzNi40My03Ljc2LDM2LjQzLTIxLjc3LDAtMS4wOCwwLTEuOTQtMS43My0xMC4xM1oiLz48cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Ik0xMjcuNDcsODMuNDljMTIuNTEsMCwzMC42MS0yLjU4LDMwLjYxLTE3LjQ2YTE0LDE0LDAsMCwwLS4zMS0zLjQybC03LjQ1LTMyLjM2Yy0xLjcyLTcuMTItMy4yMy0xMC4zNS0xNS43My0xNi42QzEyNC44OSw4LjY5LDEwMy43Ni41LDk3LjUxLjUsOTEuNjkuNSw5MCw4LDgzLjA2LDhjLTYuNjgsMC0xMS42NC01LjYtMTcuODktNS42LTYsMC05LjkxLDQuMDktMTIuOTMsMTIuNSwwLDAtOC40MSwyMy43Mi05LjQ5LDI3LjE2QTYuNDMsNi40MywwLDAsMCw0Mi41Myw0NGMwLDkuMjIsMzYuMywzOS40NSw4NC45NCwzOS40NU0xNjAsNzIuMDdjMS43Myw4LjE5LDEuNzMsOS4wNSwxLjczLDEwLjEzLDAsMTQtMTUuNzQsMjEuNzctMzYuNDMsMjEuNzdDNzguNTQsMTA0LDM3LjU4LDc2LjYsMzcuNTgsNTguNDlhMTguNDUsMTguNDUsMCwwLDEsMS41MS03LjMzQzIyLjI3LDUyLC41LDU1LC41LDc0LjIyYzAsMzEuNDgsNzQuNTksNzAuMjgsMTMzLjY1LDcwLjI4LDQ1LjI4LDAsNTYuNy0yMC40OCw1Ni43LTM2LjY1LDAtMTIuNzItMTEtMjcuMTYtMzAuODMtMzUuNzgiLz48L3N2Zz4=
       mediatype: image/svg+xml
   minKubeVersion: 1.22.0
   links:
     - name: Documentation
-      url: >-
-        https://access.redhat.com/documentation/en-us/migration_toolkit_for_applications
+      url: 'https://access.redhat.com/documentation/en-us/migration_toolkit_for_applications'
     - name: Developers
       url: 'https://developers.redhat.com/products/mta'
     - name: Konveyor
@@ -255,36 +234,27 @@ spec:
                       - name: PROFILE
                         value: mta
                       - name: VERSION
-                        value: 7.0.2
+                        value: 7.0.3
                       - name: RELATED_IMAGE_OAUTH_PROXY
-                        value: >-
-                          registry.redhat.io/openshift4/ose-oauth-proxy@sha256:65515661a7d719f1a8984c8fe3869a8c479c735b601d820c077797fe78b8e6b3
+                        value: 'registry.redhat.io/openshift4/ose-oauth-proxy@sha256:af879d8b9b5e396a5308fb675a1d6dba6d70151b9bdbe7829362e081a6adab1c'
                       - name: RELATED_IMAGE_TACKLE_HUB
-                        value: >-
-                          registry.redhat.io/mta/mta-hub-rhel9@sha256:a384ced35ff458dd597c222ce1494e1bdac958fcd8450ba0c6fab8918cb22f74
+                        value: 'registry.redhat.io/mta/mta-hub-rhel9@sha256:18c611415589a093e16e9c2f2fba9f3c83d9514f79c8e4fde9704ef0679ea4d5'
                       - name: RELATED_IMAGE_TACKLE_POSTGRES
-                        value: >-
-                          registry.redhat.io/rhel8/postgresql-12@sha256:b96be9d3e8512046bae7d5a3e04fa151043eca051416305629b3ffd547370453
+                        value: 'registry.redhat.io/rhel8/postgresql-12@sha256:da619f6617d99790b4fe00fdb23ab4aea0cdb0592590162d51b3ef94aca01a7b'
                       - name: RELATED_IMAGE_TACKLE_UI
-                        value: >-
-                          registry.redhat.io/mta/mta-ui-rhel9@sha256:bac6c899624af8798e52240c20f7743764214fe6c5a22122605e3b0f68731657
+                        value: 'registry.redhat.io/mta/mta-ui-rhel9@sha256:0e1ec99af5666a060176adc52612f20209e3398a9a5a2aa1dcff11ef260b2006'
                       - name: RELATED_IMAGE_ADDON_ANALYZER
-                        value: >-
-                          registry.redhat.io/mta/mta-analyzer-addon-rhel9@sha256:c95f722289dd3d754e723abe6f9554e754e90e5f424f075afd56c9b13423b744
+                        value: 'registry.redhat.io/mta/mta-analyzer-addon-rhel9@sha256:1b5e016046d93b6a2674d63f08e0a46f8050e785bd58fd94ba7a70487efe7e2a'
                       - name: RELATED_IMAGE_ANALYZER_LSP
-                        value: >-
-                          registry.redhat.io/mta/mta-analyzer-lsp-rhel9@sha256:d3184de7b254570627360de1133910d525bcb4e684ffee73bd7014424657a8cc
+                        value: 'registry.redhat.io/mta/mta-analyzer-lsp-rhel9@sha256:0c8f59f35a950ea8b45f16cf71362128ccc335b58a996a099384fd737dd6ff90'
                       - name: RELATED_IMAGE_WINDUP_SHIM
-                        value: >-
-                          registry.redhat.io/mta/mta-windup-shim-rhel9@sha256:8f67fafe972bd18263bd9bc01b273a2baeb60fefb62737354d88ae240c9e31cc
+                        value: 'registry.redhat.io/mta/mta-windup-shim-rhel9@sha256:e2ea89055936d7ad229b5e890c6ba234c6cb22d8b688515ed4d6a34848efea83'
                       - name: RELATED_IMAGE_CLI
-                        value: >-
-                          registry.redhat.io/mta/mta-cli-rhel9@sha256:5d0eaf6cd5f9b92fcb2d6c3ed7bab710249f66ab3711cd600562a3ddd10063b9
+                        value: 'registry.redhat.io/mta/mta-cli-rhel9@sha256:d554cc36748fc05e30eb10e6fe816ff6aab2fe07b61cc60e9d93de5c3cf17748'
                     securityContext:
                       allowPrivilegeEscalation: false
                     imagePullPolicy: Always
-                    image: >-
-                      registry.redhat.io/mta/mta-rhel8-operator@sha256:35c77bebe8097195de844a71dff331a88e67dad1d1fb1de7fc832fbe30fda507
+                    image: 'registry.redhat.io/mta/mta-rhel8-operator@sha256:268ecf5efc51af71f9b2bc2d01b410f8cfcf81a948b82d2d476fef6c0cd3e033'
                     args:
                       - '--health-probe-bind-address=:6789'
                       - '--metrics-bind-address=127.0.0.1:8080'
@@ -414,46 +384,26 @@ spec:
   maintainers:
     - email: openshift-operators@redhat.com
       name: Red Hat
-  description: >+
-    Migration Toolkit for Applications is an application modernization platform
-    that helps organizations safely and predictably modernize applications to
-    new technologies, with an initial focus on accelerating the adoption of
-    legacy applications to OpenShift.
-
+  description: |+
+    Migration Toolkit for Applications is an application modernization platform that helps organizations safely and predictably modernize applications to new technologies, with an initial focus on accelerating the adoption of legacy applications to OpenShift.
 
     ### Install
 
+    Once you have successfully installed the Operator, proceed to deploy components by creating the required Tackle CR.
 
-    Once you have successfully installed the Operator, proceed to deploy
-    components by creating the required Tackle CR.
+    By default, the Operator installs the following components on a target cluster:
 
-
-    By default, the Operator installs the following components on a target
-    cluster:
-
-
-    * Hub, to manage the application inventory and coordinate the migration
-    process.
-
-    * UI, the web console to manage the application inventory and drive the
-    migration waves.
-
+    * Hub, to manage the application inventory and coordinate the migration process.
+    * UI, the web console to manage the application inventory and drive the migration waves.
     * Keycloak, to manage authentication, including with 3rd-party providers.
 
-
     ### Documentation
-
-    Documentation can be found on our
-    [website](https://access.redhat.com/documentation/en-us/migration_toolkit_for_applications).
-
+    Documentation can be found on our [website](https://access.redhat.com/documentation/en-us/migration_toolkit_for_applications).
 
     ### Getting help
+    If you encounter any issues while using Migration Toolkit for Applications Operator, create a [support case](https://access.redhat.com/support/cases/) for bugs, enhancements, or other requests.
 
-    If you encounter any issues while using Migration Toolkit for Applications
-    Operator, create a [support case](https://access.redhat.com/support/cases/)
-    for bugs, enhancements, or other requests.
-
-  replaces: mta-operator.v7.0.1
+  replaces: mta-operator.v7.0.2
 
 ---
 apiVersion: operators.coreos.com/v1alpha1

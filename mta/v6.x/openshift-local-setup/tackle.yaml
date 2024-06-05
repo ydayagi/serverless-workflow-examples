@@ -7,4 +7,4 @@ spec:
   hub_bucket_volume_size: "25Gi"
   maven_data_volume_size: "25Gi"
   rwx_supported: "false"
-  feature_auth_required: 'true'
+  feature_auth_required: 'false'
