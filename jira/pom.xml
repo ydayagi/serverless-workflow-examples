@@ -1,26 +1,26 @@
 <?xml version="1.0"?>
-<project 
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd" 
+<project
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd"
   xmlns="http://maven.apache.org/POM/4.0.0"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>devparados</groupId>
+  <groupId>dev.parodos</groupId>
   <artifactId>jira</artifactId>
-  <version>1.0</version>
-  <description>bla</description>
+  <version>1.0.0-SNAPSHOT</version>
   <properties>
-    <maven.compiler.release>17</maven.compiler.release>
     <compiler-plugin.version>3.10.1</compiler-plugin.version>
-    <kogito.bom.artifact-id>kogito-bom</kogito.bom.artifact-id>
-    <kogito.bom.group-id>org.kie.kogito</kogito.bom.group-id>
-    <kogito.bom.version>2.44.0.Alpha</kogito.bom.version>
+    <maven.compiler.release>17</maven.compiler.release>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
     <quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
     <quarkus.platform.version>3.2.9.Final</quarkus.platform.version>
+    <kogito.bom.group-id>org.kie.kogito</kogito.bom.group-id>
+    <kogito.bom.artifact-id>kogito-bom</kogito.bom.artifact-id>
+    <kogito.bom.version>2.44.0.Alpha</kogito.bom.version>
     <skipITs>true</skipITs>
     <surefire-plugin.version>3.0.0-M7</surefire-plugin.version>
+    <version.io.quarkiverse.embedded.postgresql>0.0.8</version.io.quarkiverse.embedded.postgresql>
   </properties>
   <dependencyManagement>
     <dependencies>
@@ -38,20 +38,25 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
+      <dependency>
+        <groupId>${quarkus.platform.group-id}</groupId>
+        <artifactId>quarkus-bom</artifactId>
+        <version>${quarkus.platform.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>io.quarkiverse.embedded.postgresql</groupId>
+        <artifactId>quarkus-embedded-postgresql</artifactId>
+        <version>${version.io.quarkiverse.embedded.postgresql}</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
   <dependencies>
+    <!-- Serverless workflow extensions -->
     <dependency>
       <groupId>org.kie.kogito</groupId>
       <artifactId>kogito-quarkus-serverless-workflow</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>io.quarkus</groupId>
-      <artifactId>quarkus-smallrye-health</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.kie.kogito</groupId>
-      <artifactId>kogito-addons-quarkus-source-files</artifactId>
     </dependency>
     <dependency>
       <groupId>org.kie.kogito</groupId>
@@ -62,16 +67,56 @@
       <artifactId>kogito-addons-quarkus-process-management</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.kie.kogito</groupId>
+      <artifactId>kogito-addons-quarkus-source-files</artifactId>
+    </dependency>
+    <!-- Kogito runtime persistence -->
+    <dependency>
+      <groupId>io.quarkiverse.embedded.postgresql</groupId>
+      <artifactId>quarkus-embedded-postgresql</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-jdbc-postgresql</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-agroal</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.kogito</groupId>
+      <artifactId>kogito-addons-quarkus-persistence-jdbc</artifactId>
+    </dependency>
+
+    <!-- Embedded jobs service -->
+    <dependency>
+      <groupId>org.kie.kogito</groupId>
+      <artifactId>kogito-addons-quarkus-jobs-service-embedded</artifactId>
+    </dependency>
+
+    <!-- Embedded data index -->
+    <dependency>
+      <groupId>org.kie.kogito</groupId>
+      <artifactId>kogito-addons-quarkus-data-index-inmemory</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.eclipse.angus</groupId>
+      <artifactId>angus-mail</artifactId>
+      <version>2.0.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-smallrye-openapi</artifactId>
+    </dependency>
+    <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-resteasy-jackson</artifactId>
     </dependency>
     <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-arc</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.kie.kogito</groupId>
-      <artifactId>kogito-addons-quarkus-data-index-inmemory</artifactId>
     </dependency>
     <dependency>
       <groupId>io.quarkus</groupId>
@@ -150,19 +195,4 @@
       </properties>
     </profile>
   </profiles>
-  <!-- Temporary hack to use latest SonataFlow platform artifacts-->
-  <repositories>
-    <repository>
-      <id>apache-repository-snapshots</id>
-      <url>https://repository.apache.org/content/repositories/snapshots/</url>
-      <layout>default</layout>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-        <updatePolicy>daily</updatePolicy>
-      </snapshots>
-    </repository>
-  </repositories>
 </project>
