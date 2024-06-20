@@ -1,0 +1,20 @@
+{
+  "$id": "classpath:/schemas/jira.json",
+  "title": "Data input schema",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "inputs": {
+      "title": "Inputs",
+      "type": "object",
+      "properties": {
+        "issueKey": {
+          "title": "Issue",
+          "description": "Jira issue",
+          "type": "string"
+        }
+      },
+      "required": ["issueKey"]
+    }
+  }
+}
