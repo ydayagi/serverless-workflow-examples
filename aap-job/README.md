@@ -16,7 +16,7 @@ Application properties can be initialized from environment variables before runn
 
 | Environment variable  | Description | Mandatory |
 |-----------------------|-------------|-----------|
-| `AAP_URL`       | The AAP server URL | ✅ |
+| `AAP_URL`       | The AAP server URL - protocol and hostname. E.g. https://myhost.org | ✅ |
 | `AAP_USERNAME`      | The AAP server password | ✅ |
 | `AAP_PASSWORD`      | The AAP server password | ✅ |
 
