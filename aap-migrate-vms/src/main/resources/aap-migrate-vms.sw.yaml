@@ -1,0 +1,73 @@
+specVersion: "0.8"
+id: aap-migrate-vms
+version: 0.0.1
+name: aap-migrate-vms
+description: Workflow to launch AAP VM migration job
+annotations:
+  - "workflow-type/infrastructure"
+dataInputSchema: schemas/app-migrate-vms-input-schema.json
+start: LaunchJob
+functions:
+  - name: launchJob
+    operation: specs/aap-openapi.yaml#launchJob
+  - name: getJob
+    operation: specs/aap-openapi.yaml#getJob
+  - name: logInfo
+    type: custom
+    operation: "sysout:INFO"
+states:
+  - name: LaunchJob
+    type: operation
+    actions:
+      - functionRef:
+          refName: launchJob
+          arguments:
+            job_template_id: .jobTemplateId
+            extra_vars:
+              mtv_migration_request: .mtvMigrationRequest
+        actionDataFilter:
+          toStateData: .launchedJob
+    transition: GetJob
+  - name: GetJob
+    type: operation
+    actions:
+      - functionRef:
+          refName: logInfo
+          arguments:
+            message: "\"Sleeping before checking the aap job \\(.launchedJob)\""
+        sleep:
+          after: PT30S
+      - functionRef:
+          refName: getJob
+          arguments:
+            job_id: .launchedJob.id
+        actionDataFilter:
+          toStateData: .readJob
+    transition: IsJobDone
+  - name: IsJobDone
+    type: switch
+    dataConditions:
+      - condition: (.readJob.status == "successful")
+        transition:
+          nextState: Success
+      - condition: (.readJob.failed == true)
+        transition:
+          nextState: Failure
+    defaultCondition:
+      transition: GetJob
+  - name: Failure
+    type: operation
+    actions:
+      - functionRef:
+          refName: logInfo
+          arguments:
+            message: "AAP VM Migration failed"
+    end: true
+  - name: Success
+    type: operation
+    actions:
+      - functionRef:
+          refName: logInfo
+          arguments:
+            message: "AAP VM Migration succeeded"
+    end: true

@@ -1,0 +1,142 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "jobTemplateId": {
+      "type": "integer",
+      "description": "Job template id"
+    },
+    "mtvMigrationRequest": {
+      "type": "object",
+      "properties": {
+        "mtv_namespace": {
+          "type": "string",
+          "default": "openshift-mtv"
+        },
+        "source_type": {
+          "type": "string",
+          "default": "vsphere"
+        },
+        "source": {
+          "type": "string",
+          "default": "vmware"
+        },
+        "source_namespace": {
+          "type": "string"
+        },
+        "destination": {
+          "type": "string",
+          "default": "host"
+        },
+        "destination_namespace": {
+          "type": "string"
+        },
+        "destination_type": {
+          "type": "string",
+          "default": "openshift"
+        },
+        "vms_per_plan": {
+          "type": "number",
+          "default": 10
+        },
+        "split_plans": {
+          "type": "boolean",
+          "default": false
+        },
+        "plan_overrides": {
+          "type": "object",
+          "default": {}
+        },
+        "vm_overrides": {
+          "type": "object",
+          "default": {}
+        },
+        "target_namespace": {
+          "type": "string",
+          "default": "openshift-mtv"
+        },
+        "dry_run": {
+          "type": "boolean",
+          "default": false
+        },
+        "network_map": {
+          "type": "string"
+        },
+        "network_map_namespace": {
+          "type": "string",
+          "default": "openshift-mtv"
+        },
+        "storage_map": {
+          "type": "string"
+        },
+        "storage_map_namespace": {
+          "type": "string",
+          "default": "openshift-mtv"
+        },
+        "start_migration": {
+          "type": "boolean",
+          "default": false
+        },
+        "verify_plans_ready": {
+          "type": "boolean",
+          "default": false
+        },
+        "verify_migrations_complete": {
+          "type": "boolean",
+          "default": false
+        },
+        "plan_name": {
+          "type": "string"
+        },
+        "vms": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "overrides": {
+                "type": "object",
+                "default": {}
+              },
+              "exclude": {
+                "type": "boolean",
+                "default": false
+              }
+            }
+          }
+        },
+        "folders": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "overrides": {
+                "type": "object",
+                "default": {}
+              },
+              "exclude": {
+                "type": "boolean",
+                "default": false
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "required": [
+    "jobTemplateId",
+    "mtvMigrationRequest"
+  ]
+}
